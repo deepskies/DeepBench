@@ -18,8 +18,7 @@ Simulation library for very simple simulations to benchmark machine learning alg
 3. Be fully controllable parametrically
 
 ## Example
-![GitHub Logo](/images/logo.png)
-Format: ![Alt Text](url)
+![Example Image of pipeline](/images/example_simplephysicalimage.png) Format: ![Alt Text](url)
 
 ## Planned Features
 1. Kinds of data to mimic
