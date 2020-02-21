@@ -1,6 +1,12 @@
 # SimplePhysicalImage
 
+### What is it?
 Simulation library for very simple simulations to benchmark machine learning algorithms.
+
+### Why do we need it? Why is it useful?
+1. There are very universally recognized scientifically meaningful benchmark data sets, or methods with which to generate them.
+2. A very simple data set will have objects, patterns, and signals that are intuitively quanitifiable and will be fast to generate.
+3. A very simple data set will be a great testing ground for new networks and for newcomers to practice with the technology.
 
 ## Requirements
 1. python 3.x
