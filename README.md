@@ -2,6 +2,10 @@
 
 Simulation library for very simple simulations to benchmark machine learning algorithms.
 
+## Requirements
+1. python 3.x
+2. matplotlib
+
 ## General Features
 1. very fast to generate
 2. Mimics in a very basic / toy way what is in astro images
@@ -23,7 +27,6 @@ Simulation library for very simple simulations to benchmark machine learning alg
 3. Top Data Sets for Initial Release:
 	1. Strong lenses
 	2. Light curves
-
 
 ## Original Development Team
 1. Craig Brechmos
