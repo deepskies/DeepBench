@@ -17,6 +17,10 @@ Simulation library for very simple simulations to benchmark machine learning alg
 2. Mimics in a very basic / toy way what is in astro images
 3. Be fully controllable parametrically
 
+## Example
+![GitHub Logo](/images/logo.png)
+Format: ![Alt Text](url)
+
 ## Planned Features
 1. Kinds of data to mimic
 	1. Strong lenses: Arcs, circles
