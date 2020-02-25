@@ -2,23 +2,29 @@
 
 ### What is it?
 Simulation library for very simple simulations to *benchmark* machine learning algorithms.
+![Example Image of pipeline](/repository_support/images/DeepSkies_Logos_DeepBench.png) Format: ![Alt Text](url)
+
 
 ### Why do we need it? Why is it useful?
 1. There are very universally recognized scientifically meaningful benchmark data sets, or methods with which to generate them.
 2. A very simple data set will have objects, patterns, and signals that are intuitively quanitifiable and will be fast to generate.
 3. A very simple data set will be a great testing ground for new networks and for newcomers to practice with the technology.
 
+
 ## Requirements
 1. python 3.x
 2. matplotlib
+
 
 ## General Features
 1. very fast to generate
 2. Mimics in a very basic / toy way what is in astro images
 3. Be fully controllable parametrically
 
+
 ## Example
 ![Example Image of pipeline](/repository_support/images/example_simplephysicalimage.png) Format: ![Alt Text](url)
+
 
 ## Planned Features
 1. Kinds of data to mimic
@@ -37,6 +43,7 @@ Simulation library for very simple simulations to *benchmark* machine learning a
 	1. Strong lenses
 	2. Light curves
 
+
 ## Original Development Team
 1. Craig Brechmos
 2. Renee Hlozek
@@ -44,7 +51,6 @@ Simulation library for very simple simulations to *benchmark* machine learning a
 
 
 ## How to contribute
-
 I'm really glad you're reading this, because we need volunteer developers to help this project come to fruition.
 
 ### Testing
