@@ -18,7 +18,7 @@ Simulation library for very simple simulations to *benchmark* machine learning a
 3. Be fully controllable parametrically
 
 ## Example
-![Example Image of pipeline](/images/example_simplephysicalimage.png) Format: ![Alt Text](url)
+![Example Image of pipeline](/repository_support/images/example_simplephysicalimage.png) Format: ![Alt Text](url)
 
 ## Planned Features
 1. Kinds of data to mimic
