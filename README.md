@@ -1,7 +1,7 @@
-# SimplePhysicalImage
+# DeepBench
 
 ### What is it?
-Simulation library for very simple simulations to benchmark machine learning algorithms.
+Simulation library for very simple simulations to *benchmark* machine learning algorithms.
 
 ### Why do we need it? Why is it useful?
 1. There are very universally recognized scientifically meaningful benchmark data sets, or methods with which to generate them.
