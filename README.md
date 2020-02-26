@@ -13,7 +13,8 @@ Simulation library for very simple simulations to *benchmark* machine learning a
 
 ## Requirements
 1. python 3.x
-2. matplotlib
+
+You can use conda and the 'environment.yml' file to generate a conda environment for this project.
 
 
 ## General Features
