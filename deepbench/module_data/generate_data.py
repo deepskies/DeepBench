@@ -1,6 +1,6 @@
 __all__ = ['Catalog', 'concat_catalogs', 'empty_imshape', 'create_meshgrid',
            'create_Sersic2D','create_Moffat2D','create_Gaussian','create_noise',
-           'combine_sky_imshape','create_lensing_event']
+           'combine_sky_imshape','create_lensing_event','create_psf']
 
 import os
 import numpy as np
@@ -12,9 +12,7 @@ import scipy.ndimage
 from typing import Union
 from matplotlib import pyplot as plt
 from astropy.modeling.models import Sersic2D, Gaussian2D, Moffat2D
-from deepbench.module_draw.generate_draw import *
-
-
+from module_draw.generate_draw import *
 
 class Catalog:
     """
@@ -60,8 +58,8 @@ class Catalog:
             np.empty((n_obj, len(self.column_names))),
             columns=self.column_names)
         self.data.index += id_start
-        self.data.x_center = rand.normal(n_pix_side/2, 5., (n_obj, 1))
-        self.data.y_center = rand.normal(n_pix_side/2, 5., (n_obj, 1))
+        self.data.x_center = (n_pix_side/2) * np.ones((n_obj,1))
+        self.data.y_center = (n_pix_side/2) * np.ones((n_obj,1))
         self.data.radius = radius
         self.data.amplitude = amplitude
         self.data.myclass = self.poss_classes[myclass]
@@ -87,6 +85,7 @@ class Catalog:
                                                     self.pix_dim)
 
     def _generate_image(self, catalog_single, n_pix_side):
+        add_noise = True
         imshape = empty_imshape(n_pix_side)
         noise = rand.uniform(0.9, 1.3)
         noise_profile = 0
@@ -117,8 +116,9 @@ class Catalog:
                                       radius=catalog_single.radius)
 
             noise_profile = create_noise(imshape, noise)
-        imshape = create_psf(imshape)
-        imshape += noise_profile
+        if add_noise:
+            imshape += noise_profile
+            imshape = create_psf(imshape)
         return imshape
 
     def save_images(self, path):
@@ -311,7 +311,7 @@ def create_noise(imshape, noise_level, seed=42):
 
 def create_psf(imshape):
 
-    return scipy.ndimage.gaussian_filter(imshape, sigma=5)
+    return scipy.ndimage.gaussian_filter(imshape, sigma=0.7)
 
 
 def combine_sky_imshape(imshape_list, amplitude_list):
