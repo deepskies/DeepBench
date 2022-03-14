@@ -17,7 +17,7 @@ jobs:
           python get-poetry.py -y
           echo "::set-env name=PATH::$HOME/.poetry/bin:$PATH"
       - name: Configure Poetry
-        uses: poetry config virtualenvs.in-project true
+        run: poetry config virtualenvs.in-project true
       - name: Install dependencies
         run: pip install .[dev]
       - name: Test with PyTest and Code Coverage
