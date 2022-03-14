@@ -7,10 +7,10 @@ jobs:
   release:
     runs-on:  ubuntu-latest
     steps:
-     - name: Checkout Code
-        uses:
+      - name: Checkout Code
+        uses: actions/checkout@v2
       - name: Setup Python
-        uses:
+        uses: actions/setup-python@v2
           python-version: '3.x'
       - name: Install Poetry
         run: |
