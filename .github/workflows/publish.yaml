@@ -6,12 +6,16 @@ on:
 jobs:
   release:
     runs-on:  ubuntu-latest
+    strategy:
+    matrix:
+      python-version: ['3.8','3.9','3.10']
+    name: Python ${{ matrix.python-version }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
       - name: Setup Python
         uses: actions/setup-python@v2
-          python-version: '3.x'
+          python-version: ${{ matrix.python-version }}
       - name: Install Poetry
         run: |
           curl -fsS -o get-poetry.py https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py
