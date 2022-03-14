@@ -14,9 +14,19 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: "3.10"
-    - name: Install Poetry
-      run: pip install poetry
+    - name: Install poetry ${{ matrix.poetry-version }}
+      run: |
+        python -m ensurepip
+        python -m pip install --upgrade pip
+        python -m pip install poetry==${{ matrix.poetry-version }}
+
+    - name: View poetry --help
+      run: poetry --help
+
     - name: Install dependencies
-      run: pip install .[dev]
-    - name: Test with PyTest and Code Coverage
-      run: poetry run pytest --cov
+      shell: bash
+      run: python -m poetry install
+
+    - name: Test with pytest
+      run: |
+        python -m poetry run python -m pytest -v tests
