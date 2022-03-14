@@ -16,8 +16,6 @@ jobs:
         python-version: "3.10"
     - name: Install Poetry
       run: pip install poetry
-    - name: Configure Poetry
-      run: poetry config virtualenvs.in-project true
     - name: Install dependencies
       run: pip install .[dev]
     - name: Test with PyTest and Code Coverage
