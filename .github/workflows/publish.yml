@@ -25,6 +25,6 @@ jobs:
       shell: bash
       run: python -m poetry install
     - name: Build package
-    - run: python3 -m poetry build
+      run: python3 -m poetry build
     - name: Publish Package
-    - run: python3 -m poetry publish --username=__token__ --password=${{ secrets.PYPI_TOKEN }}
+      run: python3 -m poetry publish --username=__token__ --password=${{ secrets.PYPI_TOKEN }}
