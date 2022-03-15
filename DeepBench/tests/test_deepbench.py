@@ -1,4 +1,4 @@
-from deepbench import __version__
+from src.deepbench import __version__
 
 
 def test_version():
