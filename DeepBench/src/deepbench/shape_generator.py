@@ -18,7 +18,7 @@ class ShapeGenerator:
         pass
 
     @staticmethod
-    def create_polygon():
+    def create_regular_polygon():
         pass
 
     @staticmethod
@@ -40,3 +40,6 @@ class ShapeGenerator:
     @staticmethod
     def create_empty_shape():
         pass
+
+    # TODO Define the types of noise allowed
+    # TODO Write method to apply noise
