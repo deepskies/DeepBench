@@ -1,12 +1,11 @@
 from unittest import TestCase
 from src.deepbench.shape_generator import ShapeGenerator
 
+import numpy as np
+import matplotlib.pyplot as plt
+
 
 class TestShapeGenerator(TestCase):
-    def test_patch_conversion(self):
-        # Not sure how to completely separate this one from other test, they all use it
-        pass
-
     def test_patch_conversion_defaults(self):
         pass
 
