@@ -200,25 +200,61 @@ class TestShapeGenerator(TestCase):
         self.assertEqual(rectangle_size, rectangle_sum)
 
     def test_polygon_default(self):
-        pass
+        triangle = ShapeGenerator.create_regular_polygon()
+
+        shape_x, shape_y = triangle.shape
+        expected_x, expected_y = 28, 28
+
+        self.assertEqual(shape_x, expected_x)
+        self.assertEqual(shape_y, expected_y)
+
+        # Center should be white
+        self.assertEqual(0, triangle[14, 14])
+
+        # top point should be black
+        self.assertEqual(1, triangle[14, 21])
+
+        # TODO the trig to check the other points here
 
     def test_polygon_size_center_mismatch(self):
-        pass
+        ShapeGenerator.create_regular_polygon(xy=(14, 14, 14))
+        self.assertRaises(ValueError)
 
     def test_polygon_oob_xy(self):
-        pass
+        triangle = ShapeGenerator.create_rectangle(image_shape=(10, 10), xy=(100, 100))
+        self.assertRaises(UserWarning)
+
+        contents = triangle.sum().sum()
+        self.assertEqual(0, contents)
 
     def test_polygon_positive_oob_angle(self):
-        pass
+        angle = 45
+        triangle_rotated = ShapeGenerator.create_regular_polygon(angle=angle + 360)
+        triangle_non_rotated = ShapeGenerator.create_regular_polygon(angle=angle)
+
+        self.assertEqual(triangle_rotated, triangle_non_rotated)
 
     def test_polygon_negative_oob_angle(self):
-        pass
+        angle = 45
+        triangle_rotated = ShapeGenerator.create_regular_polygon(angle=angle - 360)
+        triangle_non_rotated = ShapeGenerator.create_regular_polygon(angle=angle)
+
+        self.assertEqual(triangle_rotated, triangle_non_rotated)
 
     def test_negative_radius(self):
-        pass
+        triangle = ShapeGenerator.create_regular_polygon(radius=-5)
+        self.assertRaises(UserWarning)
+
+        # Center should be white
+        self.assertEqual(0, triangle[14, 14])
+
+        # top point should be black
+        # The radius will just be abs
+        self.assertEqual(1, triangle[14, 21])
 
     def test_negative_vertices(self):
-        pass
+        ShapeGenerator.create_regular_polygon(vertices=-3)
+        self.assertRaises(ValueError)
 
     def test_circle_default(self):
         pass
