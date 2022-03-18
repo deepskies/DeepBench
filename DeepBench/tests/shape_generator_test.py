@@ -304,6 +304,45 @@ class TestShapeGenerator(TestCase):
     def test_line_max_width(self):
         pass
 
+    def test_ellipse_default(self):
+        circle = ShapeGenerator.create_ellipse()
+
+        shape_x, shape_y = circle.shape
+        expected_x, expected_y = 28, 28
+
+        self.assertEqual(shape_x, expected_x)
+        self.assertEqual(shape_y, expected_y)
+
+        # Center should be white
+        self.assertEqual(0, circle[14, 14])
+
+        # top and bottom points should be black
+        self.assertEqual(1, circle[21, 21])
+        self.assertEqual(1, circle[9, 9])
+
+    def test_ellipse_single_dim_xy(self):
+        ShapeGenerator.create_ellipse(xy=1)
+        self.assertRaises(ValueError)
+
+    def test_ellipse_size_xy_mismatch(self):
+        ShapeGenerator.create_ellipse(xy=(14, 14, 14))
+        self.assertRaises(ValueError)
+
+    def test_ellipse_0_radius(self):
+        pass
+
+    def test_ellipse_non_int_radius(self):
+        pass
+
+    def test_ellipse_oob_center(self):
+        pass
+
+    def test_ellipse_non_int_width(self):
+        pass
+
+    def test_ellipse_oob_width(self):
+        pass
+
     def test_noise_1(self):
         # TODO
         # Define Noise options

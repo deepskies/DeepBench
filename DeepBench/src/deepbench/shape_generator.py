@@ -6,11 +6,11 @@ class ShapeGenerator:
         pass
 
     @staticmethod
-    def resize():
+    def resize(image, resize_dimensions):
         pass
 
     @staticmethod
-    def _convert_path_to_image():
+    def _convert_patch_to_image(image, image_shape=(28, 28)):
         pass
 
     @staticmethod
@@ -19,10 +19,6 @@ class ShapeGenerator:
 
     @staticmethod
     def create_regular_polygon():
-        pass
-
-    @staticmethod
-    def create_circle():
         pass
 
     @staticmethod
