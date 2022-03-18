@@ -71,49 +71,133 @@ class TestShapeGenerator(TestCase):
         self.assertEqual(converted_object_shape_y, expected_y_dim)
 
     def test_resize_default(self):
-        pass
+        simple_image = np.zeros((32, 32))
+        resized_image = ShapeGenerator.resize(image=simple_image)
+        resized_image_x, resized_image_y = resized_image.shape
+        default_new_size_x, default_new_size_y = 28, 28
+
+        self.assertEqual(resized_image_x, default_new_size_x)
+        self.assertEqual(resized_image_y, default_new_size_y)
 
     def test_resize_dim_mismatch(self):
-        pass
+        simple_image = np.zeros((32, 32))
+        resize_dimensions = (1, 1, 1)
+        ShapeGenerator.resize(image=simple_image, resize_dimensions=resize_dimensions)
 
-    def test_resize_zero_size(self):
-        pass
+        self.assertRaises(ValueError)
+
+    def test_resize_zero_size_source(self):
+        simple_image = np.zeros((0, 0))
+        resize_dimensions = (1, 1)
+        ShapeGenerator.resize(image=simple_image, resize_dimensions=resize_dimensions)
+
+        self.assertRaises(ValueError)
+
+    def test_resize_zero_size_target(self):
+        simple_image = np.zeros((1, 1))
+        resize_dimensions = (0, 0)
+        ShapeGenerator.resize(image=simple_image, resize_dimensions=resize_dimensions)
+
+        self.assertRaises(ValueError)
 
     def test_resize_upscale(self):
-        pass
+        simple_image = np.zeros((32, 32))
+        resize = (50, 50)
+        resized_image = ShapeGenerator.resize(
+            image=simple_image, resize_dimensions=resize
+        )
+        resized_image_x, resized_image_y = resized_image.shape
+        new_size_x, new_size_y = resize
+
+        self.assertEqual(resized_image_x, new_size_x)
+        self.assertEqual(resized_image_y, new_size_y)
 
     def test_resize_downscale(self):
-        pass
+        simple_image = np.zeros((80, 80))
+        resize = (50, 50)
+        resized_image = ShapeGenerator.resize(
+            image=simple_image, resize_dimensions=resize
+        )
+        resized_image_x, resized_image_y = resized_image.shape
+        new_size_x, new_size_y = resize
 
-    def test_resize_upscale_pad(self):
-        pass
+        self.assertEqual(resized_image_x, new_size_x)
+        self.assertEqual(resized_image_y, new_size_y)
 
     def test_rectangle_default(self):
-        pass
+        rectangle = ShapeGenerator.create_rectangle()
+
+        x, y = rectangle.shape
+        expected_x, expected_y = (28, 28)
+        self.assertEqual(x, expected_x)
+        self.assertEqual(y, expected_y)
+
+        # Each corner should have a black pixel
+        self.assertEqual(1, rectangle[21, 9])
+        self.assertEqual(1, rectangle[9, 9])
+        self.assertEqual(1, rectangle[9, 21])
+        self.assertEqual(1, rectangle[21, 21])
+
+        # Center needs to be white (default is unfilled)
+        self.assertEqual(0, rectangle[14, 14])
 
     def test_rectangle_single_dim_xy(self):
-        pass
+        ShapeGenerator.create_rectangle(xy=1)
+        self.assertRaises(ValueError)
 
     def test_rectangle_size_center_dim_mismatch(self):
-        pass
+        ShapeGenerator.create_rectangle(xy=1)
+        self.assertRaises(ValueError)
 
     def test_rectangle_xy_out_of_range(self):
-        pass
+        rectangle = ShapeGenerator.create_rectangle(image_shape=(10, 10), xy=(100, 100))
+        self.assertRaises(UserWarning)
 
-    def test_rectangle_width_oob(self):
-        pass
+        rectangle_contents = rectangle.sum().sum()
+        self.assertEqual(0, rectangle_contents)
 
-    def test_rectangle_height_oob(self):
-        pass
+    def test_rectangle_angle_in_bounds_no_change(self):
+        angle = 90
+        rectangle_rotated = ShapeGenerator.create_rectangle(angle=angle)
 
-    def test_rectangle_angle_in_bounds(self):
-        pass
+        rectangle_non_rotated = ShapeGenerator.create_rectangle(angle=0)
+
+        # But it's a square so it looks the same
+        self.assertEqual(rectangle_rotated, rectangle_non_rotated)
+
+    def test_rectangle_angle_in_bounds_change(self):
+        angle = 90
+        rectangle = ShapeGenerator.create_rectangle(width=6, height=10, angle=angle)
+
+        # Each corner should have a black pixel
+        self.assertEqual(1, rectangle[21, 21])
+        self.assertEqual(1, rectangle[9, 11])
+        self.assertEqual(1, rectangle[21, 11])
+        self.assertEqual(1, rectangle[9, 21])
+
+    # TODO Test to check odd n on width and height
 
     def test_rectangle_angle_oob_positive(self):
-        pass
+        angle = 45
+        rectangle_rotated = ShapeGenerator.create_rectangle(angle=angle + 360)
+        rectangle_non_rotated = ShapeGenerator.create_rectangle(angle=angle)
+
+        self.assertEqual(rectangle_rotated, rectangle_non_rotated)
 
     def test_rectangle_angle_oob_negative(self):
-        pass
+        angle = 45
+        rectangle_rotated = ShapeGenerator.create_rectangle(angle=angle - 360)
+        rectangle_non_rotated = ShapeGenerator.create_rectangle(angle=angle)
+
+        self.assertEqual(rectangle_rotated, rectangle_non_rotated)
+
+    def test_rectangle_fill(self):
+        # This should fill the whole screen.
+        rectangle = ShapeGenerator.create_rectangle(width=28, height=28, fill=True)
+        rectangle_sum = rectangle.sum().sum()
+        rectangle_size = rectangle.size
+
+        self.assertEqual(rectangle_size, rectangle_sum)
 
     def test_polygon_default(self):
         pass
