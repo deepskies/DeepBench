@@ -2,23 +2,73 @@ from unittest import TestCase
 from src.deepbench.shape_generator import ShapeGenerator
 
 import numpy as np
-import matplotlib.pyplot as plt
+import matplotlib.patches as patch
 
 
 class TestShapeGenerator(TestCase):
     def test_patch_conversion_defaults(self):
-        pass
+        # simple patch object. Convert to a numpy array
+        simple_patch = patch.Rectangle(xy=(0, 0), width=1, height=1)
+        converted_object = ShapeGenerator._convert_patch_to_image(image=simple_patch)
+        expected_obj_type = np.array
+        self.assertIsInstance(converted_object, expected_obj_type)
+
+    def test_patch_conversion_default_dimensions(self):
+        simple_patch = patch.Rectangle(xy=(0, 0), width=1, height=1)
+        converted_object = ShapeGenerator._convert_patch_to_image(image=simple_patch)
+        converted_object_shape_x, converted_object_shape_y = converted_object.shape
+        expected_x_dim, expected_y_dim = 28, 28
+
+        self.assertEqual(converted_object_shape_x, expected_x_dim)
+        self.assertEqual(converted_object_shape_y, expected_y_dim)
 
     def test_patch_conversion_single_image_dimension(self):
-        # Catches incorrect inputs for all the shapes as well
-        pass
+        simple_patch = patch.Rectangle(xy=(0, 0), width=1, height=1)
+        ShapeGenerator._convert_patch_to_image(image=simple_patch, image_shape=28)
+        self.assertRaises(ValueError)
+
+    def test_patch_conversion_N_dimension(self):
+        simple_patch = patch.Rectangle(xy=(0, 0), width=1, height=1)
+        converted_object = ShapeGenerator._convert_patch_to_image(
+            image=simple_patch, image_shape=(28, 28, 28)
+        )
+        (
+            converted_object_shape_x,
+            converted_object_shape_y,
+            converted_object_shape_z,
+        ) = converted_object.shape
+        expected_x_dim, expected_y_dim, expected_z_dim = 28, 28, 28
+
+        self.assertEqual(converted_object_shape_x, expected_x_dim)
+        self.assertEqual(converted_object_shape_y, expected_y_dim)
+        self.assertEqual(converted_object_shape_z, expected_z_dim)
 
     def test_patch_conversion_size_0(self):
-        # Catches it for all shapes as well
-        pass
+        simple_patch = patch.Rectangle(xy=(0, 0), width=1, height=1)
+        ShapeGenerator._convert_patch_to_image(image=simple_patch, image_shape=(0, 0))
+        self.assertRaises(ValueError)
 
     def test_patch_conversion_non_int_size(self):
-        pass
+        simple_patch = patch.Rectangle(xy=(0, 0), width=1, height=1)
+        converted_object = ShapeGenerator._convert_patch_to_image(
+            image=simple_patch, image_shape=(55.5, 55.5)
+        )
+        converted_object_shape_x, converted_object_shape_y = converted_object.shape
+        expected_x_dim, expected_y_dim = 56, 56
+
+        self.assertEqual(converted_object_shape_x, expected_x_dim)
+        self.assertEqual(converted_object_shape_y, expected_y_dim)
+
+    def test_patch_conversion_non_int_size_round(self):
+        simple_patch = patch.Rectangle(xy=(0, 0), width=1, height=1)
+        converted_object = ShapeGenerator._convert_patch_to_image(
+            image=simple_patch, image_shape=(55.1, 55.6)
+        )
+        converted_object_shape_x, converted_object_shape_y = converted_object.shape
+        expected_x_dim, expected_y_dim = 56, 56
+
+        self.assertEqual(converted_object_shape_x, expected_x_dim)
+        self.assertEqual(converted_object_shape_y, expected_y_dim)
 
     def test_resize_default(self):
         pass
@@ -33,6 +83,9 @@ class TestShapeGenerator(TestCase):
         pass
 
     def test_resize_downscale(self):
+        pass
+
+    def test_resize_upscale_pad(self):
         pass
 
     def test_rectangle_default(self):

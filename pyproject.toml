@@ -13,6 +13,8 @@ documentation = "https://github.com/AeRabelais/DeepBench/tree/main/docs"
 [tool.poetry.dependencies]
 python = "^3.8"
 pytest-cov = "^3.0.0"
+numpy = "^1.22.3"
+matplotlib = "^3.5.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.0"
