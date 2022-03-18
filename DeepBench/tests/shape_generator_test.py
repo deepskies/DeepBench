@@ -257,42 +257,62 @@ class TestShapeGenerator(TestCase):
         self.assertRaises(ValueError)
 
     def test_arc_default(self):
-        pass
+        arc = ShapeGenerator.create_arc()
+
+        x, y = arc.shape
+        expected_x, expected_y = (28, 28)
+        self.assertEqual(x, expected_x)
+        self.assertEqual(y, expected_y)
+
+        # TODO set defaults on theta1 and theta2. And then math
 
     def test_arc_size_center_dim_mismatch(self):
-        pass
+        ShapeGenerator.create_arc(center=(0, 0, 0))
+        self.assertRaises(ValueError)
 
     def test_arc_oob_center(self):
-        pass
+        triangle = ShapeGenerator.create_arc(center=(100, 100))
+        self.assertRaises(UserWarning)
+
+        contents = triangle.sum().sum()
+        self.assertEqual(0, contents)
 
     def test_arc_oob_negative_theta1(self):
-        pass
+        angle = 45
+        arc_rotated = ShapeGenerator.create_arc(theta1=angle - 360)
+        arc_non_rotated = ShapeGenerator.create_arc(theta1=angle)
+
+        self.assertEqual(arc_rotated, arc_non_rotated)
 
     def test_arc_oob_positive_theta1(self):
-        pass
+        angle = 45
+        arc_rotated = ShapeGenerator.create_arc(theta1=angle + 360)
+        arc_non_rotated = ShapeGenerator.create_arc(theta1=angle)
+
+        self.assertEqual(arc_rotated, arc_non_rotated)
 
     def test_arc_oob_negative_theta2(self):
-        pass
+        angle = 45
+        arc_rotated = ShapeGenerator.create_arc(theta2=angle - 360)
+        arc_non_rotated = ShapeGenerator.create_arc(theta2=angle)
+
+        self.assertEqual(arc_rotated, arc_non_rotated)
 
     def test_arc_oob_positive_theta2(self):
-        pass
+        angle = 45
+        arc_rotated = ShapeGenerator.create_arc(theta2=angle + 360)
+        arc_non_rotated = ShapeGenerator.create_arc(theta2=angle)
+
+        self.assertEqual(arc_rotated, arc_non_rotated)
 
     def test_arc_oob_width(self):
-        pass
+        arc = ShapeGenerator.create_arc(width=100)
+
+        size = arc.size
+        n_black_pixels = arc.sum().sum()
+        self.assertEqual(size, n_black_pixels)
 
     def test_line_defaults(self):
-        pass
-
-    def test_line_size_start_dim_mismatch(self):
-        pass
-
-    def test_line_size_end_dim_mismatch(self):
-        pass
-
-    def test_line_start_end_dim_mismatch(self):
-        pass
-
-    def test_line_start_oob(self):
         line = ShapeGenerator.create_line()
 
         x, y = line.shape
@@ -306,6 +326,21 @@ class TestShapeGenerator(TestCase):
 
         self.assertEqual(0, line[0, 28])
         self.assertEqual(0, line[28, 0])
+
+    def test_line_size_start_dim_mismatch(self):
+        ShapeGenerator.create_line(start=(0, 0, 0))
+        self.assertRaises(ValueError)
+
+    def test_line_size_end_dim_mismatch(self):
+        ShapeGenerator.create_line(end=(0, 0, 0))
+        self.assertRaises(ValueError)
+
+    def test_line_start_oob(self):
+        line = ShapeGenerator.create_line(start=(-200, -100))
+
+        # Bottom left top right are black. Opposite are white
+        self.assertEqual(1, line[14, 0])
+        self.assertEqual(1, line[28, 28])
 
     def test_line_end_oob(self):
         line = ShapeGenerator.create_line(end=(200, 100))
