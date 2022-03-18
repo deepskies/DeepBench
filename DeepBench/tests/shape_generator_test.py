@@ -293,16 +293,39 @@ class TestShapeGenerator(TestCase):
         pass
 
     def test_line_start_oob(self):
-        pass
+        line = ShapeGenerator.create_line()
+
+        x, y = line.shape
+        expected_x, expected_y = (28, 28)
+        self.assertEqual(x, expected_x)
+        self.assertEqual(y, expected_y)
+
+        # Bottom left top right are black. Opposite are white
+        self.assertEqual(1, line[0, 0])
+        self.assertEqual(1, line[28, 28])
+
+        self.assertEqual(0, line[0, 28])
+        self.assertEqual(0, line[28, 0])
 
     def test_line_end_oob(self):
-        pass
+        line = ShapeGenerator.create_line(end=(200, 100))
+        self.assertRaises(UserWarning)
+
+        self.assertEqual(1, line[0, 0])
+        self.assertEqual(1, line[14, 28])
 
     def test_line_same_start_end(self):
-        pass
+        line = ShapeGenerator.create_line(end=(0, 0))
+
+        self.assertEqual(1, line[0, 0])
+        self.assertEqual(1, line.sum().sum())
 
     def test_line_max_width(self):
-        pass
+        line = ShapeGenerator.create_line(width=100)
+
+        size = line.size
+        n_black_pixels = line.sum().sum()
+        self.assertEqual(size, n_black_pixels)
 
     def test_ellipse_default(self):
         circle = ShapeGenerator.create_ellipse()
@@ -329,19 +352,47 @@ class TestShapeGenerator(TestCase):
         self.assertRaises(ValueError)
 
     def test_ellipse_0_radius(self):
-        pass
+        circle = ShapeGenerator.create_ellipse(radius=0)
+        # Should just make a dot
+        self.assertEqual(1, circle.sum().sum())
+
+    def test_ellipse_0_width(self):
+        circle = ShapeGenerator.create_ellipse(width=0)
+        # Should just make a circle
+
+        self.assertEqual(1, circle[21, 21])
+        self.assertEqual(1, circle[9, 9])
+        self.assertEqual(1, circle[21, 14])
+        self.assertEqual(1, circle[9, 14])
 
     def test_ellipse_non_int_radius(self):
-        pass
+        # Just round up
+        circle = ShapeGenerator.create_ellipse(radius=4.4)
+
+        # Center should be white
+        self.assertEqual(0, circle[14, 14])
+
+        # top and bottom points should be black
+        self.assertEqual(1, circle[21, 21])
+        self.assertEqual(1, circle[9, 9])
 
     def test_ellipse_oob_center(self):
-        pass
+        circle = ShapeGenerator.create_ellipse(image_shape=(10, 10), xy=(100, 100))
+        self.assertRaises(UserWarning)
+
+        contents = circle.sum().sum()
+        self.assertEqual(0, contents)
 
     def test_ellipse_non_int_width(self):
-        pass
+        # Just round up
+        circle = ShapeGenerator.create_ellipse(width=4.4)
 
-    def test_ellipse_oob_width(self):
-        pass
+        # Center should be white
+        self.assertEqual(0, circle[14, 14])
+
+        # top and bottom points should be black
+        self.assertEqual(1, circle[21, 21])
+        self.assertEqual(1, circle[9, 9])
 
     def test_noise_1(self):
         # TODO
