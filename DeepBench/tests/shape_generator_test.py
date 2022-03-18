@@ -256,30 +256,6 @@ class TestShapeGenerator(TestCase):
         ShapeGenerator.create_regular_polygon(vertices=-3)
         self.assertRaises(ValueError)
 
-    def test_circle_default(self):
-        pass
-
-    def test_circle_single_dim_xy(self):
-        pass
-
-    def test_circle_size_xy_mismatch(self):
-        pass
-
-    def test_circle_0_radius(self):
-        pass
-
-    def test_circle_non_int_radius(self):
-        pass
-
-    def test_circle_oob_center(self):
-        pass
-
-    def test_circle_non_int_width(self):
-        pass
-
-    def test_circle_oob_width(self):
-        pass
-
     def test_arc_default(self):
         pass
 
