@@ -10,8 +10,8 @@ class TestShapeGenerator(TestCase):
         # simple patch object. Convert to a numpy array
         simple_patch = patch.Rectangle(xy=(0, 0), width=1, height=1)
         converted_object = ShapeGenerator._convert_patch_to_image(image=simple_patch)
-        expected_obj_type = np.array
-        self.assertIsInstance(converted_object, expected_obj_type)
+        expected_obj_type = np.array([0, 0])
+        self.assertEqual(type(converted_object), type(expected_obj_type))
 
     def test_patch_conversion_default_dimensions(self):
         simple_patch = patch.Rectangle(xy=(0, 0), width=1, height=1)
@@ -23,9 +23,11 @@ class TestShapeGenerator(TestCase):
         self.assertEqual(converted_object_shape_y, expected_y_dim)
 
     def test_patch_conversion_single_image_dimension(self):
-        simple_patch = patch.Rectangle(xy=(0, 0), width=1, height=1)
-        ShapeGenerator._convert_patch_to_image(image=simple_patch, image_shape=28)
-        self.assertRaises(ValueError)
+        with self.assertRaises(ValueError):
+            simple_patch = patch.Rectangle(xy=(0, 0), width=1, height=1)
+            ShapeGenerator._convert_patch_to_image(
+                image=simple_patch, image_shape=tuple([28])
+            )
 
     def test_patch_conversion_N_dimension(self):
         simple_patch = patch.Rectangle(xy=(0, 0), width=1, height=1)
@@ -44,9 +46,11 @@ class TestShapeGenerator(TestCase):
         self.assertEqual(converted_object_shape_z, expected_z_dim)
 
     def test_patch_conversion_size_0(self):
-        simple_patch = patch.Rectangle(xy=(0, 0), width=1, height=1)
-        ShapeGenerator._convert_patch_to_image(image=simple_patch, image_shape=(0, 0))
-        self.assertRaises(ValueError)
+        with self.assertRaises(ValueError):
+            simple_patch = patch.Rectangle(xy=(0, 0), width=1, height=1)
+            ShapeGenerator._convert_patch_to_image(
+                image=simple_patch, image_shape=(0, 0)
+            )
 
     def test_patch_conversion_non_int_size(self):
         simple_patch = patch.Rectangle(xy=(0, 0), width=1, height=1)
@@ -80,25 +84,28 @@ class TestShapeGenerator(TestCase):
         self.assertEqual(resized_image_y, default_new_size_y)
 
     def test_resize_dim_mismatch(self):
-        simple_image = np.zeros((32, 32))
-        resize_dimensions = (1, 1, 1)
-        ShapeGenerator.resize(image=simple_image, resize_dimensions=resize_dimensions)
-
-        self.assertRaises(ValueError)
+        with self.assertRaises(ValueError):
+            simple_image = np.zeros((32, 32))
+            resize_dimensions = (1, 1, 1)
+            ShapeGenerator.resize(
+                image=simple_image, resize_dimensions=resize_dimensions
+            )
 
     def test_resize_zero_size_source(self):
-        simple_image = np.zeros((0, 0))
-        resize_dimensions = (1, 1)
-        ShapeGenerator.resize(image=simple_image, resize_dimensions=resize_dimensions)
-
-        self.assertRaises(ValueError)
+        with self.assertRaises(ValueError):
+            simple_image = np.zeros((0, 0))
+            resize_dimensions = (1, 1)
+            ShapeGenerator.resize(
+                image=simple_image, resize_dimensions=resize_dimensions
+            )
 
     def test_resize_zero_size_target(self):
-        simple_image = np.zeros((1, 1))
-        resize_dimensions = (0, 0)
-        ShapeGenerator.resize(image=simple_image, resize_dimensions=resize_dimensions)
-
-        self.assertRaises(ValueError)
+        with self.assertRaises(ValueError):
+            simple_image = np.zeros((1, 1))
+            resize_dimensions = (0, 0)
+            ShapeGenerator.resize(
+                image=simple_image, resize_dimensions=resize_dimensions
+            )
 
     def test_resize_upscale(self):
         simple_image = np.zeros((32, 32))
@@ -142,19 +149,21 @@ class TestShapeGenerator(TestCase):
         self.assertEqual(0, rectangle[14, 14])
 
     def test_rectangle_single_dim_xy(self):
-        ShapeGenerator.create_rectangle(xy=1)
-        self.assertRaises(ValueError)
+        with self.assertRaises(ValueError):
+            ShapeGenerator.create_rectangle(xy=1)
 
     def test_rectangle_size_center_dim_mismatch(self):
-        ShapeGenerator.create_rectangle(xy=1)
-        self.assertRaises(ValueError)
+        with self.assertRaises(ValueError):
+            ShapeGenerator.create_rectangle(xy=1)
 
     def test_rectangle_xy_out_of_range(self):
-        rectangle = ShapeGenerator.create_rectangle(image_shape=(10, 10), xy=(100, 100))
-        self.assertRaises(UserWarning)
+        with self.assertRaises(UserWarning):
+            rectangle = ShapeGenerator.create_rectangle(
+                image_shape=(10, 10), xy=(100, 100)
+            )
 
-        rectangle_contents = rectangle.sum().sum()
-        self.assertEqual(0, rectangle_contents)
+            rectangle_contents = rectangle.sum().sum()
+            self.assertEqual(0, rectangle_contents)
 
     def test_rectangle_angle_in_bounds_no_change(self):
         angle = 90
@@ -217,12 +226,14 @@ class TestShapeGenerator(TestCase):
         # TODO the trig to check the other points here
 
     def test_polygon_size_center_mismatch(self):
-        ShapeGenerator.create_regular_polygon(xy=(14, 14, 14))
-        self.assertRaises(ValueError)
+        with self.assertRaises(ValueError):
+            ShapeGenerator.create_regular_polygon(xy=(14, 14, 14))
 
     def test_polygon_oob_xy(self):
-        triangle = ShapeGenerator.create_rectangle(image_shape=(10, 10), xy=(100, 100))
-        self.assertRaises(UserWarning)
+        with self.assertRaises(UserWarning):
+            triangle = ShapeGenerator.create_rectangle(
+                image_shape=(10, 10), xy=(100, 100)
+            )
 
         contents = triangle.sum().sum()
         self.assertEqual(0, contents)
