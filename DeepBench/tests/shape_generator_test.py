@@ -164,13 +164,9 @@ class TestShapeGenerator(TestCase):
         # Center needs to be white (default is unfilled)
         self.assertEqual(0.0, rectangle[14, 14], "Center Filled")
 
-    def test_rectangle_single_dim_xy(self):
-        with self.assertRaises(ValueError):
-            ShapeGenerator.create_rectangle(center=1)
-
     def test_rectangle_size_center_dim_mismatch(self):
         with self.assertRaises(ValueError):
-            ShapeGenerator.create_rectangle(center=1)
+            ShapeGenerator.create_rectangle(center=(1, 1, 1))
 
     def test_rectangle_xy_out_of_range(self):
         with self.assertRaises(UserWarning):
@@ -188,7 +184,7 @@ class TestShapeGenerator(TestCase):
         rectangle_non_rotated = ShapeGenerator.create_rectangle(angle=0)
 
         # But it's a square so it looks the same
-        self.assertEqual(rectangle_rotated, rectangle_non_rotated)
+        self.assertEqual(rectangle_rotated.all(), rectangle_non_rotated.all())
 
     def test_rectangle_angle_in_bounds_change(self):
         angle = 90
@@ -209,22 +205,21 @@ class TestShapeGenerator(TestCase):
         rectangle_rotated = ShapeGenerator.create_rectangle(angle=angle + 360)
         rectangle_non_rotated = ShapeGenerator.create_rectangle(angle=angle)
 
-        self.assertEqual(rectangle_rotated, rectangle_non_rotated)
+        self.assertEqual(rectangle_rotated.all(), rectangle_non_rotated.all())
 
     def test_rectangle_angle_oob_negative(self):
         angle = 45
         rectangle_rotated = ShapeGenerator.create_rectangle(angle=angle - 360)
         rectangle_non_rotated = ShapeGenerator.create_rectangle(angle=angle)
 
-        self.assertEqual(rectangle_rotated, rectangle_non_rotated)
+        self.assertEqual(rectangle_rotated.all(), rectangle_non_rotated.all())
 
     def test_rectangle_fill(self):
         # This should fill the whole screen.
-        rectangle = ShapeGenerator.create_rectangle(width=28, height=28, fill=True)
-        rectangle_sum = rectangle.sum().sum()
-        rectangle_size = rectangle.size
+        rectangle = ShapeGenerator.create_rectangle(width=80, height=80, fill=True)
+        ideal_rectangle = np.ones((28, 28))
 
-        self.assertEqual(rectangle_size, rectangle_sum)
+        self.assertEqual(ideal_rectangle.all(), rectangle.all())
 
     def test_polygon_default(self):
         triangle = ShapeGenerator.create_regular_polygon()
@@ -239,39 +234,39 @@ class TestShapeGenerator(TestCase):
         self.assertEqual(0.0, triangle[14, 14])
 
         # top point should be black
-        self.assertEqual(1.0, triangle[14, 21])
+        self.assertEqual(1.0, triangle[21, 17])
 
         # TODO the trig to check the other points here
 
     def test_polygon_size_center_mismatch(self):
         with self.assertRaises(ValueError):
-            ShapeGenerator.create_regular_polygon(xy=(14, 14, 14))
+            ShapeGenerator.create_regular_polygon(center=(14, 14, 14))
 
     def test_polygon_oob_xy(self):
         with self.assertRaises(UserWarning):
-            triangle = ShapeGenerator.create_rectangle(
-                image_shape=(10, 10), xy=(100, 100)
+            triangle = ShapeGenerator.create_regular_polygon(
+                image_shape=(10, 10), center=(100, 100)
             )
 
-        contents = triangle.sum().sum()
-        self.assertEqual(0.0, contents)
+            contents = triangle.sum().sum()
+            self.assertEqual(0.0, contents)
 
     def test_polygon_positive_oob_angle(self):
         angle = 45
         triangle_rotated = ShapeGenerator.create_regular_polygon(angle=angle + 360)
         triangle_non_rotated = ShapeGenerator.create_regular_polygon(angle=angle)
 
-        self.assertEqual(triangle_rotated, triangle_non_rotated)
+        self.assertEqual(triangle_rotated.all(), triangle_non_rotated.all())
 
     def test_polygon_negative_oob_angle(self):
         angle = 45
         triangle_rotated = ShapeGenerator.create_regular_polygon(angle=angle - 360)
         triangle_non_rotated = ShapeGenerator.create_regular_polygon(angle=angle)
 
-        self.assertEqual(triangle_rotated, triangle_non_rotated)
+        self.assertEqual(triangle_rotated.all(), triangle_non_rotated.all())
 
-    def test_negative_radius(self):
-        triangle = ShapeGenerator.create_regular_polygon(radius=-5)
+    def test_polygon_negative_radius(self):
+        triangle = ShapeGenerator.create_regular_polygon(radius=-10)
         self.assertRaises(UserWarning)
 
         # Center should be white
@@ -279,11 +274,11 @@ class TestShapeGenerator(TestCase):
 
         # top point should be black
         # The radius will just be abs
-        self.assertEqual(1.0, triangle[14, 21])
+        self.assertEqual(1.0, triangle[21, 17])
 
-    def test_negative_vertices(self):
-        ShapeGenerator.create_regular_polygon(vertices=-3)
-        self.assertRaises(ValueError)
+    def test_polygon_negative_vertices(self):
+        with self.assertRaises(ValueError):
+            ShapeGenerator.create_regular_polygon(vertices=-3)
 
     def test_arc_default(self):
         arc = ShapeGenerator.create_arc()
@@ -350,42 +345,40 @@ class TestShapeGenerator(TestCase):
         self.assertEqual(y, expected_y)
 
         # Bottom left top right are black. Opposite are white
-        self.assertEqual(1.0, line[0, 0])
-        self.assertEqual(1.0, line[28, 28])
+        self.assertEqual(1.0, line[1, 2], "line start incorrect")
+        self.assertEqual(1.0, line[26, 27], "line end incorrect")
 
-        self.assertEqual(0.0, line[0, 28])
-        self.assertEqual(0.0, line[28, 0])
+        self.assertEqual(0.0, line[1, 27], "line corner incorrect")
+        self.assertEqual(0.0, line[27, 1], "line corner incorrect")
 
     def test_line_size_start_dim_mismatch(self):
-        ShapeGenerator.create_line(start=(0, 0, 0))
-        self.assertRaises(ValueError)
+        with self.assertRaises(ValueError):
+            ShapeGenerator.create_line(start=(0, 0, 0))
 
     def test_line_size_end_dim_mismatch(self):
-        ShapeGenerator.create_line(end=(0, 0, 0))
-        self.assertRaises(ValueError)
+        with self.assertRaises(ValueError):
+            ShapeGenerator.create_line(end=(0, 0, 0))
 
     def test_line_start_oob(self):
         line = ShapeGenerator.create_line(start=(-200, -100))
 
         # Bottom left top right are black. Opposite are white
-        self.assertEqual(1.0, line[14, 0])
-        self.assertEqual(1.0, line[28, 28])
+        self.assertEqual(1.0, line[1, 14])
+        self.assertEqual(1.0, line[25, 27])
 
     def test_line_end_oob(self):
         line = ShapeGenerator.create_line(end=(200, 100))
         self.assertRaises(UserWarning)
 
-        self.assertEqual(1.0, line[0, 0])
-        self.assertEqual(1.0, line[14, 28])
+        self.assertEqual(1.0, line[1, 1], "line start incorrect")
+        self.assertEqual(1.0, line[27, 14], "line end incorrect")
 
     def test_line_same_start_end(self):
-        line = ShapeGenerator.create_line(end=(0, 0))
-
-        self.assertEqual(1.0, line[0, 0])
-        self.assertEqual(1.0, line.sum().sum())
+        with self.assertRaises(ValueError):
+            ShapeGenerator.create_line(end=(0, 0))
 
     def test_line_max_width(self):
-        line = ShapeGenerator.create_line(width=100)
+        line = ShapeGenerator.create_line(line_width=100)
 
         size = line.size
         n_black_pixels = line.sum().sum()
