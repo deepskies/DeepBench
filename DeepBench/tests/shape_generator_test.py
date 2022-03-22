@@ -131,6 +131,24 @@ class TestShapeGenerator(TestCase):
         self.assertEqual(resized_image_x, new_size_x)
         self.assertEqual(resized_image_y, new_size_y)
 
+    def test_resize_non_int(self):
+        simple_image = np.zeros((80, 80))
+        resize = (49.1, 49.6)
+        resized_image = ShapeGenerator.resize(
+            image=simple_image, resize_dimensions=resize
+        )
+        resized_image_x, resized_image_y = resized_image.shape
+        new_size_x, new_size_y = (50, 50)
+
+        self.assertEqual(resized_image_x, new_size_x)
+        self.assertEqual(resized_image_y, new_size_y)
+
+    def test_resize_negative(self):
+        with self.assertRaises(ValueError):
+            simple_image = np.zeros((80, 80))
+            resize = (-1, -1)
+            ShapeGenerator.resize(image=simple_image, resize_dimensions=resize)
+
     def test_rectangle_default(self):
         rectangle = ShapeGenerator.create_rectangle()
 
@@ -140,26 +158,24 @@ class TestShapeGenerator(TestCase):
         self.assertEqual(y, expected_y)
 
         # Each corner should have a black pixel
-        self.assertEqual(1, rectangle[21, 9])
-        self.assertEqual(1, rectangle[9, 9])
-        self.assertEqual(1, rectangle[9, 21])
-        self.assertEqual(1, rectangle[21, 21])
+        self.assertEqual(1.0, rectangle[9, 10], "corner 1 failed")
+        self.assertEqual(1.0, rectangle[19, 19], "corner 4 failed")
 
         # Center needs to be white (default is unfilled)
-        self.assertEqual(0, rectangle[14, 14])
+        self.assertEqual(0.0, rectangle[14, 14], "Center Filled")
 
     def test_rectangle_single_dim_xy(self):
         with self.assertRaises(ValueError):
-            ShapeGenerator.create_rectangle(xy=1)
+            ShapeGenerator.create_rectangle(center=1)
 
     def test_rectangle_size_center_dim_mismatch(self):
         with self.assertRaises(ValueError):
-            ShapeGenerator.create_rectangle(xy=1)
+            ShapeGenerator.create_rectangle(center=1)
 
     def test_rectangle_xy_out_of_range(self):
         with self.assertRaises(UserWarning):
             rectangle = ShapeGenerator.create_rectangle(
-                image_shape=(10, 10), xy=(100, 100)
+                image_shape=(10, 10), center=(100, 100)
             )
 
             rectangle_contents = rectangle.sum().sum()
@@ -179,12 +195,14 @@ class TestShapeGenerator(TestCase):
         rectangle = ShapeGenerator.create_rectangle(width=6, height=10, angle=angle)
 
         # Each corner should have a black pixel
-        self.assertEqual(1, rectangle[21, 21])
-        self.assertEqual(1, rectangle[9, 11])
-        self.assertEqual(1, rectangle[21, 11])
-        self.assertEqual(1, rectangle[9, 21])
+        self.assertEqual(1.0, rectangle[9, 10], "corner 1 failed")
+        self.assertEqual(1.0, rectangle[19, 19], "corner 4 failed")
+
+        # Center needs to be white (default is unfilled)
+        self.assertEqual(0.0, rectangle[14, 14], "Center Filled")
 
     # TODO Test to check odd n on width and height
+    # TODO Checks on line width validity
 
     def test_rectangle_angle_oob_positive(self):
         angle = 45
@@ -218,10 +236,10 @@ class TestShapeGenerator(TestCase):
         self.assertEqual(shape_y, expected_y)
 
         # Center should be white
-        self.assertEqual(0, triangle[14, 14])
+        self.assertEqual(0.0, triangle[14, 14])
 
         # top point should be black
-        self.assertEqual(1, triangle[14, 21])
+        self.assertEqual(1.0, triangle[14, 21])
 
         # TODO the trig to check the other points here
 
@@ -236,7 +254,7 @@ class TestShapeGenerator(TestCase):
             )
 
         contents = triangle.sum().sum()
-        self.assertEqual(0, contents)
+        self.assertEqual(0.0, contents)
 
     def test_polygon_positive_oob_angle(self):
         angle = 45
@@ -257,11 +275,11 @@ class TestShapeGenerator(TestCase):
         self.assertRaises(UserWarning)
 
         # Center should be white
-        self.assertEqual(0, triangle[14, 14])
+        self.assertEqual(0.0, triangle[14, 14])
 
         # top point should be black
         # The radius will just be abs
-        self.assertEqual(1, triangle[14, 21])
+        self.assertEqual(1.0, triangle[14, 21])
 
     def test_negative_vertices(self):
         ShapeGenerator.create_regular_polygon(vertices=-3)
@@ -286,7 +304,7 @@ class TestShapeGenerator(TestCase):
         self.assertRaises(UserWarning)
 
         contents = triangle.sum().sum()
-        self.assertEqual(0, contents)
+        self.assertEqual(0.0, contents)
 
     def test_arc_oob_negative_theta1(self):
         angle = 45
@@ -332,11 +350,11 @@ class TestShapeGenerator(TestCase):
         self.assertEqual(y, expected_y)
 
         # Bottom left top right are black. Opposite are white
-        self.assertEqual(1, line[0, 0])
-        self.assertEqual(1, line[28, 28])
+        self.assertEqual(1.0, line[0, 0])
+        self.assertEqual(1.0, line[28, 28])
 
-        self.assertEqual(0, line[0, 28])
-        self.assertEqual(0, line[28, 0])
+        self.assertEqual(0.0, line[0, 28])
+        self.assertEqual(0.0, line[28, 0])
 
     def test_line_size_start_dim_mismatch(self):
         ShapeGenerator.create_line(start=(0, 0, 0))
@@ -350,21 +368,21 @@ class TestShapeGenerator(TestCase):
         line = ShapeGenerator.create_line(start=(-200, -100))
 
         # Bottom left top right are black. Opposite are white
-        self.assertEqual(1, line[14, 0])
-        self.assertEqual(1, line[28, 28])
+        self.assertEqual(1.0, line[14, 0])
+        self.assertEqual(1.0, line[28, 28])
 
     def test_line_end_oob(self):
         line = ShapeGenerator.create_line(end=(200, 100))
         self.assertRaises(UserWarning)
 
-        self.assertEqual(1, line[0, 0])
-        self.assertEqual(1, line[14, 28])
+        self.assertEqual(1.0, line[0, 0])
+        self.assertEqual(1.0, line[14, 28])
 
     def test_line_same_start_end(self):
         line = ShapeGenerator.create_line(end=(0, 0))
 
-        self.assertEqual(1, line[0, 0])
-        self.assertEqual(1, line.sum().sum())
+        self.assertEqual(1.0, line[0, 0])
+        self.assertEqual(1.0, line.sum().sum())
 
     def test_line_max_width(self):
         line = ShapeGenerator.create_line(width=100)
@@ -383,11 +401,11 @@ class TestShapeGenerator(TestCase):
         self.assertEqual(shape_y, expected_y)
 
         # Center should be white
-        self.assertEqual(0, circle[14, 14])
+        self.assertEqual(0.0, circle[14, 14])
 
         # top and bottom points should be black
-        self.assertEqual(1, circle[21, 21])
-        self.assertEqual(1, circle[9, 9])
+        self.assertEqual(1.0, circle[21, 21])
+        self.assertEqual(1.0, circle[9, 9])
 
     def test_ellipse_single_dim_xy(self):
         ShapeGenerator.create_ellipse(xy=1)
@@ -400,45 +418,45 @@ class TestShapeGenerator(TestCase):
     def test_ellipse_0_radius(self):
         circle = ShapeGenerator.create_ellipse(radius=0)
         # Should just make a dot
-        self.assertEqual(1, circle.sum().sum())
+        self.assertEqual(1.0, circle.sum().sum())
 
     def test_ellipse_0_width(self):
         circle = ShapeGenerator.create_ellipse(width=0)
         # Should just make a circle
 
-        self.assertEqual(1, circle[21, 21])
-        self.assertEqual(1, circle[9, 9])
-        self.assertEqual(1, circle[21, 14])
-        self.assertEqual(1, circle[9, 14])
+        self.assertEqual(1.0, circle[21, 21])
+        self.assertEqual(1.0, circle[9, 9])
+        self.assertEqual(1.0, circle[21, 14])
+        self.assertEqual(1.0, circle[9, 14])
 
     def test_ellipse_non_int_radius(self):
         # Just round up
         circle = ShapeGenerator.create_ellipse(radius=4.4)
 
         # Center should be white
-        self.assertEqual(0, circle[14, 14])
+        self.assertEqual(0.0, circle[14, 14])
 
         # top and bottom points should be black
-        self.assertEqual(1, circle[21, 21])
-        self.assertEqual(1, circle[9, 9])
+        self.assertEqual(1.0, circle[21, 21])
+        self.assertEqual(1.0, circle[9, 9])
 
     def test_ellipse_oob_center(self):
         circle = ShapeGenerator.create_ellipse(image_shape=(10, 10), xy=(100, 100))
         self.assertRaises(UserWarning)
 
         contents = circle.sum().sum()
-        self.assertEqual(0, contents)
+        self.assertEqual(0.0, contents)
 
     def test_ellipse_non_int_width(self):
         # Just round up
         circle = ShapeGenerator.create_ellipse(width=4.4)
 
         # Center should be white
-        self.assertEqual(0, circle[14, 14])
+        self.assertEqual(0.0, circle[14, 14])
 
         # top and bottom points should be black
-        self.assertEqual(1, circle[21, 21])
-        self.assertEqual(1, circle[9, 9])
+        self.assertEqual(1.0, circle[21, 21])
+        self.assertEqual(1.0, circle[9, 9])
 
     def test_noise_1(self):
         # TODO
