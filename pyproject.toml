@@ -15,6 +15,7 @@ python = "^3.8"
 pytest-cov = "^3.0.0"
 numpy = "^1.22.3"
 matplotlib = "^3.5.1"
+scikit-image = "^0.19.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.0"
