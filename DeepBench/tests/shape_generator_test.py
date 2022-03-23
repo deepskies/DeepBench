@@ -288,49 +288,58 @@ class TestShapeGenerator(TestCase):
         self.assertEqual(x, expected_x)
         self.assertEqual(y, expected_y)
 
-        # TODO set defaults on theta1 and theta2. And then math
+        self.assertEqual(0.0, arc[14, 14], "Empty Center")
+        self.assertEqual(1.0, arc[14, 24], "Bottom Point")
+        self.assertEqual(1.0, arc[23, 15], "Starting Point")
 
     def test_arc_size_center_dim_mismatch(self):
-        ShapeGenerator.create_arc(center=(0, 0, 0))
-        self.assertRaises(ValueError)
+        with self.assertRaises(ValueError):
+            ShapeGenerator.create_arc(center=(0, 0, 0))
 
     def test_arc_oob_center(self):
-        triangle = ShapeGenerator.create_arc(center=(100, 100))
-        self.assertRaises(UserWarning)
+        with self.assertRaises(UserWarning):
+            triangle = ShapeGenerator.create_arc(center=(100, 100))
 
-        contents = triangle.sum().sum()
-        self.assertEqual(0.0, contents)
+            contents = triangle.sum().sum()
+            self.assertEqual(0.0, contents)
 
     def test_arc_oob_negative_theta1(self):
         angle = 45
         arc_rotated = ShapeGenerator.create_arc(theta1=angle - 360)
         arc_non_rotated = ShapeGenerator.create_arc(theta1=angle)
 
-        self.assertEqual(arc_rotated, arc_non_rotated)
+        self.assertEqual(arc_rotated.all(), arc_non_rotated.all())
 
     def test_arc_oob_positive_theta1(self):
         angle = 45
         arc_rotated = ShapeGenerator.create_arc(theta1=angle + 360)
         arc_non_rotated = ShapeGenerator.create_arc(theta1=angle)
 
-        self.assertEqual(arc_rotated, arc_non_rotated)
+        self.assertEqual(arc_rotated.all(), arc_non_rotated.all())
 
     def test_arc_oob_negative_theta2(self):
         angle = 45
         arc_rotated = ShapeGenerator.create_arc(theta2=angle - 360)
         arc_non_rotated = ShapeGenerator.create_arc(theta2=angle)
 
-        self.assertEqual(arc_rotated, arc_non_rotated)
+        self.assertEqual(arc_rotated.all(), arc_non_rotated.all())
 
     def test_arc_oob_positive_theta2(self):
         angle = 45
         arc_rotated = ShapeGenerator.create_arc(theta2=angle + 360)
         arc_non_rotated = ShapeGenerator.create_arc(theta2=angle)
 
-        self.assertEqual(arc_rotated, arc_non_rotated)
+        self.assertEqual(arc_rotated.all(), arc_non_rotated.all())
+
+    def test_arc_theta2_less_than_theta1(self):
+
+        arc_negative_sweep = ShapeGenerator.create_arc(theta1=90, theta2=0)
+        arc_positive_sweep = ShapeGenerator.create_arc(theta1=0, theta2=90)
+
+        self.assertEqual(arc_negative_sweep.all(), arc_positive_sweep.all())
 
     def test_arc_oob_width(self):
-        arc = ShapeGenerator.create_arc(width=100)
+        arc = ShapeGenerator.create_arc(radius=50, line_width=100)
 
         size = arc.size
         n_black_pixels = arc.sum().sum()
@@ -396,63 +405,47 @@ class TestShapeGenerator(TestCase):
         # Center should be white
         self.assertEqual(0.0, circle[14, 14])
 
-        # top and bottom points should be black
-        self.assertEqual(1.0, circle[21, 21])
-        self.assertEqual(1.0, circle[9, 9])
-
-    def test_ellipse_single_dim_xy(self):
-        ShapeGenerator.create_ellipse(xy=1)
-        self.assertRaises(ValueError)
+        # Default is a circle
+        self.assertEqual(1.0, circle[11, 10])
+        self.assertEqual(1.0, circle[14, 19])
+        self.assertEqual(1.0, circle[19, 14])
+        self.assertEqual(1.0, circle[9, 14])
 
     def test_ellipse_size_xy_mismatch(self):
-        ShapeGenerator.create_ellipse(xy=(14, 14, 14))
-        self.assertRaises(ValueError)
+        with self.assertRaises(ValueError):
+            ShapeGenerator.create_ellipse(center=(14, 14, 14))
 
     def test_ellipse_0_radius(self):
-        circle = ShapeGenerator.create_ellipse(radius=0)
-        # Should just make a dot
-        self.assertEqual(1.0, circle.sum().sum())
-
-    def test_ellipse_0_width(self):
-        circle = ShapeGenerator.create_ellipse(width=0)
-        # Should just make a circle
-
-        self.assertEqual(1.0, circle[21, 21])
-        self.assertEqual(1.0, circle[9, 9])
-        self.assertEqual(1.0, circle[21, 14])
-        self.assertEqual(1.0, circle[9, 14])
+        ## Nothing is displayed
+        with self.assertRaises(UserWarning):
+            ShapeGenerator.create_ellipse(width=0, height=0)
 
     def test_ellipse_non_int_radius(self):
         # Just round up
-        circle = ShapeGenerator.create_ellipse(radius=4.4)
+        circle = ShapeGenerator.create_ellipse(height=9.4)
 
         # Center should be white
         self.assertEqual(0.0, circle[14, 14])
 
         # top and bottom points should be black
-        self.assertEqual(1.0, circle[21, 21])
-        self.assertEqual(1.0, circle[9, 9])
+        self.assertEqual(1.0, circle[14, 19])
+        self.assertEqual(1.0, circle[19, 14])
 
     def test_ellipse_oob_center(self):
-        circle = ShapeGenerator.create_ellipse(image_shape=(10, 10), xy=(100, 100))
-        self.assertRaises(UserWarning)
-
-        contents = circle.sum().sum()
-        self.assertEqual(0.0, contents)
+        with self.assertRaises(UserWarning):
+            circle = ShapeGenerator.create_ellipse(
+                image_shape=(10, 10), center=(100, 100)
+            )
+            contents = circle.sum().sum()
+            self.assertEqual(0.0, contents)
 
     def test_ellipse_non_int_width(self):
         # Just round up
-        circle = ShapeGenerator.create_ellipse(width=4.4)
+        circle = ShapeGenerator.create_ellipse(width=9.4)
 
         # Center should be white
         self.assertEqual(0.0, circle[14, 14])
 
         # top and bottom points should be black
-        self.assertEqual(1.0, circle[21, 21])
-        self.assertEqual(1.0, circle[9, 9])
-
-    def test_noise_1(self):
-        # TODO
-        # Define Noise options
-        # Define uhhHHH everything about them
-        pass
+        self.assertEqual(1.0, circle[14, 19])
+        self.assertEqual(1.0, circle[19, 14])

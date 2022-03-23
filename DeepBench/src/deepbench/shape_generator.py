@@ -185,8 +185,34 @@ class ShapeGenerator:
         return polygon_array
 
     @staticmethod
-    def create_arc():
-        pass
+    def create_arc(
+        image_shape=(28, 28),
+        center=(14, 14),
+        radius=10,
+        theta1=0,
+        theta2=90,
+        line_width=1,
+    ):
+        """
+        Create an arc with radius "radius" arcing from theta1 to theta2
+
+        :param image_shape:
+        :param center:
+        :param radius:
+        :param theta1:
+        :param theta2:
+        :param line_width:
+        :return:
+        """
+        arc = patches.Wedge(
+            center=center, r=radius, theta1=theta1, theta2=theta2, width=line_width
+        )
+        arc_array = ShapeGenerator._convert_patch_to_image(arc, image_shape=image_shape)
+
+        if arc_array.ravel().sum() == 0.0:
+            raise UserWarning("Image out of bounds, no shape displayed")
+
+        return arc_array
 
     @staticmethod
     def create_line(image_shape=(28, 28), start=(0, 0), end=(28, 28), line_width=1):
@@ -223,8 +249,44 @@ class ShapeGenerator:
         return line_array
 
     @staticmethod
-    def create_ellipse():
-        pass
+    def create_ellipse(
+        image_shape=(28, 28),
+        center=(14, 14),
+        width=10,
+        height=10,
+        angle=0,
+        line_width=1,
+        fill=False,
+    ):
+
+        if len(image_shape) != len(center):
+            raise ValueError(
+                f"Dimension mismatch, image had dimensions of {len(image_shape)}, "
+                f"but center point had dimensions of {len(center)}"
+            )
+
+        height, width = int(np.ceil(height)), int(np.ceil(width))
+
+        ellipse = patches.Ellipse(xy=center, width=width, height=height, angle=angle)
+
+        cutout = None
+        if not fill:
+            xy_cutout = center
+            width_cutout = width - (2 * line_width) if width != 0 else 0
+            height_cutout = height - (2 * line_width) if height != 0 else 0
+
+            cutout = patches.Ellipse(
+                xy=xy_cutout, width=width_cutout, height=height_cutout, angle=angle
+            )
+
+        ellipse_array = ShapeGenerator._convert_patch_to_image(
+            ellipse, image_shape=image_shape, cutout=cutout
+        )
+
+        if ellipse_array.ravel().sum() == 0.0:
+            raise UserWarning("Image out of bounds, no shape displayed")
+
+        return ellipse_array
 
     @staticmethod
     def create_empty_shape(image_shape=(28, 28)):
@@ -240,6 +302,3 @@ class ShapeGenerator:
             raise ValueError(f"Image size must be greater than 0")
 
         return np.zeros(image_shape)
-
-    # TODO Define the types of noise allowed
-    # TODO Write method to apply noise
