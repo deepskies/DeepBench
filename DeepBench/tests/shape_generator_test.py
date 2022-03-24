@@ -187,8 +187,8 @@ class TestShapeGenerator(TestCase):
         self.assertEqual(rectangle_rotated.all(), rectangle_non_rotated.all())
 
     def test_rectangle_angle_in_bounds_change(self):
-        angle = 90
-        rectangle = ShapeGenerator.create_rectangle(width=6, height=10, angle=angle)
+        angle = 360
+        rectangle = ShapeGenerator.create_rectangle(width=10, height=10, angle=angle)
 
         # Each corner should have a black pixel
         self.assertEqual(1.0, rectangle[9, 10], "corner 1 failed")
@@ -339,10 +339,12 @@ class TestShapeGenerator(TestCase):
         self.assertEqual(arc_negative_sweep.all(), arc_positive_sweep.all())
 
     def test_arc_oob_width(self):
-        arc = ShapeGenerator.create_arc(radius=50, line_width=100)
+        arc = ShapeGenerator.create_arc(
+            image_shape=(14, 14), radius=28, line_width=100, theta1=0, theta2=360
+        )
 
         size = arc.size
-        n_black_pixels = arc.sum().sum()
+        n_black_pixels = int(arc.sum().sum())
         self.assertEqual(size, n_black_pixels)
 
     def test_line_defaults(self):
@@ -385,13 +387,6 @@ class TestShapeGenerator(TestCase):
     def test_line_same_start_end(self):
         with self.assertRaises(ValueError):
             ShapeGenerator.create_line(end=(0, 0))
-
-    def test_line_max_width(self):
-        line = ShapeGenerator.create_line(line_width=100)
-
-        size = line.size
-        n_black_pixels = line.sum().sum()
-        self.assertEqual(size, n_black_pixels)
 
     def test_ellipse_default(self):
         circle = ShapeGenerator.create_ellipse()

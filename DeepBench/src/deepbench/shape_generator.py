@@ -14,7 +14,7 @@ class ShapeGenerator:
         Resize a numpy array
 
         :param image: Numpy array to resize
-        :param resize_dimensions: tuple of integers to resize the passed image to
+        :param resize_dimensions: tuple(*int) Dimensions to reshape the image to
         :return: numpy array of shape resize_dimensions
         """
         resize_dimensions = tuple(map(lambda dim: int(np.ceil(dim)), resize_dimensions))
@@ -36,7 +36,7 @@ class ShapeGenerator:
         Converts a matplot path or patch object into a numpy array of the designated size
 
         :param image: Matplotlib image object to convert
-        :param image_shape: [tuple(int)] Size of the desired image
+        :param image_shape: [tuple(*int)] Size of the desired image
         :return: numpy array of shape image_shape, containing the image
         """
         n_dim = len(image_shape)
@@ -50,8 +50,8 @@ class ShapeGenerator:
         if 0 in image_shape:
             raise ValueError(f"Image size must be greater than 0")
 
-        x = np.arange(1, image_shape[0])
-        y = np.arange(1, image_shape[1])
+        x = np.arange(0, image_shape[0])
+        y = np.arange(0, image_shape[1])
         meshgrid = np.meshgrid(x, y)
 
         coordinates = np.array(list(zip(*(c.flat for c in meshgrid))))
@@ -81,8 +81,8 @@ class ShapeGenerator:
     ):
         """
 
-        :param image_shape: [tuple(int)] Shape of the image output
-        :param center: [tuple(int)] Center of the rectangle (coordinate)
+        :param image_shape: [tuple(*int)] Shape of the image output
+        :param center: [tuple(*int)] Center of the rectangle (coordinate)
         :param width: [int] Horizontal width of the rectangle (in pixels)
         :param height: [int] Vertical height of the rectangle (in pixels)
         :param angle: [float] Angle to rotate, in degrees
@@ -136,8 +136,8 @@ class ShapeGenerator:
         """
         Create a polygon with equal length sides
 
-        :param image_shape: tuple[int] Size of the output image (pixels)
-        :param center: tuple[int] Where to center the object
+        :param image_shape: tuple[*int] Size of the output image (pixels)
+        :param center: tuple[*int] Where to center the object
         :param angle: float Angle of rotation (degrees)
         :param vertices: int number of vertices (3=triangle, 4=square, etc)
         :param radius: int Distance from vertex to vertex
@@ -196,14 +196,15 @@ class ShapeGenerator:
         """
         Create an arc with radius "radius" arcing from theta1 to theta2
 
-        :param image_shape:
-        :param center:
-        :param radius:
-        :param theta1:
-        :param theta2:
-        :param line_width:
-        :return:
+        :param image_shape: Shape of the output array (pixels)
+        :param center: tuple[*int]Center point of the arc
+        :param radius: int distance from the arc to the center point
+        :param theta1: float starting point of the arc (degrees)
+        :param theta2: float ending point of the arc (degrees)
+        :param line_width: int thickness of the arc (pixels)
+        :return: Numpy array of the arc
         """
+
         arc = patches.Wedge(
             center=center, r=radius, theta1=theta1, theta2=theta2, width=line_width
         )
@@ -216,6 +217,15 @@ class ShapeGenerator:
 
     @staticmethod
     def create_line(image_shape=(28, 28), start=(0, 0), end=(28, 28), line_width=1):
+        """
+        Generate a numpy array of a line
+
+        :param image_shape:  tuple(*int) Shape of the output arrray (pixels)
+        :param start: tuple(*int) Starting corner of the line
+        :param end: tuple(*int) Ending corner of the line
+        :param line_width: int Thickness of the line (pixels)
+        :return: Numpy array containing the line
+        """
 
         if len(start) != len(end):
             raise ValueError(
@@ -246,6 +256,10 @@ class ShapeGenerator:
         line_array = ShapeGenerator._convert_patch_to_image(
             line, image_shape=image_shape
         )
+
+        if line_array.ravel().sum() == 0.0:
+            raise UserWarning("Image out of bounds, no shape displayed")
+
         return line_array
 
     @staticmethod
@@ -258,6 +272,17 @@ class ShapeGenerator:
         line_width=1,
         fill=False,
     ):
+        """
+
+        :param image_shape: tuple(*int) Shape of the output arrray (pixels)
+        :param center: tuple(*int) Center point of the ellipse
+        :param width: int Horizontal length of the ellipse (pixels)
+        :param height: int Vertical height of the ellipse (pixels)
+        :param angle: float Rotation angle of the ellipse (degrees)
+        :param line_width: int Width of the ellipse's border (pixels)
+        :param fill: bool Fill the center of the ellipse
+        :return: Numpy array containing the ellipse
+        """
 
         if len(image_shape) != len(center):
             raise ValueError(
