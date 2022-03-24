@@ -4,4 +4,4 @@
  [![PyPI version](https://badge.fury.io/py/deepbench.svg)](https://badge.fury.io/py/deepbench)
 # DeepBench
  A library for the simulation of useful physics benchmark datasets. 
- PyPI: 
+
