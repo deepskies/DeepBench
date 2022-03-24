@@ -6,9 +6,9 @@ license = "Apache 2.0"
 authors = ["Ashia Lewis <pantagruelspendulum@protonmail.com>", "Maggie Voetberg <maggiev@fnal.gov>"]
 maintainers = ["Ashia Lewis <pantagruelspendulum@protonmail.com>", "Maggie Voetberg <maggiev@fnal.gov>"]
 readme = "README.md"
-homepage = "https://github.com/AeRabelais/DeepBench"
-repository = "https://github.com/AeRabelais/DeepBench"
-documentation = "https://github.com/AeRabelais/DeepBench/tree/main/docs"
+homepage = "https://github.com/AeRabelais/DeepBenchmark"
+repository = "https://github.com/AeRabelais/DeepBenchmark"
+documentation = "https://github.com/AeRabelais/DeepBenchmark/tree/main/docs"
 
 [tool.poetry.dependencies]
 python = ">=3.7,<3.11,"
@@ -17,6 +17,8 @@ numpy = "^1.22.3"
 matplotlib = "^3.5.1"
 scikit-image = "^0.19.2"
 scipy = "1.7.2"
+astropy = "^5.0.2"
+
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.0"
