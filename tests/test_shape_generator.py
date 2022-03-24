@@ -1,5 +1,5 @@
 from unittest import TestCase
-from src.deepbench import shape_generator
+from src.deepbench.shape_generator.shape_generator import ShapeGenerator
 
 import numpy as np
 import matplotlib.patches as patch
