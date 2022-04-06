@@ -36,6 +36,12 @@ class SkyImage(Image):
 
                 self.image += object_image
 
+            else:
+                # TODO Test for this check
+                raise UserWarning(
+                    "Parameters 'object_type' and 'object_parameters' needed to generate sky objects"
+                )
+
     def generate_noise(self, noise_type, **kwargs):
         noise_map = {
             "gaussian": self._generate_gaussian_noise,
@@ -51,23 +57,6 @@ class SkyImage(Image):
 
         noise = noise_map[noise_type](**kwargs)
         self.image += noise
-
-    def _generate_astro_object(self, object_type, object_parameters={}):
-        # TODO Replace with real class names and verify naming scheme
-        astro_object_map = {
-            "star": astro_object.StarObject,
-            "strong_lens": astro_object.StrongLensObject,
-            "galaxy": astro_object.GalaxyObject,
-            "spiral_galaxy": astro_object.SpiralGalaxyObject,
-            "n_body": astro_object.NBodyObject,
-        }
-        if object_type not in astro_object_map.keys():
-            raise NotImplementedError(
-                f"Object type {object_type}, is not available. "
-                f"Please select object from {astro_object_map.keys()}"
-            )
-
-        return astro_object_map[object_type](**object_parameters)
 
     def _generate_gaussian_noise(self, sigma=1):
         return ndimage.gaussian_filter(self.image, sigma=sigma)

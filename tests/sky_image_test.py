@@ -1,8 +1,6 @@
 from unittest import TestCase
 from src.deepbench.image.sky_image import SkyImage
 
-from src.deepbench import astro_object
-
 
 class TestSkyImage(TestCase):
     def test_init(self):
@@ -60,53 +58,6 @@ class TestSkyImage(TestCase):
 
         self.assertEqual(image_shape, one_image_sky.image.shape)
         self.assertEqual(0, one_image_sky.image.sum())
-
-    # def test_generate_astro_object_star(self):
-    #     object_params = [{}]
-    #     image_shape = (14, 14)
-    #     one_image_sky = SkyImage(object_params, image_shape)
-    #     obj = one_image_sky._generate_astro_object("star")
-    #
-    #     self.assertIsInstance(obj, astro_object.Star)
-    #
-    # def test_generate_astro_object_strong_lens(self):
-    #     object_params = [{}]
-    #     image_shape = (14, 14)
-    #     one_image_sky = SkyImage(object_params, image_shape)
-    #     obj = one_image_sky._generate_astro_object("strong_lens")
-    #
-    #     self.assertIsInstance(obj, astro_object.StrongLens)
-    #
-    # def test_generate_galaxy_object(self):
-    #     object_params = [{}]
-    #     image_shape = (14, 14)
-    #     one_image_sky = SkyImage(object_params, image_shape)
-    #     obj = one_image_sky._generate_astro_object("galaxy")
-    #
-    #     self.assertIsInstance(obj, astro_object.Galaxy)
-    #
-    # def test_generate_spiral_galaxy_object(self):
-    #     object_params = [{}]
-    #     image_shape = (14, 14)
-    #     one_image_sky = SkyImage(object_params, image_shape)
-    #     obj = one_image_sky._generate_astro_object("spiral_galaxy")
-    #
-    #     self.assertIsInstance(obj, astro_object.SpiralGalaxy)
-    #
-    # def test_generate_n_body_object(self):
-    #     object_params = [{}]
-    #     image_shape = (14, 14)
-    #     one_image_sky = SkyImage(object_params, image_shape)
-    #     obj = one_image_sky._generate_astro_object("n_body")
-    #
-    #     self.assertIsInstance(obj, astro_object.NBody)
-    #
-    # def test_not_included_object(self):
-    #     with self.assertRaises(NotImplementedError):
-    #         object_params = [{}]
-    #         image_shape = (14, 14)
-    #         one_image_sky = SkyImage(object_params, image_shape)
-    #         one_image_sky._generate_astro_object("Fake Object")
 
     def test_generate_gaussian_noise(self):
         object_params = [{}]
