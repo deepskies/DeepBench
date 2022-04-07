@@ -9,7 +9,7 @@ from src.deepbench import astro_object
 class Image(ABC):
     @abstractmethod
     def __init__(self, object_list, image_shape):
-        # TODO Change to something less ambigious than 'objects'
+        # TODO Change to something less ambiguous than 'objects'
         self.objects = object_list
         self.image_shape = image_shape
         self.image = None
@@ -27,6 +27,15 @@ class Image(ABC):
         raise NotImplementedError
 
     def _generate_astro_object(self, object_type, object_parameters):
+        """
+        Utilize the astro_object module and generate instances of the classes
+
+        :param object_type: String identifier of the class.
+            Pick from ["star", "strong_lens”, "galaxy", "spiral_galaxy", "n_body"]
+        :param object_parameters: Dictionary of the parameters required for the selected class
+            Any passed image_shape will be overwritten into Image.image_shape.
+        :return: Instance of the selected class initialized with passed object parameters.
+        """
 
         if object_type == "test_object":
             astro_object_map = {"test_object": ObjectForTesting}
@@ -54,6 +63,15 @@ class Image(ABC):
         return astro_object_map[object_type](**object_parameters)
 
     def save_image(self, save_dir="results", image_name="image_1", image_format="jpg"):
+        """
+        Save the generated image into the specified directory.
+        Will create directory if it does not already exist.
+
+        :param save_dir: Directory to save
+        :param image_name: base name of the saved image
+        :param image_format: file format. Recommended jpg
+        :return: None
+        """
 
         assert self.image is not None, "Image not instantiated"
 

@@ -17,10 +17,17 @@ class SkyImage(Image):
         self.image = np.zeros(self.image_shape)
 
         """
+        Utilize Image._generate_astro_objects to overlay all selected astro objects into one image
+        If object parameters are not included in object list, defaults are used.
+        Updates SkyImage.image.
+
         Current input parameter assumptions (totally up to change):
         For a single image:
-        [{"object_type":"<object_type>",
-        "object_parameters":{<parameters specify to that object>}]
+        [{
+            "object_type":"<object_type>",
+            "object_parameters":{<parameters for that object>}
+        }]
+
         """
 
         for sky_object in self.objects:
@@ -28,17 +35,14 @@ class SkyImage(Image):
             if "object_type" in sky_object.keys():
                 object_type = sky_object["object_type"]
 
-                if "object_parameters" in sky_object.keys():
-                    object_parameters = sky_object["object_parameters"]
-
-                    additional_sky_object = self._generate_astro_object(
-                        object_type, object_parameters
-                    )
-
-                else:
-                    # TODO Tests
-                    # Use the default
-                    additional_sky_object = self._generate_astro_object(object_type, {})
+                object_parameters = (
+                    {}
+                    if "object_parameters" not in sky_object.keys()
+                    else sky_object["object_parameters"]
+                )
+                additional_sky_object = self._generate_astro_object(
+                    object_type, object_parameters
+                )
 
                 object_image = additional_sky_object.create_object()
 
@@ -51,6 +55,13 @@ class SkyImage(Image):
                 )
 
     def generate_noise(self, noise_type, **kwargs):
+        """
+        Add noise to an image
+        Updates SkyImage.image
+
+        :param noise_type: Type of noise add. Select from [“gaussian”,“poisson”]
+        :param kwargs: arg required for the noise. ["gaussian"->sigma, "poisson"->lam]
+        """
         noise_map = {
             "gaussian": self._generate_gaussian_noise,
             "poisson": self._generate_poisson_noise,

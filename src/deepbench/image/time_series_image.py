@@ -16,6 +16,20 @@ class TimeSeriesImage(Image):
         super().__init__(objects, image_shape)
 
     def combine_objects(self):
+
+        """
+        Utilize Image._generate_astro_objects to overlay all selected astro objects into one image
+        If object parameters are not included in object list, defaults are used.
+        Updates SkyImage.image.
+
+        Current input parameter assumptions (totally up to change):
+        [{
+            "object_type":"<object_type>",
+            "object_parameters":{<parameters for that object>}
+        }]
+
+        """
+
         generative_object = self.objects[0]
         if "object_type" in generative_object.keys():
             object_type = generative_object["object_type"]
@@ -36,8 +50,14 @@ class TimeSeriesImage(Image):
             # TODO Test for this check
             warnings.warn("Parameters 'object_type' needed to generate")
 
-    # Noise methods are stolen directly from skyimage. Tests for them as well.
     def generate_noise(self, noise_type, **kwargs):
+        """
+        Add noise to an image
+        Updates SkyImage.image
+
+        :param noise_type: Type of noise add. Select from [“gaussian”,“poisson”]
+        :param kwargs: arg required for the noise. ["gaussian"->sigma, "poisson"->lam]
+        """
         noise_map = {
             "gaussian": self._generate_gaussian_noise,
             "poisson": self._generate_poisson_noise,
