@@ -29,7 +29,7 @@ class TestSkyImage(TestCase):
         self.assertEqual(im_shape, test_sky.image_shape)
 
     def test_combine_one_image(self):
-        object_params = [{"type": "star"}]
+        object_params = [{"object_type": "test_object"}]
         image_shape = (14, 14)
         one_image_sky = SkyImage(object_params, image_shape)
 
@@ -39,7 +39,7 @@ class TestSkyImage(TestCase):
         self.assertEqual(image_shape, one_image_sky.image.shape)
 
     def test_combine_2_images(self):
-        object_params = [{"object_type": "star"}, {"object_type": "star"}]
+        object_params = [{"object_type": "test_object"}, {"object_type": "test_object"}]
         image_shape = (14, 14)
         one_image_sky = SkyImage(object_params, image_shape)
 
@@ -54,13 +54,16 @@ class TestSkyImage(TestCase):
         one_image_sky = SkyImage(object_params, image_shape)
 
         # Not testing that they're the right ones, only that they're made
-        one_image_sky.combine_objects()
+        with self.assertWarns(UserWarning):
+            one_image_sky.combine_objects()
 
         self.assertEqual(image_shape, one_image_sky.image.shape)
         self.assertEqual(0, one_image_sky.image.sum())
 
     def test_generate_gaussian_noise(self):
-        object_params = [{}]
+
+        object_params = [{"object_type": "test_object", "object_parameters": {}}]
+
         image_shape = (14, 14)
         one_image_sky = SkyImage(object_params, image_shape)
         one_image_sky.combine_objects()
@@ -70,7 +73,9 @@ class TestSkyImage(TestCase):
         self.assertEqual(image_shape, one_image_sky.image.shape)
 
     def test_generate_poisson_noise(self):
-        object_params = [{}]
+
+        object_params = [{"object_type": "test_object", "object_parameters": {}}]
+
         image_shape = (14, 14)
         one_image_sky = SkyImage(object_params, image_shape)
         one_image_sky.combine_objects()
@@ -81,7 +86,9 @@ class TestSkyImage(TestCase):
 
     def test_add_fake_noise(self):
         with self.assertRaises(NotImplementedError):
-            object_params = [{}]
+
+            object_params = [{"object_type": "test_object", "object_parameters": {}}]
+
             image_shape = (14, 14)
             one_image_sky = SkyImage(object_params, image_shape)
             one_image_sky.combine_objects()
@@ -89,7 +96,9 @@ class TestSkyImage(TestCase):
 
     def test_image_not_made(self):
         with self.assertRaises(AssertionError):
-            object_params = [{}]
+
+            object_params = [{"object_type": "test_object", "object_parameters": {}}]
+
             image_shape = (14, 14)
             one_image_sky = SkyImage(object_params, image_shape)
 

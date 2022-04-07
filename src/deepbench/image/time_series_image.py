@@ -3,26 +3,28 @@ from src.deepbench import astro_object
 
 import numpy as np
 from scipy import ndimage
+import warnings
 
 
 class TimeSeriesImage(Image):
     def __init__(self, objects, image_shape):
 
         # Requires the object to be a single dictionary
-        assert len(image_shape) >= 2
-        assert len(objects) == 1
+        assert len(image_shape) >= 2, "Image shape must be >=2"
+        assert len(objects) == 1, "Must pass exactly one image"
 
         super().__init__(objects, image_shape)
 
     def combine_objects(self):
         generative_object = self.objects[0]
-        if (
-            "object_type"
-            in generative_object.keys() & "object_parameters"
-            in generative_object.keys()
-        ):
+        if "object_type" in generative_object.keys():
             object_type = generative_object["object_type"]
-            object_parameters = generative_object["object_parameters"]
+
+            object_parameters = (
+                {}
+                if "object_parameters" not in generative_object.keys()
+                else generative_object["object_parameters"]
+            )
 
             additional_object = self._generate_astro_object(
                 object_type, object_parameters
@@ -32,9 +34,7 @@ class TimeSeriesImage(Image):
 
         else:
             # TODO Test for this check
-            raise UserWarning(
-                "Parameters 'object_type' and 'object_parameters' needed to generate"
-            )
+            warnings.warn("Parameters 'object_type' needed to generate")
 
     # Noise methods are stolen directly from skyimage. Tests for them as well.
     def generate_noise(self, noise_type, **kwargs):

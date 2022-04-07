@@ -2,7 +2,7 @@ from src.deepbench.image.image import Image
 from scipy import ndimage
 import numpy as np
 
-from src.deepbench import astro_object
+import warnings
 
 
 class SkyImage(Image):
@@ -23,23 +23,31 @@ class SkyImage(Image):
         "object_parameters":{<parameters specify to that object>}]
         """
 
-        for object in self.objects:
+        for sky_object in self.objects:
 
-            if "object_type" in object.keys() & "object_parameters" in object.keys():
-                object_type = object["object_type"]
-                object_parameters = object["object_parameters"]
+            if "object_type" in sky_object.keys():
+                object_type = sky_object["object_type"]
 
-                additional_object = self._generate_astro_object(
-                    object_type, object_parameters
-                )
-                object_image = additional_object.create_object()
+                if "object_parameters" in sky_object.keys():
+                    object_parameters = sky_object["object_parameters"]
+
+                    additional_sky_object = self._generate_astro_object(
+                        object_type, object_parameters
+                    )
+
+                else:
+                    # TODO Tests
+                    # Use the default
+                    additional_sky_object = self._generate_astro_object(object_type, {})
+
+                object_image = additional_sky_object.create_object()
 
                 self.image += object_image
 
             else:
                 # TODO Test for this check
-                raise UserWarning(
-                    "Parameters 'object_type' and 'object_parameters' needed to generate sky objects"
+                warnings.warn(
+                    "Parameter 'object_type' is needed to generate sky objects"
                 )
 
     def generate_noise(self, noise_type, **kwargs):

@@ -1,6 +1,7 @@
 from abc import abstractmethod, ABC
 from PIL import Image as PILImage
 import os
+import numpy as np
 
 from src.deepbench import astro_object
 
@@ -25,21 +26,30 @@ class Image(ABC):
     def generate_noise(self, noise_type):
         raise NotImplementedError
 
-    def generate_astro_object(self, object_type, object_parameters):
-        # TODO Replace with real class names and verify naming scheme
-        # TODO Check where Sin objects are
-        astro_object_map = {
-            "star": astro_object.StarObject,
-            "strong_lens": astro_object.StrongLensObject,
-            "galaxy": astro_object.GalaxyObject,
-            "spiral_galaxy": astro_object.SpiralGalaxyObject,
-            "n_body": astro_object.NBodyObject,
-        }
+    def _generate_astro_object(self, object_type, object_parameters):
+
+        if object_type == "test_object":
+            astro_object_map = {"test_object": ObjectForTesting}
+
+        else:
+            # TODO Replace with real class names and verify naming scheme
+            # TODO Check where Sin objects are/if they're included
+            # TODO Remove this if/else once astro objects are implimented
+            astro_object_map = {
+                "star": astro_object.star_object.StarObject,
+                "strong_lens": astro_object.strong_lens_object.StrongLensObject,
+                "galaxy": astro_object.galaxy_object.GalaxyObject,
+                "spiral_galaxy": astro_object.spiral_galaxy_object.SpiralGalaxyObject,
+                "n_body": astro_object.n_body_object.NBodyObject,
+            }
+
         if object_type not in astro_object_map.keys():
             raise NotImplementedError(
                 f"Object type {object_type}, is not available. "
                 f"Please select object from {astro_object_map.keys()}"
             )
+
+        object_parameters["image_shape"] = self.image_shape
 
         return astro_object_map[object_type](**object_parameters)
 
@@ -57,3 +67,11 @@ class Image(ABC):
         save_path = f"{save_dir}/{image_name}.{image_format}"
 
         image.save(save_path)
+
+
+class ObjectForTesting:
+    def __init__(self, image_shape):
+        self.image = np.zeros(image_shape)
+
+    def create_object(self):
+        return self.image
