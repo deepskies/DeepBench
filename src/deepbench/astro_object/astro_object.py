@@ -1,6 +1,6 @@
 from abc import ABC, abstractclassmethod
 
-# from scipy import ndimage
+from scipy import ndimage
 import numpy.random as rand
 import numpy as np
 
@@ -34,7 +34,7 @@ class AstroObject(ABC):
         """
         Comment Container.
         """
-        # self.image = ndimage.gaussian_filter(self.image, sigma=self.image_blur)
+        self.image = ndimage.gaussian_filter(self.image, sigma=self.image_blur)
 
     def create_noise(self):
         """
