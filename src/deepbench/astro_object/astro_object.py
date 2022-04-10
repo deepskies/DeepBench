@@ -6,6 +6,10 @@ import numpy as np
 
 
 class AstroObject(ABC):
+    """
+    Description container.
+    """
+
     def __init__(
         self,
         image_dimensions: Union[int, float, List[int], List[float]],
@@ -46,7 +50,7 @@ class AstroObject(ABC):
         raise NotImplementedError()
 
     @staticmethod
-    def create_psf(self, gaussian_blur=0.7) -> np.ndarray:
+    def create_psf(self, image_shape, gaussian_blur=0.7) -> np.ndarray:
         """
         Creates the Point Spread Function to append to the object.
 
@@ -60,10 +64,11 @@ class AstroObject(ABC):
             >>> example_obj.create_psf(gaussian_blur=1.2)
             >>> example_obj.create_psf()
         """
-        return ndimage.gaussian_filter(self._image.shape, sigma=gaussian_blur)
+        return ndimage.gaussian_filter(image_shape, sigma=gaussian_blur)
 
+    # UPDATE THIS METHODS DOCSTRINGS.
     @staticmethod
-    def create_noise(self, seed=42) -> np.ndarray:
+    def create_noise(self, seed=42, galaxy=False) -> np.ndarray:
         """
         Creates the Poisson noise added to the object.
 
@@ -77,9 +82,12 @@ class AstroObject(ABC):
             >>> example_obj.create_noise()
             >>> example_obj.create_noise(seed=5)
         """
-
-        rs = rand.RandomState(seed)
-        return rs.poisson(self._noise_level, size=self._image.shape)
+        if galaxy:
+            rs = rand.RandomState(seed)
+            return rs.poisson(self._noise_level * 10.0, size=self._image.shape)
+        else:
+            rs = rand.RandomState(seed)
+            return rs.poisson(self._noise_level, size=self._image.shape)
 
     @staticmethod
     def create_meshgrid(self) -> np.ndarray:
@@ -98,3 +106,11 @@ class AstroObject(ABC):
         )
 
         return meshgrid
+
+    @abstractmethod
+    def displayObject(self):
+
+        # Yet to implement. Will essentially just display a matplotlib image of the Object.
+
+        print("Code Container.")
+        raise NotImplementedError()

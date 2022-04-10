@@ -8,6 +8,10 @@ import numpy as np
 
 
 class StarObject(AstroObject):
+    """
+    Description Container.
+    """
+
     def __init__(
         self,
         img_dim: Union[int, float, List[int], List[float]],
@@ -99,6 +103,12 @@ class StarObject(AstroObject):
 
         # Append the noise profiles to the object.
         image_shape += noise_profile
-        image_shape = self.create_psf()
+        image_shape = self.create_psf(image_shape)
 
         return image_shape
+
+    def displayImage(self):
+
+        # To be implemented. Check parent for details.
+
+        print("Code Container.")
