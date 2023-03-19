@@ -18,7 +18,7 @@ authors:
   - name: Brian Nord
     orcid: 0000-0001-6706-8972
     equal-contrib: false
-    affiliation: "1, 2, 4" # (Multiple affiliations must be quoted)
+    affiliation: "1, 2, 3, 4" # (Multiple affiliations must be quoted)
 affiliations:
  - name:  Fermi National Accelerator Laboratory, P.O. Box 500, Batavia, IL 60510
    index: 1
