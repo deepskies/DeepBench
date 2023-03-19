@@ -26,20 +26,17 @@ affiliations:
    index: 3
 date: 13 August 2017
 bibliography: paper.bib
+
 ---
 
 
-
 # Summary
-We introduce \texttt{DeepBench}, a python library  that generates simple simulated image data from first principles, such as basic geometric shapes and astronomical objects. 
-These data are highly valuable for developing (calibration, testing, and benchmarking) statistical and machine learning models because they make it possible to connect the final data product to physically interpretable inputs. 
-This software includes tools to curate and store the datasets to maximize reproducibility.
-% We also present a trained ResNet50 model to illustrate the expected use of the software as a benchmarking tool for different architectures’ suitability to scientifically motivated problems. 
+We introduce \texttt{DeepBench}, a python library  that generates simple simulated image data from first principles, such as basic geometric shapes and astronomical objects. These data are highly valuable for developing (calibration, testing, and benchmarking) statistical and machine learning models because they make it possible to connect the final data product to physically interpretable inputs. This software includes tools to curate and store the datasets to maximize reproducibility.
 
 
 # Statement of Need
 
-One of the main motivations of this project was the production of a tool to softly introduce new practitioners of machine learning to simulation datasets, producing datasets that would be easy to integrate with out-of-the-box machine learning frameworks. 
+The astronomy community at large is experiencing a lack of benchmark datasets tailored toward the types of computer vision problems specific to astronomy. One of the main motivations of this project was the production of a tool to softly introduce new practitioners of machine learning to simulation datasets, producing datasets that would be easy to integrate with out-of-the-box machine learning frameworks. 
 
 \begin{enumerate}
     \item need replicability, reproducibility
@@ -49,11 +46,9 @@ One of the main motivations of this project was the production of a tool to soft
     \item needs simple data that can be used for benchmarking and for education
 \end{enumerate}
 
- \texttt{DeepBench} was designed and written with three key goals in mind: 1) ease of use, 2) diagnostics for model design, and 3) model benchmarking and testing. 
-
-The astronomy community at large is experiencing a lack of benchmark datasets tailored toward the types of computer vision problems specific to astronomy. 
 
 ## Related Work
+
 Benchmarking and dataset generation is heavily used in the field of Machine Learning. 
 MNIST, CIFAR, Imagenet
 lenstronomy
@@ -67,43 +62,21 @@ Works that most closely related the work described here include \texttt{SHAPES} 
 * Reproducibility of Data : Including methods to catalog all produced images and provide a description of all generated objects included in the images. 
 metadata tracking to help with benchmarking
 * Diagnosis: The software is also intended for use as a diagnostic tool, for help in identifying weaknesses during model developmenta. 
-When working with a difficult problem, being able to incrementally scale back the difficulty (remove noise, decrease the number of classes, increase the class balance, etc.) can be a useful tool in finding the point of difficulty when training a new architecture. 
-The design of \texttt{DeepBench} is such that configuration files can be generated with varying levels of complexity, making it possible to “roll back” the scale of a problem, such that possible areas of difficulty can be removed and added back in incrementally, allowing for problems to be solved one by one. 
+When working with a difficult problem, being able to incrementally scale back the difficulty (remove noise, decrease the number of classes, increase the class balance, etc.) can be a useful tool in finding the point of difficulty when training a new architecture.  The design of \texttt{DeepBench} is such that configuration files can be generated with varying levels of complexity, making it possible to “roll back” the scale of a problem, such that possible areas of difficulty can be removed and added back in incrementally, allowing for problems to be solved one by one. 
 
 
 # Modules
 
 An overview of the  \texttt{DeepBench} process. 
 Dataset parameters, such as the type of objects in each image, and the associated qualities of each object, is passed to the catalog module by the user. 
-These are collected and used by the Image module to call each individual object with their specified parameters, combined into one composite image, and noise, specified in the image parameters, is then applied before the image is saved. 
-The parameters of each image is stored and saved as well.
+These are collected and used by the Image module to call each individual object with their specified parameters, combined into one composite image, and noise, specified in the image parameters, is then applied before the image is saved. The parameters of each image is stored and saved as well.
 
 
-* Geometric objects: are generated by utilizing the library \texttt{matplotlib} \cite{Hunter:2007}, and are able to either be left as solid two-dimensional shapes or of an outline with a varying thickness. 
-    Shapes include: Rectangles, n sided regular polygons, arcs. straight lines, ellipses, circles. 
-    Shapes are limited to two-color rendering, such that all shapes are composed of 0 and 1 values within an array. 
-    They can be combined in multiple ways using the "Image" module to produce composite images with both different geometric objects and astronomical objects. 
-* Physics objects: The \emph{N-Body} object is currently the sole one-dimensional model available in the alpha release. 
-    The N-Body model is output as a set of \texttt{NumPy} \cite{harris2020array} arrays containing coordinates representing the path of the points produced, along with the kinetic and potential energy produced over the specified duration.    
-* Astronomical Objects: Astronomical objects offer simplified renderings of common profiles found in astronomical data sets. 
-    Two-dimensional models are representations of astronomical objects commonly found in data sets used for galaxy morphology classification. 
-    All objects also come with the option to append various levels of Gaussian and Poisson noise, and are output as \texttt{NumPy} arrays.  
-    The \emph{Star} object is created using the Moffat distribution provided by the \texttt{AstroPy} \cite{astropy:2018} modeling library. 
-    The \emph{(Elliptical) Galaxy} object is created using the Sérsic profile provided by the \texttt{AstroPy} modelling library. 
-    The profile of the \emph{Spiral Galaxy} object is created by simulating the function used to produce a logarithmic spiral \cite{Ringermacher_2009}, along with reproducing the following relationship:
-    \begin{equation}
-        r(\phi) = A / log[B*tan(\phi/2N)]
-    \end{equation}
-* Image The image module allows users to concatenate various shape or astronomical objects within a \texttt{matplotlib} meshgrid object in order to simulate the profiles and shape distributions commonly seen in images used in more complex astronomical data sets. 
-    Three distinct image types are available - sky images, lensing images, and geometric images. 
-    Sky images are composed of any combination of user-specified galaxy and star objects, while lensing images are randomized combinations of arc and star objects. 
-    Lastly, geometric images are canvased assortments of any of the individual geometric shape objects available. 
-* Catalogue
-    The Catalogue module allows users to specify the size, contents, and output directory of a data set composed of \texttt{DeepBench}'s available image types or individual object images. 
-    Catalogues can either be entirely randomized, with parameters of the included image being randomly chosen, or have parameters specified by the user at various levels of granularity. 
-    The only required argument in the creation of Catalogue objects are the output directory and image type. 
-    Within the Catalogue module also exists a Collection class, which concatenates various catalogues of varying image types into one data set. 
-    Catalogues and collections can be output as a directory of.jpeg files, .npy, or .h5.
+* Geometric objects: are generated by utilizing the library \texttt{matplotlib} \cite{Hunter:2007}, and are able to either be left as solid two-dimensional shapes or of an outline with a varying thickness. Shapes include: Rectangles, n sided regular polygons, arcs. straight lines, ellipses, circles. Shapes are limited to two-color rendering, such that all shapes are composed of 0 and 1 values within an array. They can be combined in multiple ways using the "Image" module to produce composite images with both different geometric objects and astronomical objects. 
+* Physics objects: The \emph{N-Body} object is currently the sole one-dimensional model available in the alpha release. The N-Body model is output as a set of \texttt{NumPy} \cite{harris2020array} arrays containing coordinates representing the path of the points produced, along with the kinetic and potential energy produced over the specified duration.    
+* Astronomical Objects: Astronomical objects offer simplified renderings of common profiles found in astronomical data sets. Two-dimensional models are representations of astronomical objects commonly found in data sets used for galaxy morphology classification. All objects also come with the option to append various levels of Gaussian and Poisson noise, and are output as \texttt{NumPy} arrays.  The \emph{Star} object is created using the Moffat distribution provided by the \texttt{AstroPy} \cite{astropy:2018} modeling library. The \emph{(Elliptical) Galaxy} object is created using the Sérsic profile provided by the \texttt{AstroPy} modelling library. The profile of the \emph{Spiral Galaxy} object is created by simulating the function used to produce a logarithmic spiral \cite{Ringermacher_2009}
+* Image The image module allows users to concatenate various shape or astronomical objects within a \texttt{matplotlib} meshgrid object in order to simulate the profiles and shape distributions commonly seen in images used in more complex astronomical data sets. Three distinct image types are available - sky images, lensing images, and geometric images. Sky images are composed of any combination of user-specified galaxy and star objects, while lensing images are randomized combinations of arc and star objects. Lastly, geometric images are canvased assortments of any of the individual geometric shape objects available. 
+* Catalogue: The Catalogue module allows users to specify the size, contents, and output directory of a data set composed of \texttt{DeepBench}'s available image types or individual object images. Catalogues can either be entirely randomized, with parameters of the included image being randomly chosen, or have parameters specified by the user at various levels of granularity. The only required argument in the creation of Catalogue objects are the output directory and image type. Within the Catalogue module also exists a Collection class, which concatenates various catalogues of varying image types into one data set. Catalogues and collections can be output as a directory of.jpeg files, .npy, or .h5.
 
 
 Figure with examples
@@ -114,9 +87,9 @@ Figure with examples
 
 We acknowledge contributions from Alex Ciprijanovic, Renee Hlozek, Brechmos.
 
-Fermilab
+Work supported by the Fermi National Accelerator Laboratory, managed and operated by Fermi Research Alliance, LLC under Contract No. DE-AC02-07CH11359 with the U.S. Department of Energy. The U.S. Government retains and the publisher, by accepting the article for publication, acknowledges that the U.S. Government retains a non-exclusive, paid-up, irrevocable, world-wide license to publish or reproduce the published form of this manuscript, or allow others to do so, for U.S. Government purposes.
 
-DeepSkies Lab
+We acknowledge the Deep Skies Lab as a community of multi-domain experts and collaborators who’ve facilitated an environment of open discussion, idea-generation, and collaboration. This community was important for the development of this project.
 
 
 # References
