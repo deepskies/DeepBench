@@ -81,7 +81,7 @@ These are collected and used by the Image module to call each individual object 
 * Catalogue: The Catalogue module allows users to specify the size, contents, and output directory of a data set composed of **DeepBench**'s available image types or individual object images. Catalogues can either be entirely randomized, with parameters of the included image being randomly chosen, or have parameters specified by the user at various levels of granularity. The only required argument in the creation of Catalogue objects are the output directory and image type. Within the Catalogue module also exists a Collection class, which concatenates various catalogues of varying image types into one data set. Catalogues and collections can be output as a directory of.jpeg files, .npy, or .h5.
 
 
-![Algorithm Overview \label{fig:overview}](overview_diagram.png){width=50%}
+![Algorithm Overview \label{fig:overview}](figures/overview_diagram.png){ width=20% }
 
 overview figure \autoref{fig:overview}.
 
