@@ -73,3 +73,10 @@ Start reading our code and you'll get the hang of it. We optimize for readabilit
   * We indent using tabs
   * We ALWAYS put spaces after list items and method parameters (`[1, 2, 3]`, not `[1,2,3]`), around operators (`x += 1`, not `x+=1`), and around hash arrows.
   * This is open source software. Consider the people who will read your code, and make it look nice for them. It's sort of like driving a car: Perhaps you love doing donuts when you're alone, but with passengers the goal is to make the ride as smooth as possible.
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/AeRabelais/DeepBenchmark/build-bench)
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/AeRabelais/DeepBench/test-bench?label=test)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+ [![PyPI version](https://badge.fury.io/py/deepbench.svg)](https://badge.fury.io/py/deepbench)
+# DeepBench
+ A library for the simulation of useful physics benchmark datasets. 
+

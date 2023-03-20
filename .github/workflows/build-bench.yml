@@ -1,0 +1,26 @@
+name: build-bench
+on:
+  push:
+    branches: [master]
+
+jobs:
+  build:
+    runs-on:  ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v2
+      with:
+        python-version: "3.10"
+    - name: Install poetry ${{ matrix.poetry-version }}
+      env:
+        ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+      run: |
+        python -m ensurepip
+        python -m pip install --upgrade pip
+        python -m pip install poetry==1.1.13
+    - name: Install dependencies
+      shell: bash
+      run: python -m poetry install
+    - name: Build package
+      run: python3 -m poetry build
