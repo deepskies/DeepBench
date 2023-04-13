@@ -1,6 +1,19 @@
 # What functionality do we need the simulator to have?
-# Need to be able to draw from it at one point in time
-# Need to animate
+
+# We need to be able to draw from it at one or multiple moments in time
+
+# Maggie: time needs to be adjustable, as an input to simulate_x
+
+# Becky: I'm confused about how this works with the hierarchy of the inference
+# do we need to modify this class so that it can accept arrays and matrices
+# of eta values? This needs to happen for the hierarchy, where we have multiple
+# moments in time, multiple pendulii, and multiple different planets that 
+# we're running the experiment on.
+# OR do we just need to make this external, where the science (inference) module
+# will call the simulator multiple times within an iterable?
+
+# I would like it to have a nice animation / plotting utility, but lmk if this 
+# should be implemented separately and I'll take it out
 
 import numpy as np
 import math
@@ -9,7 +22,6 @@ from matplotlib.animation import FuncAnimation
 
 
 class pendulum:
-    
     def __init__(self, theta, t, noise, m = None, b = None):
 
         self.theta = theta
@@ -84,7 +96,7 @@ class pendulum:
         animation = FuncAnimation(fig, update, frames=range(1, len(t)), interval=100)
         plt.show()
         
-    
+    # This is the simulator, currently, just simulating the x position
     def simulate_x(self):
         theta = self.theta
         t = self.t
