@@ -24,7 +24,7 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 
 
-class pendulum(AstroObject):
+class Pendulum(AstroObject):
     def __init__(self, eta, t, noise, m = None, b = None):
         self.eta = eta
         self.noise = noise
