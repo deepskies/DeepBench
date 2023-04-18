@@ -24,10 +24,9 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 
 
-class pendulum:
+class pendulum(AstroObject):
     def __init__(self, eta, t, noise, m = None, b = None):
         self.eta = eta
-        self.t = t
         self.noise = noise
         # Optional arguments: mass, friction
         self.m = m if m is not None else 10.
@@ -39,7 +38,7 @@ class pendulum:
             self.noise = np.zeros(np.shape(eta))
     
     # I want to add a function that will give you a cute animated pendulum:
-    # SUGGESTIONS FOR MAKING IT CUTER APPRECATED :)
+    # SUGGESTIONS FOR MAKING IT CUTER APPRECIATED :)
     def animate(self):
         # First you need to instatiate the simulator for x, y, dx/dt, dy/dt (simulate_q_p.())
         t = self.t
@@ -81,10 +80,10 @@ class pendulum:
         
     # This is the simulator, currently, just simulating the x position of the pendulum
     # for multiple moments in time
-    def simulate_x(self):
+    def simulate_pendulum_position(self, time):
         eta = self.eta
-        t = self.t
         noise = self.noise
+        t = time
         ts = np.repeat(t[:, np.newaxis], eta.shape[0], axis=1)
         if eta.ndim == 1:
             eta = eta[np.newaxis, :]
@@ -104,7 +103,6 @@ class pendulum:
             eta_os =  np.random.normal(loc=eta[n][2], scale=noise[2], size=np.shape(t))
             eta_t = np.array([eta_os[i] * math.cos(np.sqrt(gs[i] / Ls[i]) * t[i]) for i, _ in enumerate(t)])
             x[n,:] = np.array([Ls[i] * math.sin(eta_t[i]) for i, _ in enumerate(t)])
-            
         return x
 
     # This needs to be fixed so that x, y, dx/dt, and dy/dt are all packaged together, also so mass is incorporated
