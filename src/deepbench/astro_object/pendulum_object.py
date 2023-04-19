@@ -26,6 +26,11 @@ from matplotlib.animation import FuncAnimation
 
 class Pendulum(AstroObject):
     def __init__(self, eta, t, noise, m = None, b = None):
+        super().__init__(
+            image_dimension=None,
+            amplitude=None,
+            noise_level=None,
+        )
         self.eta = eta
         self.noise = noise
         # Optional arguments: mass, friction
