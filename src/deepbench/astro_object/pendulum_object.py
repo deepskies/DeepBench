@@ -68,7 +68,10 @@ class Pendulum(AstroObject):
             amplitude=None,
             noise_level=None,
         )
-        self.eta = eta
+        self.L = L
+        self.theta_0 = theta_0
+        self.J = J
+        self.phi = phi
         self.noise = noise
         # Optional arguments: mass, friction
         self.m = m if m is not None else 10.
@@ -76,48 +79,7 @@ class Pendulum(AstroObject):
         if not self.noise:
             # If it is not defined, then no noise
             self.noise = np.zeros(np.shape(eta)) 
-    # I want to add a function that will give you a cute animated pendulum:
-    # SUGGESTIONS FOR MAKING IT CUTER APPRECIATED :)
-
-    def animate(self):
-        # First you need to instatiate the simulator
-        # for x, y, dx/dt, dy/dt (simulate_q_p.())
-        t = self.t
-        x, y, mom_x, mom_y = self.simulate_q_p()
-        #t, x, y, mom_x, mom_y = create_t_p_q_noise(eta_o, noise = [0.0,0.0,0.0])
-        plt.clf()
-        # Create the figure and axis
-        #fig, axs = plt.subplots(nrows = 1, ncols = 2)
-        fig = plt.figure(figsize = (10,3))
-        ax1 = fig.add_subplot(121)
-        ax2 = fig.add_subplot(122) 
-        # Define the function to update the plot at each time step
-        def update(i):
-            # Calculate the position and velocity at the current time step
-            # Clear the previous plot
-            #ax1.clear()
-            # Plot the position of the pendulum
-            xnow = x[i]
-            ynow = y[i]
-            print('xnow', xnow)
-            dxnow = mom_x[i]
-            dynow = mom_y[i] 
-            ax1.plot([xnow,0],[ynow,1.4])
-            ax1.scatter(xnow, ynow)#, markersize=10)
-            ax1.set_title('x = '+str(round(xnow, 1))+', y = '+str(round(ynow, 1)))
-            # Set the axis limits
-            ax1.set_xlim(-5, 5)
-            ax1.set_ylim(-7, 3)#0, 1.5)
-            #ax2.plot([mom_x],[mom_y])
-            ax2.set_title('mom_x = '+str(round(dxnow, 1))+', mom_y = '+str(round(dynow, 1)))
-            ax2.scatter(dxnow, dynow)#, markersize=10)
-            # Set the axis limits
-            ax2.set_xlim(-10, 10)
-            ax2.set_ylim(-3, 3)#0, 1.5)
-            #ax.annotate('L = '+str())
-            #plt.scatter(x, y, c = t,  alpha = 0.5)
-        animation = FuncAnimation(fig, update, frames=range(1, len(t)), interval=100)
-        plt.show()
+    
         
     # This is the simulator, currently, just simulating the x position of the pendulum
     # for multiple moments in time
@@ -148,7 +110,7 @@ class Pendulum(AstroObject):
 
     # This needs to be fixed so that x, y, dx/dt, and dy/dt are all packaged together, also so mass is incorporated
     # into the momentum:
-    def simulate_q_p(self):
+    def simulate_q_p(self, time):
         eta = self.eta
         t = self.t
         noise = self.noise
@@ -186,12 +148,49 @@ class Pendulum(AstroObject):
             # Okay and what about taking the time derivative?
             dx_dt[n,:] = np.array([-Ls[i] * eta_os[i] * np.sqrt(gs[i] / Ls[i]) * math.cos(eta_t[i]) * math.sin( np.sqrt(gs[i] / Ls[i]) * t[i]) for i, _ in enumerate(t)])
             dy_dt[n,:] = np.array([-Ls[i] * eta_os[i] * np.sqrt(gs[i] / Ls[i]) * math.sin(eta_t[i]) * math.sin( np.sqrt(gs[i] / Ls[i]) * t[i]) for i, _ in enumerate(t)])
-
-
-
-
-
         return x, y, dx_dt, dy_dt
+
+    # I want to add a function that will give you a cute animated pendulum:
+    # SUGGESTIONS FOR MAKING IT CUTER APPRECIATED :)
+
+    def animate(self, time):
+        # First you need to instatiate the simulator
+        # for x, y, dx/dt, dy/dt (simulate_q_p.())
+        x, y, mom_x, mom_y = self.simulate_q_p(time)
+        #t, x, y, mom_x, mom_y = create_t_p_q_noise(eta_o, noise = [0.0,0.0,0.0])
+        plt.clf()
+        # Create the figure and axis
+        #fig, axs = plt.subplots(nrows = 1, ncols = 2)
+        fig = plt.figure(figsize = (10,3))
+        ax1 = fig.add_subplot(121)
+        ax2 = fig.add_subplot(122) 
+        # Define the function to update the plot at each time step
+        def update(i):
+            # Calculate the position and velocity at the current time step
+            # Clear the previous plot
+            #ax1.clear()
+            # Plot the position of the pendulum
+            xnow = x[i]
+            ynow = y[i]
+            print('xnow', xnow)
+            dxnow = mom_x[i]
+            dynow = mom_y[i] 
+            ax1.plot([xnow,0],[ynow,1.4])
+            ax1.scatter(xnow, ynow)#, markersize=10)
+            ax1.set_title('x = '+str(round(xnow, 1))+', y = '+str(round(ynow, 1)))
+            # Set the axis limits
+            ax1.set_xlim(-5, 5)
+            ax1.set_ylim(-7, 3)#0, 1.5)
+            #ax2.plot([mom_x],[mom_y])
+            ax2.set_title('mom_x = '+str(round(dxnow, 1))+', mom_y = '+str(round(dynow, 1)))
+            ax2.scatter(dxnow, dynow)#, markersize=10)
+            # Set the axis limits
+            ax2.set_xlim(-10, 10)
+            ax2.set_ylim(-3, 3)#0, 1.5)
+            #ax.annotate('L = '+str())
+            #plt.scatter(x, y, c = t,  alpha = 0.5)
+        animation = FuncAnimation(fig, update, frames=range(1, len(t)), interval=100)
+        plt.show()
 
     # This is from Sree, simulates an image of the position and momentum, think
     # of it as a summary statistic
@@ -232,4 +231,16 @@ class Pendulum(AstroObject):
         if return_points:
             return I, data
         else:
-            return I   
+            return I  
+
+    def create_noise(self):
+
+
+
+    def create_object(self, time):
+        if self.calculation_type == "x position":
+            pendulum = self.simulate_pendulum_position(time)
+            pendulum += self.create_noise()
+        else:
+            assert "This calculation type is not implemented"
+        return pendulum
