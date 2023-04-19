@@ -17,15 +17,52 @@
 
 # I would like it to have a nice animation / plotting utility, but lmk if this 
 # should be implemented separately and I'll take it out
+from astro_object import AstroObject
 
 import numpy as np
 import math
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
+from typing import Union, List
 
 
 class Pendulum(AstroObject):
-    def __init__(self, eta, t, noise, m = None, b = None):
+    def __init__(self,
+                 L: float,
+                 theta_0: float,
+                 J: float,
+                 phi: float,
+                 t: Union[float, List[float]],
+                 noise: float,
+                 calculation_type: str = "x position",
+                 m: float = None,
+                 b: float = None):
+        """
+        The initialization function for the Pendulum class.
+
+        Args:
+            L (float): The length of the pendulum arm
+            theta_0 (float): The starting angle of the pendulum
+                (angle from the 'ceiling')
+            J (float): This is terrible, but the stand-in for big G,
+                the gravitational constant
+            phi (float): M/r^2, this changes based on the planet
+            t (Union[float, List[float]]): moment(s) in time
+                at which the pendulum is observed
+            noise (float): The Poisson noise level to be applied to the object.
+                This needs to be updated for the pendulum,
+                currently it follows the Poisson prescription
+                from astro_object.py
+            calculation_type (str): Type of observation of the pendulum.
+                Options are ["x position","position and momentum"]
+            m (float): Mass of the pendulum bob,
+                this is optional if calculation_type is position only.
+            b (float): Coefficient of friction, optional argument.
+
+        Examples:
+
+            >>> pendulum_obj = Pendulum(image_dimensions=28, radius=5, amplitude=3, noise_level=0.7)
+        """
         super().__init__(
             image_dimension=None,
             amplitude=None,
@@ -36,16 +73,15 @@ class Pendulum(AstroObject):
         # Optional arguments: mass, friction
         self.m = m if m is not None else 10.
         self.b = b if b is not None else 0.
-        # Other optional arguments could be ????
-        # I'm not sure how to do this within eta because some of us have different etas
         if not self.noise:
             # If it is not defined, then no noise
-            self.noise = np.zeros(np.shape(eta))
-    
+            self.noise = np.zeros(np.shape(eta)) 
     # I want to add a function that will give you a cute animated pendulum:
     # SUGGESTIONS FOR MAKING IT CUTER APPRECIATED :)
+
     def animate(self):
-        # First you need to instatiate the simulator for x, y, dx/dt, dy/dt (simulate_q_p.())
+        # First you need to instatiate the simulator
+        # for x, y, dx/dt, dy/dt (simulate_q_p.())
         t = self.t
         x, y, mom_x, mom_y = self.simulate_q_p()
         #t, x, y, mom_x, mom_y = create_t_p_q_noise(eta_o, noise = [0.0,0.0,0.0])
