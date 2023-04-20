@@ -80,14 +80,14 @@ class Pendulum(AstroObject):
             # If it is not defined, then no noise
             self.noise = np.zeros(np.shape(eta)) 
     
-        
     # This is the simulator, currently, just simulating the x position of the pendulum
     # for multiple moments in time
     def simulate_pendulum_position(self, time):
-        eta = self.eta
-        noise = self.noise
-        t = time
-        ts = np.repeat(t[:, np.newaxis], eta.shape[0], axis=1)
+        #ts = np.repeat(time[:, np.newaxis], eta.shape[0], axis=1)
+
+        # Need to turn all parameters into arrays so there are multiple moments in time
+        x = [self.L * math.sin(self.theta_0 * math.cos(np.sqrt(self.J * self.phi / self.L) * t)) for t in time]
+        return x
         if eta.ndim == 1:
             eta = eta[np.newaxis, :]
         # time to solve for position and velocity
@@ -138,7 +138,7 @@ class Pendulum(AstroObject):
 
             gs = np.random.normal(loc=eta[n][0], scale=noise[0], size=np.shape(t))
             Ls = np.random.normal(loc=eta[n][1], scale=noise[1], size=np.shape(t))
-            eta_os =  np.random.normal(loc=eta[n][2], scale=noise[2], size=np.shape(t))
+            eta_os = np.random.normal(loc=eta[n][2], scale=noise[2], size=np.shape(t))
 
             eta_t = np.array([eta_os[i] * math.cos(np.sqrt(gs[i] / Ls[i]) * t[i]) for i, _ in enumerate(t)])
 
@@ -234,6 +234,7 @@ class Pendulum(AstroObject):
             return I  
 
     def create_noise(self):
+        return noise.noise(self.noise)
 
 
 
@@ -244,3 +245,7 @@ class Pendulum(AstroObject):
         else:
             assert "This calculation type is not implemented"
         return pendulum
+
+def __main__():
+    pend = Pendulum(10., np.pi/4, 1, 1)
+    pend.simulate_pendulum_position([0,1,2])
