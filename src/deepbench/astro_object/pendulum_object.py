@@ -30,11 +30,12 @@ class Pendulum(AstroObject):
     def __init__(self,
                  L: float,
                  theta_0: float,
-                 J: float,
-                 phi: float,
-                 t: Union[float, List[float]],
+                 #t: Union[float, List[float]],
                  noise: float,
                  calculation_type: str = "x position",
+                 g: float = None,
+                 J: float = None,
+                 phi: float = None,
                  m: float = None,
                  b: float = None):
         """
@@ -44,9 +45,6 @@ class Pendulum(AstroObject):
             L (float): The length of the pendulum arm
             theta_0 (float): The starting angle of the pendulum
                 (angle from the 'ceiling')
-            J (float): This is terrible, but the stand-in for big G,
-                the gravitational constant
-            phi (float): M/r^2, this changes based on the planet
             t (Union[float, List[float]]): moment(s) in time
                 at which the pendulum is observed
             noise (float): The Poisson noise level to be applied to the object.
@@ -55,6 +53,14 @@ class Pendulum(AstroObject):
                 from astro_object.py
             calculation_type (str): Type of observation of the pendulum.
                 Options are ["x position","position and momentum"]
+            g (float): Little g, local gravity coefficient, 
+                optional if J and phi are defined,
+                g = J * phi
+            J (float): This is terrible, but the stand-in for big G,
+                the gravitational constant, 
+                optional if g is defined
+            phi (float): M/r^2, this changes based on the planet,
+                optional if g is defined
             m (float): Mass of the pendulum bob,
                 this is optional if calculation_type is position only.
             b (float): Coefficient of friction, optional argument.
@@ -64,15 +70,24 @@ class Pendulum(AstroObject):
             >>> pendulum_obj = Pendulum(image_dimensions=28, radius=5, amplitude=3, noise_level=0.7)
         """
         super().__init__(
-            image_dimension=None,
+            image_dimensions=None,
+            radius=None,
             amplitude=None,
-            noise_level=None,
+            noise=noise,
         )
         self.L = L
         self.theta_0 = theta_0
-        self.J = J
-        self.phi = phi
         self.noise = noise
+        if J is not None and phi is not None:
+            # This is if J and phi are defined
+            self.J = J
+            self.phi = phi
+            self.g = J * phi
+        else:
+            # This is if J and phi are not defined
+            self.J = None
+            self.phi = None
+            self.g = g
         # Optional arguments: mass, friction
         self.m = m if m is not None else 10.
         self.b = b if b is not None else 0.
@@ -83,10 +98,7 @@ class Pendulum(AstroObject):
     # This is the simulator, currently, just simulating the x position of the pendulum
     # for multiple moments in time
     def simulate_pendulum_position(self, time):
-        #ts = np.repeat(time[:, np.newaxis], eta.shape[0], axis=1)
-
-        # Need to turn all parameters into arrays so there are multiple moments in time
-        x = [self.L * math.sin(self.theta_0 * math.cos(np.sqrt(self.J * self.phi / self.L) * t)) for t in time]
+        x = [self.L * math.sin(self.theta_0 * math.cos(np.sqrt(self.g / self.L) * t)) for t in time]
         return x
         if eta.ndim == 1:
             eta = eta[np.newaxis, :]
@@ -246,6 +258,27 @@ class Pendulum(AstroObject):
             assert "This calculation type is not implemented"
         return pendulum
 
-def __main__():
-    pend = Pendulum(10., np.pi/4, 1, 1)
-    pend.simulate_pendulum_position([0,1,2])
+    def displayObject(self):
+
+        # To be implemented. Check parent for details.
+
+        print("Code Container.")
+
+
+print('initializing the pendulum class')
+pend = Pendulum(10., np.pi/4, 1, 1, g=1)
+pend.simulate_pendulum_position([0,1,2])
+
+'''
+def __init__(self,
+                L: float,
+                theta_0: float,
+                t: Union[float, List[float]],
+                noise: float,
+                calculation_type: str = "x position",
+                g: float = None,
+                J: float = None,
+                phi: float = None,
+                m: float = None,
+                b: float = None):
+'''
