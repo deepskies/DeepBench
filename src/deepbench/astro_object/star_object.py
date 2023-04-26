@@ -1,6 +1,6 @@
-from astro_object import AstroObject
+from src.deepbench.astro_object.astro_object import AstroObject
 from astropy.modeling.models import Moffat2D
-from shape_generator.shape_generator import create_empty_shape
+from src.deepbench.shape_generator.shape_generator import ShapeGenerator
 
 from typing import Union, List, Tuple
 
@@ -14,9 +14,8 @@ class StarObject(AstroObject):
 
     def __init__(
         self,
-        img_dim: Union[int, float, List[int], List[float]],
+        image_dimensions: Union[int, float, List[int], List[float]],
         noise: Union[float, List[float]],
-        center: Tuple[float, float] = (0.0, 0.0),
         radius: Union[int, float] = 1.0,
         amplitude: Union[int, float] = 1.0,
     ) -> None:
@@ -24,24 +23,23 @@ class StarObject(AstroObject):
         The initialization function for the StarObject.
 
         Args:
-            img_dim (Union[int, float, List[int], List[float]]): The dimension(s) of the Star to be produced.
+            image_dimensions (Union[int, float, List[int], List[float]]): The dimension(s) of the Star to be produced.
             noise_level (Union[float, list[float]]): The Poisson noise level to be applied to the object.
-            center (Tuple[float], Tuple[int]): The center of the Star object to be produced.
             radius (Union[int, float]): The radius of the object to be produced.
             amplitude (Union[int, float]): The amplitude of the object to be produced.
 
         Examples:
 
-            >>> example_star = StarObject(img_dim=28, noise=5.0, center=3, radius=0.7, amplitude=1.2)
-            >>> example_star = StarObject(img_dim=(28,28), noise=5.0)
+            >>> example_star = StarObject(image_dimensions=28, noise=5.0, center=3, radius=0.7, amplitude=1.2)
+            >>> example_star = StarObject(image_dimensions=(28,28), noise=5.0)
         """
         super().__init__(
-            image_dimensions=img_dim,
+            image_dimensions=image_dimensions,
             radius=radius,
             amplitude=amplitude,
             noise_level=noise,
         )
-        self._center = center
+
 
     def create_Moffat_profile(
         self, center_x: float, center_y: float, alpha=1.0
@@ -66,8 +64,8 @@ class StarObject(AstroObject):
         x, y = self.create_meshgrid()
         profile = Moffat2D(
             amplitude=self._amplitude,
-            x_center=self._center[0],
-            y_center=self._center[1],
+            x_center=center_x,
+            y_center=center_y,
             gamma=self._radius,
             alpha=alpha,
         )
@@ -94,12 +92,12 @@ class StarObject(AstroObject):
         """
 
         # Create the empty image shape.
-        image_shape = create_empty_shape(self._image)
+        image_shape = ShapeGenerator.create_empty_shape(self._image)
 
         # Create the Poisson noise profile.
         noise_profile = self.create_noise()
 
-        image_shape = self.create_Moffat_profile(center_x=center_x, center_y=center_y)
+        image_shape = self.create_Moffat_profile(center_x=center_x, center_y=center_y, alpha=alpha)
 
         # Append the noise profiles to the object.
         image_shape += noise_profile
@@ -107,7 +105,7 @@ class StarObject(AstroObject):
 
         return image_shape
 
-    def displayImage(self):
+    def displayObject(self):
 
         # To be implemented. Check parent for details.
 

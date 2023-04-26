@@ -15,7 +15,7 @@ class AstroObject(ABC):
         image_dimensions: Union[int, float, List[int], List[float]],
         radius: Union[int, float],
         amplitude: Union[int, float],
-        noise: Union[float, List[float]],
+        noise_level: Union[float, List[float]],
     ) -> None:
         """
         The initialization function for the Abstract AstroObject class.
@@ -37,7 +37,7 @@ class AstroObject(ABC):
         self._image = np.zeros((image_dimensions, image_dimensions))
         self._radius = radius
         self._amplitude = amplitude
-        self._noise_level = noise
+        self._noise_level = noise_level
 
     @abstractmethod
     def create_object(self):

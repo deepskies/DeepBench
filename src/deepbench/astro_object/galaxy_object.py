@@ -1,5 +1,5 @@
-from astro_object import AstroObject
-from shape_generator.shape_generator import create_empty_shape
+from src.deepbench.astro_object.astro_object import AstroObject
+from src.deepbench.shape_generator.shape_generator import ShapeGenerator
 from astropy.modeling.models import Sersic2D
 
 import numpy as np
@@ -11,18 +11,34 @@ class GalaxyObject(AstroObject):
     # BOUNDS: ellipse -> (0,1), n -> (0.5, 1.0)
     def __init__(
         self,
-        img_dim,
+        image_dimensions,
         amplitude=1,
-        center=(50, 50),
         radius=25,
         n=1.0,
+        noise_level = 0.2,
         ellipse=random.uniform(0.1, 0.9),
         theta=random.uniform(-1.5, 1.5),
     ):
+        """_summary_
 
-        super().__init__(image_dimensions=img_dim, radius=radius, amplitude=amplitude)
+        Args:
+            image_dimensions (Union[int, float, List[int], List[float]]): The dimension(s) of the object to be produced.
+            radius (Union[int, float]): The radius of the object to be produced.
+            amplitude (Union[int, float]): The amplitude of the object to be produced.
+            noise_level (Union[float, list[float]]): The Poisson noise level to be applied to the object.
 
-        self._center = center
+            radius (int, optional): _description_. Defaults to 25.
+            n (float, optional): _description_. Defaults to 1.0.
+            ellipse (_type_, optional): _description_. Defaults to random.uniform(0.1, 0.9).
+            theta (_type_, optional): _description_. Defaults to random.uniform(-1.5, 1.5).
+        """
+
+        super().__init__(
+            image_dimensions=image_dimensions,
+            radius=radius,
+            amplitude=amplitude,
+            noise_level=noise_level)
+
         self._n = n
         self._ellipse = ellipse
         self._theta = theta
@@ -42,13 +58,13 @@ class GalaxyObject(AstroObject):
 
         return profile(x, y)
 
-    def create_object(self, center_x: float, center_y: float) -> np.ndarray:
+    def create_object(self, center_x = 5.0, center_y = 5.0) -> np.ndarray:
         """
         Create the star object from a Moffat distribution and Poisson and PSF noise.
 
         Args:
-            center_x (float): The x-axis placement of the star object.
-            center_y (float): The y-axis placement of the star object.
+            center_x (float): The x-axis placement of the galaxy object.
+            center_y (float): The y-axis placement of the galaxy object.
 
         Returns:
             ndarray: Two dimensional Galaxy object, composed of Sersic Distribution and noise appendings.
@@ -60,13 +76,13 @@ class GalaxyObject(AstroObject):
         """
 
         # Create the empty image shape.
-        image_shape = create_empty_shape(self._image)
+        image_shape = ShapeGenerator.create_empty_shape(self._image)
 
         # Create the Poisson noise profile specific to Galaxy objects.
         noise_profile = self.create_noise(galaxy=True)
 
         image_shape = self.create_Sersic_profile(
-            center_x=self._center[0], center_y=self._center[1]
+            center_x=center_x, center_y=center_y
         )
 
         # Append the noise profiles to the object.
@@ -75,7 +91,7 @@ class GalaxyObject(AstroObject):
 
         return image_shape
 
-    def displayImage(self):
+    def displayObject(self):
 
         # To be implemented. Check parent for details.
 
