@@ -74,8 +74,12 @@ class Pendulum(AstroObject):
     # for one or multiple moments in time
     def simulate_pendulum_position(self, time):
         assert len(time) is not None, "Must enter a time"
-        x = [self.pendulum_arm_length * math.sin(self.starting_angle_radians *
-             math.cos(np.sqrt(self.acceleration_due_to_gravity / self.pendulum_arm_length) * t)) for t in time]
+        assert self.starting_angle_radians > np.pi, \
+            "The angle better not be in degrees or else"
+        time = np.asarray(time)
+        theta_time = self.starting_angle_radians * \
+            np.cos(np.sqrt(self.g / self.pendulum_arm_length))
+        x = self.pendulum_arm_length * np.sin(theta_time * time)
         return x
 
     # To be added by Omari
@@ -89,12 +93,11 @@ class Pendulum(AstroObject):
 
     def create_object(self, time: Union[float, list[float]]):
         assert self.calculation_type == "x position", f"{self.calculation_type} method is not yet implemented, sorry."
-        #assert len(marks) != 0,"list is empty."
         pendulum = self.simulate_pendulum_position(time)
         pendulum += self.create_noise()
         return pendulum
 
-    def animate(self, time):
+    def animate(self, time: Union[float, list[float]]):
         # Right now this just plots x and t
         # Instantiate the simulator
         pendulum = self.create_object(time)
@@ -102,7 +105,7 @@ class Pendulum(AstroObject):
         # Create the figure and axis
         fig = plt.figure(figsize=(10, 3))
         ax1 = fig.add_subplot(111)
-        
+
         def update(i):
             # Calculate the position and velocity at the current time step
             # Clear the previous plot
