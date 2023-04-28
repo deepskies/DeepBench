@@ -1,42 +1,23 @@
-# What functionality do we need the simulator to have?
-
-# We need to be able to draw from it at one or multiple moments in time
-
-# Maggie: time needs to be adjustable, as an input to simulate_x
-# Becky: I stil haven't done this, I wil also need to add some sort of external
-# check here because the pendulum MCMC currently assumes that the data and the
-# model are using al the same points in time
-
-# Becky: I'm confused about how this works with the hierarchy of the inference
-# do we need to modify this class so that it can accept arrays and matrices
-# of eta values? This needs to happen for the hierarchy, where we have multiple
-# moments in time, multiple pendulii, and multiple different planets that 
-# we're running the experiment on.
-# OR do we just need to make this external, where the science (inference) module
-# wil cal the simulator multiple times within an iterable?
-
-# I would like it to have a nice animation / plotting utility, but lmk if this 
-# should be implemented separately and I'l take it out
-from astro_object import AstroObject
+from src.deepbench.astro_object.astro_object import AstroObject
 import numpy as np
 import math
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
-from typing import Union, list
+from typing import Union, List
 
 
 class Pendulum(AstroObject):
     def __init__(self,
                  pendulum_arm_length: float,
                  starting_angle_radians: float,
-                 #t: Union[float, list[float]],
                  noise: float,
                  calculation_type: str = "x position",
-                 g: float = None,
-                 J: float = None,
-                 phi: float = None,
-                 m: float = None,
-                 b: float = None):
+                 acceleration_due_to_gravity: Union[float, None] = None,
+                 big_G_newton: Union[float, None] = None,
+                 phi_planet: Union[float, None] = None,
+                 mass_pendulum_bob: Union[float, None] = None,
+                 coefficient_friction: Union[float, None] = None
+                 ):
         """
         The initialization function for the Pendulum class.
 
@@ -44,29 +25,26 @@ class Pendulum(AstroObject):
             pendulum_arm_length (float): The length of the pendulum arm
             starting_angle_radians (float): The starting angle of the pendulum
                 (angle from the 'ceiling')
-            t (Union[float, list[float]]): moment(s) in time
-                at which the pendulum is observed
             noise (float): The Poisson noise level to be applied to the object.
                 This needs to be updated for the pendulum,
                 currently it folows the Poisson prescription
                 from astro_object.py
             calculation_type (str): Type of observation of the pendulum.
                 Options are ["x position","position and momentum"]
-            g (float): little g, local gravity coefficient, 
-                optional if J and phi are defined,
-                g = J * phi
-            J (float): This is terrible, but the stand-in for big G,
-                the gravitational constant, 
+            acceleration_due_to_gravity (float): little g, local gravity coefficient,
+                optional if G and phi are defined,
+                g = G * phi
+            big_G_newton (float): Big G, the gravitational constant,
                 optional if g is defined
-            phi (float): M/r^2, this changes based on the planet,
+            phi_planet (float): M/r^2, this changes based on the planet,
                 optional if g is defined
-            m (float): Mass of the pendulum bob,
+            mass_pendulum_bob (float): Mass of the pendulum bob,
                 this is optional if calculation_type is position only.
-            b (float): Coefficient of friction, optional argument.
+            coefficient_friction (float): Coefficient of friction, optional argument.
 
         Examples:
 
-            >>> pendulum_obj = Pendulum(image_dimensions=28, radius=5, amplitude=3, noise_level=0.7)
+            >>> pendulum_obj = Pendulum()
         """
         super().__init__(
             image_dimensions=1,
@@ -78,32 +56,36 @@ class Pendulum(AstroObject):
         self.starting_angle_radians = starting_angle_radians
         self.noise = noise
         self.calculation_type = calculation_type
-        if J is not None and phi is not None:
-            # This is if J and phi are defined
-            self.J = J
-            self.phi = phi
-            self.g = J * phi
+        if big_G_newton is not None and phi_planet is not None:
+            # This is if big_G_newton and phi_planet are defined
+            self.big_G_newton = big_G_newton
+            self.phi = phi_planet
+            self.acceleration_due_to_gravity = big_G_newton * phi_planet
         else:
-            # This is if J and phi are not defined
-            self.J = None
-            self.phi = None
-            self.g = g
+            # This is if big_G_newton and phi_planet are not defined
+            self.big_G_newton = None
+            self.phi_planet = None
+            self.acceleration_due_to_gravity = acceleration_due_to_gravity
         # Optional arguments: mass, friction
-        self.m = m if m is not None else 10.
-        self.b = b if b is not None else 0.
+        self.mass_pendulum_bob = mass_pendulum_bob if mass_pendulum_bob is not None else 10.
+        self.coefficient_friction = coefficient_friction if coefficient_friction is not None else 0.
 
     # Currently just simulating the x position of the pendulum
     # for one or multiple moments in time
     def simulate_pendulum_position(self, time):
+        assert len(time) is not None, "Must enter a time"
         x = [self.pendulum_arm_length * math.sin(self.starting_angle_radians *
-             math.cos(np.sqrt(self.g / self.pendulum_arm_length) * t)) for t in time]
+             math.cos(np.sqrt(self.acceleration_due_to_gravity / self.pendulum_arm_length) * t)) for t in time]
         return x
+
+    # To be added by Omari
+    def simulate_pendulum_position_and_momentum(self, time):
+        return
 
     # I want to add a function that wil give you a cute animated pendulum:
     # SUGGESTIONS FOR MAKING IT CUTER APPRECIATED :)
-
     def animate(self, time):
-        # First you need to instatiate the simulator
+        # First you need to instantiate the simulator
         # for x, y, dx/dt, dy/dt (simulate_q_p.())
         x, y, mom_x, mom_y = self.simulate_q_p(time)
         #t, x, y, mom_x, mom_y = create_t_p_q_noise(eta_o, noise = [0.0,0.0,0.0])
@@ -112,7 +94,7 @@ class Pendulum(AstroObject):
         #fig, axs = plt.subplots(nrows = 1, ncols = 2)
         fig = plt.figure(figsize = (10,3))
         ax1 = fig.add_subplot(121)
-        ax2 = fig.add_subplot(122) 
+        ax2 = fig.add_subplot(122)
         # Define the function to update the plot at each time step
         def update(i):
             # Calculate the position and velocity at the current time step
@@ -123,7 +105,7 @@ class Pendulum(AstroObject):
             ynow = y[i]
             print('xnow', xnow)
             dxnow = mom_x[i]
-            dynow = mom_y[i] 
+            dynow = mom_y[i]
             ax1.plot([xnow,0],[ynow,1.4])
             ax1.scatter(xnow, ynow)#, markersize=10)
             ax1.set_title('x = '+str(round(xnow, 1))+', y = '+str(round(ynow, 1)))
@@ -180,13 +162,14 @@ class Pendulum(AstroObject):
         if return_points:
             return I, data
         else:
-            return I  
+            return I
 
     def create_noise(self):
-        noise = self.noise
-        return noise.noise(self.noise)
+        # We will modify this to be our own special
+        # noise profile :)
+        return super().create_noise(self)
 
-    def create_object(self, time):
+    def create_object(self, time: Union[float, list[float]]):
         assert self.calculation_type == "x position", f"{self.calculation_type} method is not yet implemented, sorry."
         #assert len(marks) != 0,"list is empty."
         pendulum = self.simulate_pendulum_position(time)
@@ -198,11 +181,3 @@ class Pendulum(AstroObject):
         # To be implemented. Check parent for details.
 
         print("Code Container.")
-
-
-print('initializing the pendulum class')
-pend = Pendulum(10., np.pi/4, 1, "x position", g=1)
-print('pend', pend)
-x = pend.create_object([0])
-x = pend.simulate_pendulum_position([0,1,2])
-print('x', x)

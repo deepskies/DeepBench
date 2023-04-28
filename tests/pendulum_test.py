@@ -1,23 +1,33 @@
+import numpy as np
 from unittest import TestCase
-from src.deepbench.image.time_series_image import TimeSeriesImage
+from src.deepbench.astro_object.pendulum_object import Pendulum
 
 
-class TestTimeSeriesImage(TestCase):
+class TestPendulum(TestCase):
     def test_1d_init(self):
         with self.assertRaises(AssertionError):
-            image_shape = (12,)
-            object_params = [{"object_type": "test_object"}]
-            TimeSeriesImage(object_params, image_shape)
+            time = [0.]
+            '''
+            object_params = [pendulum_arm_length = 10,
+                            starting_angle_radians = np.pi/4,
+                            noise = 0]
+                            '''
+            self.assertIsNone(Pendulum(10., np.pi/4, 0.,
+                                       "x position", 10.).create_object(time))
 
+
+            '''
+            {"pendulum_arm_length": 10,
+                            "starting_angle_radians": np.pi/4,
+                            "noise": 0}
+            test_sky = SkyImage([{}], (14, 14))
+
+        self.assertIsNone(test_sky.image)
+        self.assertEqual([{}], test_sky.objects)
+        self.assertEqual((14, 14), test_sky.image_shape)'''
+'''
     def test_2d_init(self):
         image_shape = (12, 12)
-        object_params = [{"object_type": "test_object"}]
-        time_series = TimeSeriesImage(object_params, image_shape)
-
-        self.assertEqual(image_shape, time_series.image_shape)
-
-    def test_3d_init(self):
-        image_shape = (12, 12, 3)
         object_params = [{"object_type": "test_object"}]
         time_series = TimeSeriesImage(object_params, image_shape)
 
@@ -96,3 +106,4 @@ class TestTimeSeriesImage(TestCase):
 
             ##Go straight to noise instead of making objects first
             one_image_sky.generate_noise("gaussian")
+'''
