@@ -3,9 +3,9 @@
 # We need to be able to draw from it at one or multiple moments in time
 
 # Maggie: time needs to be adjustable, as an input to simulate_x
-# Becky: I still haven't done this, I will also need to add some sort of external
+# Becky: I stil haven't done this, I wil also need to add some sort of external
 # check here because the pendulum MCMC currently assumes that the data and the
-# model are using all the same points in time
+# model are using al the same points in time
 
 # Becky: I'm confused about how this works with the hierarchy of the inference
 # do we need to modify this class so that it can accept arrays and matrices
@@ -13,24 +13,23 @@
 # moments in time, multiple pendulii, and multiple different planets that 
 # we're running the experiment on.
 # OR do we just need to make this external, where the science (inference) module
-# will call the simulator multiple times within an iterable?
+# wil cal the simulator multiple times within an iterable?
 
 # I would like it to have a nice animation / plotting utility, but lmk if this 
-# should be implemented separately and I'll take it out
+# should be implemented separately and I'l take it out
 from astro_object import AstroObject
-
 import numpy as np
 import math
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
-from typing import Union, List
+from typing import Union, list
 
 
 class Pendulum(AstroObject):
     def __init__(self,
-                 L: float,
-                 theta_0: float,
-                 #t: Union[float, List[float]],
+                 pendulum_arm_length: float,
+                 starting_angle_radians: float,
+                 #t: Union[float, list[float]],
                  noise: float,
                  calculation_type: str = "x position",
                  g: float = None,
@@ -42,18 +41,18 @@ class Pendulum(AstroObject):
         The initialization function for the Pendulum class.
 
         Args:
-            L (float): The length of the pendulum arm
-            theta_0 (float): The starting angle of the pendulum
+            pendulum_arm_length (float): The length of the pendulum arm
+            starting_angle_radians (float): The starting angle of the pendulum
                 (angle from the 'ceiling')
-            t (Union[float, List[float]]): moment(s) in time
+            t (Union[float, list[float]]): moment(s) in time
                 at which the pendulum is observed
             noise (float): The Poisson noise level to be applied to the object.
                 This needs to be updated for the pendulum,
-                currently it follows the Poisson prescription
+                currently it folows the Poisson prescription
                 from astro_object.py
             calculation_type (str): Type of observation of the pendulum.
                 Options are ["x position","position and momentum"]
-            g (float): Little g, local gravity coefficient, 
+            g (float): little g, local gravity coefficient, 
                 optional if J and phi are defined,
                 g = J * phi
             J (float): This is terrible, but the stand-in for big G,
@@ -75,8 +74,8 @@ class Pendulum(AstroObject):
             amplitude=None,
             noise=noise,
         )
-        self.L = L
-        self.theta_0 = theta_0
+        self.pendulum_arm_length = pendulum_arm_length
+        self.starting_angle_radians = starting_angle_radians
         self.noise = noise
         self.calculation_type = calculation_type
         if J is not None and phi is not None:
@@ -96,11 +95,11 @@ class Pendulum(AstroObject):
     # Currently just simulating the x position of the pendulum
     # for one or multiple moments in time
     def simulate_pendulum_position(self, time):
-        x = [self.L * math.sin(self.theta_0 *
-             math.cos(np.sqrt(self.g / self.L) * t)) for t in time]
+        x = [self.pendulum_arm_length * math.sin(self.starting_angle_radians *
+             math.cos(np.sqrt(self.g / self.pendulum_arm_length) * t)) for t in time]
         return x
 
-    # I want to add a function that will give you a cute animated pendulum:
+    # I want to add a function that wil give you a cute animated pendulum:
     # SUGGESTIONS FOR MAKING IT CUTER APPRECIATED :)
 
     def animate(self, time):
@@ -137,7 +136,7 @@ class Pendulum(AstroObject):
             # Set the axis limits
             ax2.set_xlim(-10, 10)
             ax2.set_ylim(-3, 3)#0, 1.5)
-            #ax.annotate('L = '+str())
+            #ax.annotate('l = '+str())
             #plt.scatter(x, y, c = t,  alpha = 0.5)
         animation = FuncAnimation(fig, update, frames=range(1, len(t)), interval=100)
         plt.show()
@@ -189,7 +188,7 @@ class Pendulum(AstroObject):
 
     def create_object(self, time):
         assert self.calculation_type == "x position", f"{self.calculation_type} method is not yet implemented, sorry."
-        #assert len(marks) != 0,"List is empty."
+        #assert len(marks) != 0,"list is empty."
         pendulum = self.simulate_pendulum_position(time)
         pendulum += self.create_noise()
         return pendulum
@@ -207,16 +206,3 @@ print('pend', pend)
 x = pend.create_object([0])
 x = pend.simulate_pendulum_position([0,1,2])
 print('x', x)
-
-'''
-def __init__(self,
-                L: float,
-                theta_0: float,
-                noise: float,
-                calculation_type: str = "x position",
-                g: float = None,
-                J: float = None,
-                phi: float = None,
-                m: float = None,
-                b: float = None):
-'''
