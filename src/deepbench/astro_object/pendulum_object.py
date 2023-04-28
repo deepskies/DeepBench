@@ -70,7 +70,7 @@ class Pendulum(AstroObject):
             >>> pendulum_obj = Pendulum(image_dimensions=28, radius=5, amplitude=3, noise_level=0.7)
         """
         super().__init__(
-            image_dimensions=None,
+            image_dimensions=1,
             radius=None,
             amplitude=None,
             noise=noise,
@@ -78,6 +78,7 @@ class Pendulum(AstroObject):
         self.L = L
         self.theta_0 = theta_0
         self.noise = noise
+        self.calculation_type = calculation_type
         if J is not None and phi is not None:
             # This is if J and phi are defined
             self.J = J
@@ -91,76 +92,13 @@ class Pendulum(AstroObject):
         # Optional arguments: mass, friction
         self.m = m if m is not None else 10.
         self.b = b if b is not None else 0.
-        if not self.noise:
-            # If it is not defined, then no noise
-            self.noise = np.zeros(np.shape(eta)) 
-    
-    # This is the simulator, currently, just simulating the x position of the pendulum
-    # for multiple moments in time
+
+    # Currently just simulating the x position of the pendulum
+    # for one or multiple moments in time
     def simulate_pendulum_position(self, time):
-        x = [self.L * math.sin(self.theta_0 * math.cos(np.sqrt(self.g / self.L) * t)) for t in time]
+        x = [self.L * math.sin(self.theta_0 *
+             math.cos(np.sqrt(self.g / self.L) * t)) for t in time]
         return x
-        if eta.ndim == 1:
-            eta = eta[np.newaxis, :]
-        # time to solve for position and velocity
-        # nested for loop, there's probably a better way to do this
-        # output needs to be (n,len(t))
-        x = np.zeros((eta.shape[0],len(t)))  
-        for n in range(eta.shape[0]):
-            # Draw parameter (eta) values from normal distributions
-            # To produce noise in the etas you are using to produce the position
-            # and momentum of the pendulum at each moment in time
-            # Another way to do this would be to just draw once and use that same noisy eta 
-            # value for all moments in time, but this would be very similar to just drawing
-            # from the prior, which we're already doing.
-            gs = np.random.normal(loc=eta[n][0], scale=noise[0], size=np.shape(t))
-            Ls = np.random.normal(loc=eta[n][1], scale=noise[1], size=np.shape(t))
-            eta_os =  np.random.normal(loc=eta[n][2], scale=noise[2], size=np.shape(t))
-            eta_t = np.array([eta_os[i] * math.cos(np.sqrt(gs[i] / Ls[i]) * t[i]) for i, _ in enumerate(t)])
-            x[n,:] = np.array([Ls[i] * math.sin(eta_t[i]) for i, _ in enumerate(t)])
-        return x
-
-    # This needs to be fixed so that x, y, dx/dt, and dy/dt are all packaged together, also so mass is incorporated
-    # into the momentum:
-    def simulate_q_p(self, time):
-        eta = self.eta
-        t = self.t
-        noise = self.noise
-        ts = np.repeat(self.t[:, np.newaxis], self.eta.shape[0], axis=1)
-        if eta.ndim == 1:
-            eta = eta[np.newaxis, :]
-        # time to solve for position and velocity
-
-        # nested for loop, there's probably a better way to do this
-        # output needs to be (n,len(t))
-        x = np.zeros((eta.shape[0],len(t)))
-        y = np.zeros((eta.shape[0],len(t)))
-
-        # TO DO: I'm not strictly solving for momentum, just velocities:
-        dx_dt = np.zeros((eta.shape[0],len(t)))
-        dy_dt = np.zeros((eta.shape[0],len(t)))
-        for n in range(eta.shape[0]):
-
-            # Draw parameter (eta) values from normal distributions
-            # To produce noise in the etas you are using to produce the position
-            # and momentum of the pendulum at each moment in time
-            # Another way to do this would be to just draw once and use that same noisy eta 
-            # value for all moments in time, but this would be very similar to just drawing
-            # from the prior, which we're already doing.
-
-            gs = np.random.normal(loc=eta[n][0], scale=noise[0], size=np.shape(t))
-            Ls = np.random.normal(loc=eta[n][1], scale=noise[1], size=np.shape(t))
-            eta_os = np.random.normal(loc=eta[n][2], scale=noise[2], size=np.shape(t))
-
-            eta_t = np.array([eta_os[i] * math.cos(np.sqrt(gs[i] / Ls[i]) * t[i]) for i, _ in enumerate(t)])
-
-            x[n,:] = np.array([Ls[i] * math.sin(eta_t[i]) for i, _ in enumerate(t)])
-            y[n,:] = np.array([-Ls[i] * math.cos(eta_t[i]) for i, _ in enumerate(t)])
-
-            # Okay and what about taking the time derivative?
-            dx_dt[n,:] = np.array([-Ls[i] * eta_os[i] * np.sqrt(gs[i] / Ls[i]) * math.cos(eta_t[i]) * math.sin( np.sqrt(gs[i] / Ls[i]) * t[i]) for i, _ in enumerate(t)])
-            dy_dt[n,:] = np.array([-Ls[i] * eta_os[i] * np.sqrt(gs[i] / Ls[i]) * math.sin(eta_t[i]) * math.sin( np.sqrt(gs[i] / Ls[i]) * t[i]) for i, _ in enumerate(t)])
-        return x, y, dx_dt, dy_dt
 
     # I want to add a function that will give you a cute animated pendulum:
     # SUGGESTIONS FOR MAKING IT CUTER APPRECIATED :)
@@ -246,16 +184,14 @@ class Pendulum(AstroObject):
             return I  
 
     def create_noise(self):
+        noise = self.noise
         return noise.noise(self.noise)
 
-
-
     def create_object(self, time):
-        if self.calculation_type == "x position":
-            pendulum = self.simulate_pendulum_position(time)
-            pendulum += self.create_noise()
-        else:
-            assert "This calculation type is not implemented"
+        assert self.calculation_type == "x position", f"{self.calculation_type} method is not yet implemented, sorry."
+        #assert len(marks) != 0,"List is empty."
+        pendulum = self.simulate_pendulum_position(time)
+        pendulum += self.create_noise()
         return pendulum
 
     def displayObject(self):
@@ -266,14 +202,16 @@ class Pendulum(AstroObject):
 
 
 print('initializing the pendulum class')
-pend = Pendulum(10., np.pi/4, 1, 1, g=1)
-pend.simulate_pendulum_position([0,1,2])
+pend = Pendulum(10., np.pi/4, 1, "x position", g=1)
+print('pend', pend)
+x = pend.create_object([0])
+x = pend.simulate_pendulum_position([0,1,2])
+print('x', x)
 
 '''
 def __init__(self,
                 L: float,
                 theta_0: float,
-                t: Union[float, List[float]],
                 noise: float,
                 calculation_type: str = "x position",
                 g: float = None,
