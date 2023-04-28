@@ -127,47 +127,12 @@ class Pendulum(AstroObject):
     # of it as a summary statistic
     # This part currently is not updated.
     def simulate_I(self):
-        # Using Taylor series expansion to solve for position (eta1) and velocity (eta2)
-        # output time, position and velocity as image i.e with dimenstions len(time) x 2: https://www.mackelab.org/sbi/tutorial/05_embedding_net/
-        m = self.m
-        l = self.eta[1]
-        g = self.eta[0]
-        b = self.b
-        dt = self.time[-1] - self.time[0]
-
-        # From here down this needs to be rewritten to work
-        # BROKEN FROM HERE DOWN
-        eta1 = eta1_0
-        eta2 = eta2_0
-        data = [[eta1, eta2]]
-        for i, t_ in enumerate(time[:-1]):
-            next_eta1 = eta1 + eta2 * dt
-            next_eta2 = eta2 - (b/(m*l**2) * eta2 - g/l *
-                np.sin(next_eta1)) * dt
-
-            data.append([next_eta1, next_eta2])
-            eta1 = next_eta1
-            eta2 = next_eta2
-
-        data = torch.as_tensor(data) #shape : (len(time), 2)
-
-        nx = len(time)
-        ny = 2
-        I = torch.zeros(nx,ny)
-        for i in range(len(time)):
-            for j in range(2):
-                I[i,j] = data[i][j]
-        I = I.T
-        I = I.reshape(1,-1)
-        if return_points:
-            return I, data
-        else:
-            return I
+        return
 
     def create_noise(self):
         # We will modify this to be our own special
         # noise profile :)
-        return super().create_noise(self)
+        return super(self).create_noise()
 
     def create_object(self, time: Union[float, list[float]]):
         assert self.calculation_type == "x position", f"{self.calculation_type} method is not yet implemented, sorry."
