@@ -58,7 +58,7 @@ class Pendulum(AstroObject):
         if big_G_newton is not None and phi_planet is not None:
             # This is if big_G_newton and phi_planet are defined
             self.big_G_newton = big_G_newton
-            self.phi = phi_planet
+            self.phi_planet = phi_planet
             self.acceleration_due_to_gravity = big_G_newton * phi_planet
         else:
             # This is if big_G_newton and phi_planet are not defined
@@ -87,46 +87,44 @@ class Pendulum(AstroObject):
     def simulate_pendulum_position_and_momentum(self, time):
         return
 
-    def create_noise(self):
-        theta = self.theta
-        t = self.t
-        noise = self.noise
-
-        ts = np.repeat(t[:, np.newaxis], theta.shape[0], axis=1)
-
-
-        if theta.ndim == 1:
-            theta = theta[np.newaxis, :]
+    def create_noise(self, baseline, time):
+        # produce noise on each parameter individually
+        pendulum_arm_length = self.pendulum_arm_length
+        starting_angle_radians = self.starting_angle_radians
+        noise_multiple = self.noise
+        calculation_type = self.calculation_type
+        big_G_newton = self.big_G_newton
+        phi_planet = self.phi_planet
+        acceleration_due_to_gravity = self.acceleration_due_to_gravity
+        mass_pendulum_bob = self.mass_pendulum_bob
+        coefficient_friction = self.coefficient_friction
+        
 
         # time to solve for position and velocity
 
         # nested for loop, there's probably a better way to do this
         # output needs to be (n,len(t))
         x = np.zeros((theta.shape[0],len(t)))
-        
-        for n in range(theta.shape[0]):
 
-            # Draw parameter (theta) values from normal distributions
-            # To produce noise in the thetas you are using to produce the position
-            # and momentum of the pendulum at each moment in time
-            # Another way to do this would be to just draw once and use that same noisy theta 
-            # value for all moments in time, but this would be very similar to just drawing
-            # from the prior, which we're already doing.
+        gs = np.random.normal(loc=theta[n][0], scale=noise[0], size=np.shape(t))
+        Ls = np.random.normal(loc=theta[n][1], scale=noise[1], size=np.shape(t))
+        theta_os =  np.random.normal(loc=theta[n][2], scale=noise[2], size=np.shape(t))
 
-            gs = np.random.normal(loc=theta[n][0], scale=noise[0], size=np.shape(t))
-            Ls = np.random.normal(loc=theta[n][1], scale=noise[1], size=np.shape(t))
-            theta_os =  np.random.normal(loc=theta[n][2], scale=noise[2], size=np.shape(t))
+        # FIX: THIS NO LONGER NEEDS TO BE A LOOP
+        theta_t = np.array([theta_os[i] * math.cos(np.sqrt(gs[i] / Ls[i]) * t[i]) for i, _ in enumerate(t)])
+        # FIX: WOULDNT IT BE AWESOME IF I COULD RUN EVERYTHING THROUGH THE
+        # SIMULATION AGAIN FOR EACH NOISY PARAMETER
+        x = np.array([Ls[i] * math.sin(theta_t[i]) for i, _ in enumerate(t)])
+        # The output needs to be the same shape as the parameters
+        # Okay now I'm confused because I actually think this creates 
+        # noise plus baseline
 
-            theta_t = np.array([theta_os[i] * math.cos(np.sqrt(gs[i] / Ls[i]) * t[i]) for i, _ in enumerate(t)])
-
-            x[n,:] = np.array([Ls[i] * math.sin(theta_t[i]) for i, _ in enumerate(t)])
-            
-        return super(self).create_noise()
+        return noise - baseline
 
     def create_object(self, time: Union[float, list[float]]):
         assert self.calculation_type == "x position", f"{self.calculation_type} method is not yet implemented, sorry."
         pendulum = self.simulate_pendulum_position(time)
-        pendulum += self.create_noise()
+        pendulum += self.create_noise(pendulum, time)
         return pendulum
 
     def animate(self, time: Union[float, list[float]]):
