@@ -11,11 +11,12 @@ class Pendulum(AstroObject):
                  starting_angle_radians: float,
                  noise: float,
                  calculation_type: str = "x position",
-                 acceleration_due_to_gravity: Union[float, None] = None,
-                 big_G_newton: Union[float, None] = None,
-                 phi_planet: Union[float, None] = None,
-                 mass_pendulum_bob: Union[float, None] = None,
-                 coefficient_friction: Union[float, None] = None
+                 #Union[float, None]
+                 acceleration_due_to_gravity: float = None,
+                 big_G_newton: float = None,
+                 phi_planet: float = None,
+                 mass_pendulum_bob: float = None,
+                 coefficient_friction: float = None
                  ):
         """
         The initialization function for the Pendulum class.
@@ -55,21 +56,16 @@ class Pendulum(AstroObject):
         self.starting_angle_radians = starting_angle_radians
         self.noise = noise
         self.calculation_type = calculation_type
-        if big_G_newton is not None and phi_planet is not None:
-            # This is if big_G_newton and phi_planet are defined
-            self.big_G_newton = big_G_newton
-            self.phi_planet = phi_planet
-            self.acceleration_due_to_gravity = big_G_newton * phi_planet
-        else:
-            # This is if big_G_newton and phi_planet are not defined
-            self.big_G_newton = None
-            self.phi_planet = None
-            self.acceleration_due_to_gravity = acceleration_due_to_gravity
+        self.big_G_newton = 0. if big_G_newton is None else big_G_newton
+        self.phi_planet = 0. if phi_planet is None else phi_planet
+        self.acceleration_due_to_gravity = self.big_G_newton * self.phi_planet if \
+            acceleration_due_to_gravity is None \
+            else acceleration_due_to_gravity
         # Optional arguments: mass, friction
-        self.mass_pendulum_bob = mass_pendulum_bob if \
-            mass_pendulum_bob is not None else 10.
-        self.coefficient_friction = coefficient_friction if \
-            coefficient_friction is not None else 0.
+        self.mass_pendulum_bob = 10. if mass_pendulum_bob \
+            is None else mass_pendulum_bob
+        self.coefficient_friction = 0. if coefficient_friction is None \
+            else coefficient_friction
 
     # Currently just simulating the x position of the pendulum
     # for one or multiple moments in time
@@ -98,7 +94,7 @@ class Pendulum(AstroObject):
         acceleration_due_to_gravity = self.acceleration_due_to_gravity
         mass_pendulum_bob = self.mass_pendulum_bob
         coefficient_friction = self.coefficient_friction
-        
+
 
         # time to solve for position and velocity
 
@@ -114,12 +110,14 @@ class Pendulum(AstroObject):
         theta_t = np.array([theta_os[i] * math.cos(np.sqrt(gs[i] / Ls[i]) * t[i]) for i, _ in enumerate(t)])
         # FIX: WOULDNT IT BE AWESOME IF I COULD RUN EVERYTHING THROUGH THE
         # SIMULATION AGAIN FOR EACH NOISY PARAMETER
+
+
         x = np.array([Ls[i] * math.sin(theta_t[i]) for i, _ in enumerate(t)])
         # The output needs to be the same shape as the parameters
-        # Okay now I'm confused because I actually think this creates 
+        # Okay now I'm confused because I actually think this creates
         # noise plus baseline
 
-        return noise - baseline
+        return noisy - baseline
 
     def create_object(self, time: Union[float, list[float]]):
         assert self.calculation_type == "x position", f"{self.calculation_type} method is not yet implemented, sorry."
@@ -127,7 +125,7 @@ class Pendulum(AstroObject):
         pendulum += self.create_noise(pendulum, time)
         return pendulum
 
-    def animate(self, time: Union[float, list[float]]):
+    def animate(self, time: list[float]):#Union[float, list[float]]
         # Right now this just plots x and t
         # Instantiate the simulator
         pendulum = self.create_object(time)
@@ -135,7 +133,6 @@ class Pendulum(AstroObject):
         # Create the figure and axis
         fig = plt.figure(figsize=(10, 3))
         ax1 = fig.add_subplot(111)
-
         def update(i):
             # Calculate the position and velocity at the current time step
             # Clear the previous plot
@@ -145,6 +142,8 @@ class Pendulum(AstroObject):
             ax1.scatter(time[i], pendulum_now)
             ax1.set_title(f'{self.calculation_type} = '
                           + str(round(pendulum_now, 1)))
+        #assert type(time) == 'float', \
+        #    "cannot run because only one moment in time"
         FuncAnimation(fig, update, frames=range(1, len(time)), interval=100)
         plt.show()
         return
