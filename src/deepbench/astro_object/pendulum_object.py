@@ -11,7 +11,6 @@ class Pendulum(AstroObject):
                  starting_angle_radians: float,
                  noise: float,
                  calculation_type: str = "x position",
-                 #Union[float, None]
                  acceleration_due_to_gravity: float = None,
                  big_G_newton: float = None,
                  phi_planet: float = None,
@@ -58,7 +57,8 @@ class Pendulum(AstroObject):
         self.calculation_type = calculation_type
         self.big_G_newton = 0. if big_G_newton is None else big_G_newton
         self.phi_planet = 0. if phi_planet is None else phi_planet
-        self.acceleration_due_to_gravity = self.big_G_newton * self.phi_planet if \
+        self.acceleration_due_to_gravity = \
+            self.big_G_newton * self.phi_planet if \
             acceleration_due_to_gravity is None \
             else acceleration_due_to_gravity
         # Optional arguments: mass, friction
