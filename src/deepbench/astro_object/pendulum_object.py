@@ -1,9 +1,8 @@
 from src.deepbench.astro_object.astro_object import AstroObject
 import numpy as np
-import math
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
-from typing import Union, List
+from typing import Union
 
 
 class Pendulum(AstroObject):
@@ -67,8 +66,10 @@ class Pendulum(AstroObject):
             self.phi_planet = None
             self.acceleration_due_to_gravity = acceleration_due_to_gravity
         # Optional arguments: mass, friction
-        self.mass_pendulum_bob = mass_pendulum_bob if mass_pendulum_bob is not None else 10.
-        self.coefficient_friction = coefficient_friction if coefficient_friction is not None else 0.
+        self.mass_pendulum_bob = mass_pendulum_bob if \
+            mass_pendulum_bob is not None else 10.
+        self.coefficient_friction = coefficient_friction if \
+            coefficient_friction is not None else 0.
 
     # Currently just simulating the x position of the pendulum
     # for one or multiple moments in time
@@ -87,8 +88,39 @@ class Pendulum(AstroObject):
         return
 
     def create_noise(self):
-        # We will modify this to be our own special
-        # noise profile :)
+        theta = self.theta
+        t = self.t
+        noise = self.noise
+
+        ts = np.repeat(t[:, np.newaxis], theta.shape[0], axis=1)
+
+
+        if theta.ndim == 1:
+            theta = theta[np.newaxis, :]
+
+        # time to solve for position and velocity
+
+        # nested for loop, there's probably a better way to do this
+        # output needs to be (n,len(t))
+        x = np.zeros((theta.shape[0],len(t)))
+        
+        for n in range(theta.shape[0]):
+
+            # Draw parameter (theta) values from normal distributions
+            # To produce noise in the thetas you are using to produce the position
+            # and momentum of the pendulum at each moment in time
+            # Another way to do this would be to just draw once and use that same noisy theta 
+            # value for all moments in time, but this would be very similar to just drawing
+            # from the prior, which we're already doing.
+
+            gs = np.random.normal(loc=theta[n][0], scale=noise[0], size=np.shape(t))
+            Ls = np.random.normal(loc=theta[n][1], scale=noise[1], size=np.shape(t))
+            theta_os =  np.random.normal(loc=theta[n][2], scale=noise[2], size=np.shape(t))
+
+            theta_t = np.array([theta_os[i] * math.cos(np.sqrt(gs[i] / Ls[i]) * t[i]) for i, _ in enumerate(t)])
+
+            x[n,:] = np.array([Ls[i] * math.sin(theta_t[i]) for i, _ in enumerate(t)])
+            
         return super(self).create_noise()
 
     def create_object(self, time: Union[float, list[float]]):
