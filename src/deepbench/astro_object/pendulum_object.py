@@ -1,5 +1,4 @@
-#from src.deepbench.astro_object.astro_object import AstroObject
-from astro_object import AstroObject
+from src.deepbench.astro_object.astro_object import AstroObject
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
@@ -189,15 +188,3 @@ class Pendulum(AstroObject):
                              interval=100)
         plt.show(anim)
         return
-time = np.linspace(0,100,1000)
-pend = Pendulum(pendulum_arm_length=10.,
-                starting_angle_radians=np.pi/4,
-                acceleration_due_to_gravity=9.8,
-                calculation_type='x position',
-                noise_std_percent=[1,0.1,0.1],
-                )
-
-pend_noisy = pend.create_object(time)
-pend_noise_free = pend.simulate_pendulum_position(time)
-pend.displayObject(time)
-print(pend)
