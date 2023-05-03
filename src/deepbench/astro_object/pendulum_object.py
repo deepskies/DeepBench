@@ -1,4 +1,5 @@
-from src.deepbench.astro_object.astro_object import AstroObject
+#from src.deepbench.astro_object.astro_object import AstroObject
+from astro_object import AstroObject
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
@@ -45,13 +46,18 @@ class Pendulum(AstroObject):
 
         Examples:
 
-            >>> pendulum_obj = Pendulum()
+            >>> pendulum_obj = Pendulum(pendulum_arm_length=10.,
+                                        starting_angle_radians=np.pi/4,
+                                        acceleration_due_to_gravity=9.8,
+                                        noise_standard_percent = 0.1,
+                                        calculation_type = 'x position'
+                                        )
         """
         super().__init__(
             image_dimensions=1,
             radius=None,
             amplitude=None,
-            noise=noise_std_percent,
+            noise_level=noise_std_percent,
         )
         self.pendulum_arm_length = pendulum_arm_length
         self.starting_angle_radians = starting_angle_radians
@@ -73,15 +79,25 @@ class Pendulum(AstroObject):
         self.coefficient_friction = 0. if coefficient_friction is None \
             else coefficient_friction
 
+        self.initial_parameters = {'pendulum_arm_length':
+                                   self.pendulum_arm_length,
+                                   'starting_angle_radians':
+                                   self.starting_angle_radians,
+                                   'acceleration_due_to_gravity':
+                                   self.acceleration_due_to_gravity}
+
+
+
+
     # Currently just simulating the x position of the pendulum
     # for one or multiple moments in time
     def simulate_pendulum_position(self, time):
         assert len(time) is not None, "Must enter a time"
-        assert self.starting_angle_radians > np.pi, \
+        assert self.starting_angle_radians < np.pi, \
             "The angle better not be in degrees or else"
         time = np.asarray(time)
         theta_time = self.starting_angle_radians * \
-            np.cos(np.sqrt(self.g / self.pendulum_arm_length))
+            np.cos(np.sqrt(self.acceleration_due_to_gravity / self.pendulum_arm_length))
         x = self.pendulum_arm_length * np.sin(theta_time * time)
         return x
 
@@ -89,7 +105,7 @@ class Pendulum(AstroObject):
     def simulate_pendulum_position_and_momentum(self, time):
         return
 
-    def create_noise(self, baseline, time):
+    def create_noise(self):
         # Make a list of parameters to add noise to
         # Here we add noise not just on the final measurement
         # but via adding it to each parameter and propagating
@@ -98,53 +114,57 @@ class Pendulum(AstroObject):
                           self.starting_angle_radians,
                           self.acceleration_due_to_gravity]
         # Define the standard deviation of noise for each parameter
-        if type(self.noise) == 'float':  # then its one number
+        if type(self.noise) is float:  # then its one number
             std_noise = [self.noise * p for p in parameter_list]
         else:
-            for p, i in enumerate(parameter_list):
+            for i, p in enumerate(parameter_list):
                 std_noise = [self.noise[i] * p for p in parameter_list]
         # Add noise to global parameters
-        pendulum_arm_length_noisy = np.random.normal(
+        self.pendulum_arm_length_noisy = np.random.normal(
             loc=self.pendulum_arm_length,
             scale=std_noise[0]
         )
-        starting_angle_radians_noisy = np.random.normal(
+        self.starting_angle_radians = np.random.normal(
             loc=self.starting_angle_radians,
             scale=std_noise[1]
         )
-        acceleration_due_to_gravity_noisy = np.random.normal(
+        self.acceleration_due_to_gravity = np.random.normal(
             loc=self.acceleration_due_to_gravity,
             scale=std_noise[2]
         )
-        if self.calculation_type == "x position":
-            # Run the baseline Pendulum
-            pendulum_baseline = Pendulum(
-                pendulum_arm_length=self.pendulum_arm_length,
-                starting_angle_radians=self.starting_angle_radians,
-                acceleration_due_to_gravity=self.acceleration_due_to_gravity,
-            ).simulate_pendulum_position(time)
-            # Create new Pendulum object with noisy parameters
-            pendulum_noisy = Pendulum(
-                pendulum_arm_length=pendulum_arm_length_noisy,
-                starting_angle_radians=starting_angle_radians_noisy,
-                acceleration_due_to_gravity=acceleration_due_to_gravity_noisy,
-            ).simulate_pendulum_position(time)
-        else:
-            assert "Not yet implemented"
-        # Here we are adding gitter to the one parameter value that is
-        # given at all points in the time
-        # FUTURE WORK: allow the parameters to jitter for each moment
-        # in time
-        return pendulum_noisy - pendulum_baseline
+        return
 
-    def create_object(self, time: Union[float, list[float]]):
+    def destroy_noise(self):
+        # Re-modify the global parameters to
+        # have the original value
+        self.pendulum_arm_length = \
+            self.initial_parameters['pendulum_arm_length']
+        self.starting_angle_radians = \
+            self.initial_parameters['starting_angle_radians']
+        self.acceleration_due_to_gravity = \
+            self.initial_parameters['acceleration_due_to_gravity']
+        return
+
+    def create_object(self, time: Union[float, list[float]], clean_noise=True):
         assert self.calculation_type == "x position", f"\
             {self.calculation_type} method is not yet implemented, sorry."
+        self.create_noise()
         pendulum = self.simulate_pendulum_position(time)
-        pendulum += self.create_noise(pendulum, time)
+        if clean_noise:
+            self.destroy_noise()
         return pendulum
 
-    def animate(self, time: list[float]):#Union[float, list[float]]
+    def displayObject(self, time: Union[float, List[float]]):
+        plt.clf()
+        plt.scatter(time, self.create_object(time),
+                    label='noisy')
+        plt.scatter(time, self.simulate_pendulum_position(time),
+                    label='noise free')
+        plt.legend()
+        plt.show()
+
+
+    def animateObject(self, time: Union[float, List[float]]):
         # Right now this just plots x and t
         # Instantiate the simulator
         pendulum = self.create_object(time)
@@ -152,6 +172,7 @@ class Pendulum(AstroObject):
         # Create the figure and axis
         fig = plt.figure(figsize=(10, 3))
         ax1 = fig.add_subplot(111)
+
         def update(i):
             # Calculate the position and velocity at the current time step
             # Clear the previous plot
@@ -161,8 +182,22 @@ class Pendulum(AstroObject):
             ax1.scatter(time[i], pendulum_now)
             ax1.set_title(f'{self.calculation_type} = '
                           + str(round(pendulum_now, 1)))
-        #assert type(time) == 'float', \
-        #    "cannot run because only one moment in time"
-        FuncAnimation(fig, update, frames=range(1, len(time)), interval=100)
-        plt.show()
+        if isinstance(time, float):
+            time = [time]
+        anim = FuncAnimation(fig, update,
+                             frames=range(1, len(time)),
+                             interval=100)
+        plt.show(anim)
         return
+time = np.linspace(0,100,1000)
+pend = Pendulum(pendulum_arm_length=10.,
+                starting_angle_radians=np.pi/4,
+                acceleration_due_to_gravity=9.8,
+                calculation_type='x position',
+                noise_std_percent=[1,0.1,0.1],
+                )
+
+pend_noisy = pend.create_object(time)
+pend_noise_free = pend.simulate_pendulum_position(time)
+pend.displayObject(time)
+print(pend)
