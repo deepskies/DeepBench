@@ -116,7 +116,7 @@ class Pendulum(AstroObject):
             loc=self.acceleration_due_to_gravity,
             scale=std_noise[2]
         )
-        # Run the baseline pendulum
+        # Run the baseline Pendulum
         pendulum_baseline = Pendulum(
             pendulum_arm_length=self.pendulum_arm_length,
             starting_angle_radians=self.starting_angle_radians,
@@ -130,10 +130,15 @@ class Pendulum(AstroObject):
             calculation_type=self.calculation_type,
             acceleration_due_to_gravity=acceleration_due_to_gravity_noisy,
         ).simulate_pendulum_position(time)
+        # Here we are adding gitter to the one parameter value that is
+        # given at all points in the time
+        # FUTURE WORK: allow the parameters to jitter for each moment
+        # in time
         return pendulum_noisy - pendulum_baseline
 
     def create_object(self, time: Union[float, list[float]]):
-        assert self.calculation_type == "x position", f"{self.calculation_type} method is not yet implemented, sorry."
+        assert self.calculation_type == "x position", f"\
+            {self.calculation_type} method is not yet implemented, sorry."
         pendulum = self.simulate_pendulum_position(time)
         pendulum += self.create_noise(pendulum, time)
         return pendulum
