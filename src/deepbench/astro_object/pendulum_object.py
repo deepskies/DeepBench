@@ -64,7 +64,6 @@ class Pendulum(AstroObject):
         self.calculation_type = calculation_type
         self.big_G_newton = None if big_G_newton is None else big_G_newton
         self.phi_planet = None if phi_planet is None else phi_planet
-
         if acceleration_due_to_gravity is None:
             assert self.big_G_newton is not None and self.phi_planet \
                 is not None, "must define big_G_newton and phi_planet if \
@@ -77,16 +76,12 @@ class Pendulum(AstroObject):
             is None else mass_pendulum_bob
         self.coefficient_friction = 0. if coefficient_friction is None \
             else coefficient_friction
-
         self.initial_parameters = {'pendulum_arm_length':
                                    self.pendulum_arm_length,
                                    'starting_angle_radians':
                                    self.starting_angle_radians,
                                    'acceleration_due_to_gravity':
                                    self.acceleration_due_to_gravity}
-
-
-
 
     # Currently just simulating the x position of the pendulum
     # for one or multiple moments in time
@@ -96,7 +91,8 @@ class Pendulum(AstroObject):
             "The angle better not be in degrees or else"
         time = np.asarray(time)
         theta_time = self.starting_angle_radians * \
-            np.cos(np.sqrt(self.acceleration_due_to_gravity / self.pendulum_arm_length))
+            np.cos(np.sqrt(self.acceleration_due_to_gravity /
+                           self.pendulum_arm_length))
         x = self.pendulum_arm_length * np.sin(theta_time * time)
         return x
 
@@ -161,7 +157,6 @@ class Pendulum(AstroObject):
                     label='noise free')
         plt.legend()
         plt.show()
-
 
     def animateObject(self, time: Union[float, List[float]]):
         # Right now this just plots x and t
