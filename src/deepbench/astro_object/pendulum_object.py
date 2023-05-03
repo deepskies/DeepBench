@@ -116,20 +116,21 @@ class Pendulum(AstroObject):
             loc=self.acceleration_due_to_gravity,
             scale=std_noise[2]
         )
-        # Run the baseline Pendulum
-        pendulum_baseline = Pendulum(
-            pendulum_arm_length=self.pendulum_arm_length,
-            starting_angle_radians=self.starting_angle_radians,
-            calculation_type=self.calculation_type,
-            acceleration_due_to_gravity=self.acceleration_due_to_gravity,
-        ).simulate_pendulum_position(time)
-        # Create new Pendulum object with noisy parameters
-        pendulum_noisy = Pendulum(
-            pendulum_arm_length=pendulum_arm_length_noisy,
-            starting_angle_radians=starting_angle_radians_noisy,
-            calculation_type=self.calculation_type,
-            acceleration_due_to_gravity=acceleration_due_to_gravity_noisy,
-        ).simulate_pendulum_position(time)
+        if self.calculation_type == "x position":
+            # Run the baseline Pendulum
+            pendulum_baseline = Pendulum(
+                pendulum_arm_length=self.pendulum_arm_length,
+                starting_angle_radians=self.starting_angle_radians,
+                acceleration_due_to_gravity=self.acceleration_due_to_gravity,
+            ).simulate_pendulum_position(time)
+            # Create new Pendulum object with noisy parameters
+            pendulum_noisy = Pendulum(
+                pendulum_arm_length=pendulum_arm_length_noisy,
+                starting_angle_radians=starting_angle_radians_noisy,
+                acceleration_due_to_gravity=acceleration_due_to_gravity_noisy,
+            ).simulate_pendulum_position(time)
+        else:
+            assert "Not yet implemented"
         # Here we are adding gitter to the one parameter value that is
         # given at all points in the time
         # FUTURE WORK: allow the parameters to jitter for each moment
