@@ -2,20 +2,20 @@ from src.deepbench.astro_object.astro_object import AstroObject
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
-from typing import Union
+from typing import Union, List, Optional
 
 
 class Pendulum(AstroObject):
     def __init__(self,
                  pendulum_arm_length: float,
                  starting_angle_radians: float,
-                 noise: float,
+                 noise_std_percent: Union[float, List[float]] = 0.0,
                  calculation_type: str = "x position",
-                 acceleration_due_to_gravity: float = None,
-                 big_G_newton: float = None,
-                 phi_planet: float = None,
-                 mass_pendulum_bob: float = None,
-                 coefficient_friction: float = None
+                 acceleration_due_to_gravity: Optional[float] = None,
+                 big_G_newton: Optional[float] = None,
+                 phi_planet: Optional[float] = None,
+                 mass_pendulum_bob: Optional[float] = None,
+                 coefficient_friction: Optional[float] = None
                  ):
         """
         The initialization function for the Pendulum class.
@@ -24,14 +24,15 @@ class Pendulum(AstroObject):
             pendulum_arm_length (float): The length of the pendulum arm
             starting_angle_radians (float): The starting angle of the pendulum
                 (angle from the 'ceiling')
-            noise (float): The Poisson noise level to be applied to the object.
-                This needs to be updated for the pendulum,
-                currently it folows the Poisson prescription
-                from astro_object.py
+            noise_std_percent (Union[float,List[float]]): The Gaussian noise
+                level to be applied to the object. If this is one number,
+                the standard deviation of the Gaussian noise for each
+                parameter is taken to be this percent of each parameter value.
+                If this is an array, the std is this percent of each number.
             calculation_type (str): Type of observation of the pendulum.
                 Options are ["x position","position and momentum"]
-            acceleration_due_to_gravity (float): little g, local gravity coefficient,
-                optional if G and phi are defined,
+            acceleration_due_to_gravity (float): little g, local gravity
+                coefficient, optional if G and phi are defined,
                 g = G * phi
             big_G_newton (float): Big G, the gravitational constant,
                 optional if g is defined
@@ -39,7 +40,8 @@ class Pendulum(AstroObject):
                 optional if g is defined
             mass_pendulum_bob (float): Mass of the pendulum bob,
                 this is optional if calculation_type is position only.
-            coefficient_friction (float): Coefficient of friction, optional argument.
+            coefficient_friction (float): Coefficient of friction,
+            optional argument.
 
         Examples:
 
@@ -49,19 +51,23 @@ class Pendulum(AstroObject):
             image_dimensions=1,
             radius=None,
             amplitude=None,
-            noise=noise,
+            noise=noise_std_percent,
         )
         self.pendulum_arm_length = pendulum_arm_length
         self.starting_angle_radians = starting_angle_radians
-        self.noise = noise
+        self.noise = noise_std_percent
         self.calculation_type = calculation_type
-        self.big_G_newton = 0. if big_G_newton is None else big_G_newton
-        self.phi_planet = 0. if phi_planet is None else phi_planet
-        self.acceleration_due_to_gravity = \
-            self.big_G_newton * self.phi_planet if \
-            acceleration_due_to_gravity is None \
-            else acceleration_due_to_gravity
-        # Optional arguments: mass, friction
+        self.big_G_newton = None if big_G_newton is None else big_G_newton
+        self.phi_planet = None if phi_planet is None else phi_planet
+
+        if acceleration_due_to_gravity is None:
+            assert self.big_G_newton is not None and self.phi_planet \
+                is not None, "must define big_G_newton and phi_planet if \
+                    acceleration_due_to_gravity is not provided"
+            self.acceleration_due_to_gravity = self.big_G_newton * \
+                self.phi_planet
+        else:
+            self.acceleration_due_to_gravity = acceleration_due_to_gravity
         self.mass_pendulum_bob = 10. if mass_pendulum_bob \
             is None else mass_pendulum_bob
         self.coefficient_friction = 0. if coefficient_friction is None \
@@ -85,20 +91,35 @@ class Pendulum(AstroObject):
 
     def create_noise(self, baseline, time):
         # produce noise on each parameter individually
-        pendulum_arm_length = self.pendulum_arm_length
-        starting_angle_radians = self.starting_angle_radians
-        noise_multiple = self.noise
-        calculation_type = self.calculation_type
-        big_G_newton = self.big_G_newton
-        phi_planet = self.phi_planet
-        acceleration_due_to_gravity = self.acceleration_due_to_gravity
-        mass_pendulum_bob = self.mass_pendulum_bob
-        coefficient_friction = self.coefficient_friction
+        # so first determine which parameters you are making noisy
+        parameter_list = [self.pendulum_arm_length,
+                          self.starting_angle_radians,
+                          self.big_G_newton,
+                          self.phi_planet,
+                          self.acceleration_due_to_gravity]
+        if type(self.noise) == 'float':# then its one number
+            std_noise = [self.noise * p for p in parameter_list]
+        else:
+            for p, i in enumerate(parameter_list):
+                std_noise = [self.noise[i] * p for p in parameter_list]
+        self.pendulum_arm_length_noisy = np.random.normal(loc=self.pendulum_arm_length,
+                                                          scale=std_noise[0])
 
 
-        # time to solve for position and velocity
 
-        # nested for loop, there's probably a better way to do this
+        self.pendulum_arm_length_noisy = pendulum_arm_length_noisy
+
+        # What we should do is modify all of these and be able to feed
+        # them into whatever the simulation is.
+        # Ideally this is like a write over of the existing parameters
+        # but with new draws of the parameter values for every
+        # element of the time array
+        # like: self.pendulum_arm_length+= np.random.normal(loc=L, scale=std, size=np.shape(t))
+        # does it make sense to run this a bunch of times for different noise draws /
+        # different moments in time?
+        simulate_pendulum_position(time)
+
+
         # output needs to be (n,len(t))
         x = np.zeros((theta.shape[0],len(t)))
 
