@@ -90,55 +90,47 @@ class Pendulum(AstroObject):
         return
 
     def create_noise(self, baseline, time):
-        # produce noise on each parameter individually
-        # so first determine which parameters you are making noisy
+        # Make a list of parameters to add noise to
+        # Here we add noise not just on the final measurement
+        # but via adding it to each parameter and propagating
+        # through to the final measurement (ie x position)
         parameter_list = [self.pendulum_arm_length,
                           self.starting_angle_radians,
-                          self.big_G_newton,
-                          self.phi_planet,
                           self.acceleration_due_to_gravity]
-        if type(self.noise) == 'float':# then its one number
+        # Define the standard deviation of noise for each parameter
+        if type(self.noise) == 'float':  # then its one number
             std_noise = [self.noise * p for p in parameter_list]
         else:
             for p, i in enumerate(parameter_list):
                 std_noise = [self.noise[i] * p for p in parameter_list]
-        self.pendulum_arm_length_noisy = np.random.normal(loc=self.pendulum_arm_length,
-                                                          scale=std_noise[0])
-
-
-
-        self.pendulum_arm_length_noisy = pendulum_arm_length_noisy
-
-        # What we should do is modify all of these and be able to feed
-        # them into whatever the simulation is.
-        # Ideally this is like a write over of the existing parameters
-        # but with new draws of the parameter values for every
-        # element of the time array
-        # like: self.pendulum_arm_length+= np.random.normal(loc=L, scale=std, size=np.shape(t))
-        # does it make sense to run this a bunch of times for different noise draws /
-        # different moments in time?
-        simulate_pendulum_position(time)
-
-
-        # output needs to be (n,len(t))
-        x = np.zeros((theta.shape[0],len(t)))
-
-        gs = np.random.normal(loc=theta[n][0], scale=noise[0], size=np.shape(t))
-        Ls = np.random.normal(loc=theta[n][1], scale=noise[1], size=np.shape(t))
-        theta_os =  np.random.normal(loc=theta[n][2], scale=noise[2], size=np.shape(t))
-
-        # FIX: THIS NO LONGER NEEDS TO BE A LOOP
-        theta_t = np.array([theta_os[i] * math.cos(np.sqrt(gs[i] / Ls[i]) * t[i]) for i, _ in enumerate(t)])
-        # FIX: WOULDNT IT BE AWESOME IF I COULD RUN EVERYTHING THROUGH THE
-        # SIMULATION AGAIN FOR EACH NOISY PARAMETER
-
-
-        x = np.array([Ls[i] * math.sin(theta_t[i]) for i, _ in enumerate(t)])
-        # The output needs to be the same shape as the parameters
-        # Okay now I'm confused because I actually think this creates
-        # noise plus baseline
-
-        return noisy - baseline
+        # Add noise to global parameters
+        pendulum_arm_length_noisy = np.random.normal(
+            loc=self.pendulum_arm_length,
+            scale=std_noise[0]
+        )
+        starting_angle_radians_noisy = np.random.normal(
+            loc=self.starting_angle_radians,
+            scale=std_noise[1]
+        )
+        acceleration_due_to_gravity_noisy = np.random.normal(
+            loc=self.acceleration_due_to_gravity,
+            scale=std_noise[2]
+        )
+        # Run the baseline pendulum
+        pendulum_baseline = Pendulum(
+            pendulum_arm_length=self.pendulum_arm_length,
+            starting_angle_radians=self.starting_angle_radians,
+            calculation_type=self.calculation_type,
+            acceleration_due_to_gravity=self.acceleration_due_to_gravity,
+        ).simulate_pendulum_position(time)
+        # Create new Pendulum object with noisy parameters
+        pendulum_noisy = Pendulum(
+            pendulum_arm_length=pendulum_arm_length_noisy,
+            starting_angle_radians=starting_angle_radians_noisy,
+            calculation_type=self.calculation_type,
+            acceleration_due_to_gravity=acceleration_due_to_gravity_noisy,
+        ).simulate_pendulum_position(time)
+        return pendulum_noisy - pendulum_baseline
 
     def create_object(self, time: Union[float, list[float]]):
         assert self.calculation_type == "x position", f"{self.calculation_type} method is not yet implemented, sorry."
