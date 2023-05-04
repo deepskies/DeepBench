@@ -14,8 +14,8 @@ class Pendulum(AstroObject):
                  acceleration_due_to_gravity: Optional[float] = None,
                  big_G_newton: Optional[float] = None,
                  phi_planet: Optional[float] = None,
-                 mass_pendulum_bob: Optional[float] = None,
-                 coefficient_friction: Optional[float] = None
+                 mass_pendulum_bob: Optional[float] = 10.0,
+                 coefficient_friction: Optional[float] = 0.0
                  ):
         """
         The initialization function for the Pendulum class.
@@ -62,8 +62,8 @@ class Pendulum(AstroObject):
         self.starting_angle_radians = starting_angle_radians
         self.noise = noise_std_percent
         self.calculation_type = calculation_type
-        self.big_G_newton = None if big_G_newton is None else big_G_newton
-        self.phi_planet = None if phi_planet is None else phi_planet
+        self.big_G_newton = big_G_newton
+        self.phi_planet = phi_planet
         if acceleration_due_to_gravity is None:
             assert self.big_G_newton is not None and self.phi_planet \
                 is not None, "must define big_G_newton and phi_planet if \
@@ -72,10 +72,8 @@ class Pendulum(AstroObject):
                 self.phi_planet
         else:
             self.acceleration_due_to_gravity = acceleration_due_to_gravity
-        self.mass_pendulum_bob = 10. if mass_pendulum_bob \
-            is None else mass_pendulum_bob
-        self.coefficient_friction = 0. if coefficient_friction is None \
-            else coefficient_friction
+        self.mass_pendulum_bob = mass_pendulum_bob
+        self.coefficient_friction = coefficient_friction
         self.initial_parameters = {'pendulum_arm_length':
                                    self.pendulum_arm_length,
                                    'starting_angle_radians':
