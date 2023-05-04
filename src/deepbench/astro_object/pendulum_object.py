@@ -60,6 +60,8 @@ class Pendulum(AstroObject):
         )
         self.pendulum_arm_length = pendulum_arm_length
         self.starting_angle_radians = starting_angle_radians
+        assert self.starting_angle_radians < np.pi, \
+            "The angle better not be in degrees or else"
         self.noise = noise_std_percent
         self.calculation_type = calculation_type
         self.big_G_newton = big_G_newton
@@ -85,8 +87,6 @@ class Pendulum(AstroObject):
     # for one or multiple moments in time
     def simulate_pendulum_position(self, time):
         assert len(time) is not None, "Must enter a time"
-        assert self.starting_angle_radians < np.pi, \
-            "The angle better not be in degrees or else"
         time = np.asarray(time)
         theta_time = self.starting_angle_radians * \
             np.cos(np.sqrt(self.acceleration_due_to_gravity /
