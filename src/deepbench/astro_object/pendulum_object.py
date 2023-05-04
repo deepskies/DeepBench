@@ -125,7 +125,6 @@ class Pendulum(AstroObject):
             loc=self.acceleration_due_to_gravity,
             scale=std_noise[2]
         )
-        return
 
     def destroy_noise(self):
         # Re-modify the global parameters to
