@@ -8,6 +8,8 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from typing import Union, List
 
+solve_ivp = scipy.integrate.solve_ivp
+
 
 class Pendulum(AstroObject):
     def __init__(self,
@@ -87,13 +89,15 @@ class Pendulum(AstroObject):
 
     #------------------------------------------------ q and p Stuff Below!!!! ##### q and p Stuff Below!!!! ##### q and p Stuff Below!!!! ----------------------------------------------------#
 
-    def hamiltonian_fn(coords, m, g, l, **kwargs):
+    def hamiltonian_fn(self, coords):
         q, p = agnp.split(coords, 2)
-        H = (m*g*l)*(1 - agnp.cos(q)) + ((l**2) * (p ** 2))/(2*m) # pendulum hamiltonian
+        kinetic_term = ((self.pendulum_arm_length**2) * (p ** 2))/(2*self.mass_pendulum_bob)
+        potential_term = (self.mass_pendulum_bob*self.acceleration_due_to_gravity*self.pendulum_arm_length)*(1 - agnp.cos(q))
+        H = kinetic_term + potential_term # pendulum hamiltonian
         return H
     
-    def dynamics_fn(self, t, coords, *args, **kwargs):
-        dcoords = autograd.grad(self.hamiltonian_fn)(coords, m=1, g=9.8, l=1) # derives the gradient of the hamiltonian function then computes the gradient values at coords
+    def dynamics_fn(self, t, coords):
+        dcoords = autograd.grad(self.hamiltonian_fn)(coords) # derives the gradient of the hamiltonian function then computes the gradient values at coords
         dqdt, dpdt = agnp.split(dcoords, 2)
         S = agnp.concatenate([dpdt, -dqdt], axis=-1)
         return S
@@ -109,12 +113,9 @@ class Pendulum(AstroObject):
             radius = agnp.random.rand() + 1.3  # sample a range of radii between 1.3 and 2.3
         y0 = y0 / agnp.sqrt((y0 ** 2).sum()) * radius  ## set the appropriate radius
 
-        spring_ivp = solve_ivp(fun=dynamics_fn, t_span=t_span, y0=y0, t_eval=t_eval, rtol=1e-10, **kwargs)
-
+        spring_ivp = solve_ivp(fun=self.dynamics_fn, t_span=t_span, y0=y0, t_eval=t_eval, rtol=1e-10, **kwargs)
         q, p = spring_ivp['y'][0], spring_ivp['y'][1] # these are the future q and p values of the hamiltonian based on y0  
-        dydt = [dynamics_fn(None, y, self.mass_pendulum_bob, self.acceleration_due_to_gravity, 
-                            self.pendulum_arm_length) for y in spring_ivp['y'].T] # this computes the values of the gradient of the hamiltonian at each row from the transposed sprint_ivp['y']
-        
+        dydt = [self.dynamics_fn(None, y) for y in spring_ivp['y'].T] # this computes the values of the gradient of the hamiltonian at each row from the transposed sprint_ivp['y']
         dydt = agnp.stack(dydt).T # stack the computed gradients in dydt as row vectors
         dqdt, dpdt = agnp.split(dydt, 2) # split the dydt into dqdt and dpdt
 
@@ -123,14 +124,14 @@ class Pendulum(AstroObject):
         p += agnp.random.randn(*p.shape) * self.noise  # creates a random array of size p.shape and is scaled with noise_std then adds to p for noise
         return q, p, dqdt, dpdt, t_eval 
     
-    def get_field(self, xmin=-1.2, xmax=1.2, ymin=-1.2, ymax=1.2, gridsize=20, m=1, g=9.8, l=1):
+    def get_field(self, xmin=-1.2, xmax=1.2, ymin=-1.2, ymax=1.2, gridsize=20):
         field = {'meta': locals()}  # stores a dictionary of key value pairs of all local variables
 
         b, a = agnp.meshgrid(agnp.linspace(xmin, xmax, gridsize), agnp.linspace(ymin, ymax, gridsize)) # the meshgrid function returns two 2-dimensional arrays
         ys = agnp.stack([b.flatten(), a.flatten()]) # flattens the two 2-dimensional arrays and makes two row vectors which are stacked and stored in ys
 
         # get vector directions
-        dydt = [self.dynamics_fn(None, y, m, g, l) for y in ys.T] # this computes the values of the gradient of the hamiltonian at each row from the transposed ys
+        dydt = [self.dynamics_fn(None, y) for y in ys.T] # this computes the values of the gradient of the hamiltonian at each row from the transposed ys
         dydt = agnp.stack(dydt).T # stack the computed gradients in dydt as row vectors
 
         field['x'] = ys.T # convert ys into column vectors and store the values in the key 'x'
