@@ -136,7 +136,7 @@ class Pendulum(PhysicsObject):
         x = self.pendulum_arm_length * np.sin(theta_time * time)
         return x
 
-    def displayObject(self, time: Union[float, np.array]):
+    def displayObject(self, time:Union[float, np.array]):
         plt.clf()
         plt.scatter(time, self.create_object(time),
                     label='noisy')
