@@ -100,10 +100,10 @@ class Pendulum(PhysicsObject):
         return pendulum
 
 
-    def simulate_pendulum_dynamics(self, time:Union[float, np.array[float]]):
+    def simulate_pendulum_dynamics(self, time:Union[float, np.array]):
         return NotImplemented
 
-    def displayObject(self, time:Union[float, np.array[float]]):
+    def displayObject(self, time:Union[float, np.array]):
         plt.clf()
         plt.scatter(time, self.create_object(time),
                     label='noisy')
@@ -112,7 +112,7 @@ class Pendulum(PhysicsObject):
         plt.legend()
         plt.show()
 
-    def animateObject(self, time: Union[float, np.array[float]]):
+    def animateObject(self, time: Union[float, np.array]):
         # Right now this just plots x and t
         # Instantiate the simulator
         pendulum = self.create_object(time)
