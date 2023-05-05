@@ -1,4 +1,5 @@
-from src.deepbench.physics_object.physics_object import PhysicsObject
+#from src.deepbench.physics_object.physics_object import PhysicsObject
+from physics_object import PhysicsObject
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
@@ -117,7 +118,6 @@ class Pendulum(PhysicsObject):
         return
 
     def create_object(self, time: np.array, noiseless: bool = False, seed: int = 42):
-
         self.create_noise(seed=seed, n_steps=time.shape)
         if noiseless:
             self.destroy_noise()
@@ -170,3 +170,18 @@ class Pendulum(PhysicsObject):
                              interval=100)
         plt.show(anim)
         return
+
+time = np.linspace(0,100,1000)
+print(type(time))
+pend = Pendulum(pendulum_arm_length=10.,
+                starting_angle_radians=np.pi/4,
+                acceleration_due_to_gravity=9.8,
+                noise_std_percent={'pendulum_arm_length': 0.5,
+                                   'starting_angle_radians': 0.0,
+                                   'acceleration_due_to_gravity': 0.0}
+                )
+
+pend_noisy = pend.create_object(time)
+pend_noise_free = pend.simulate_pendulum_dynamics(time)
+pend.displayObject(time)
+print(pend)
