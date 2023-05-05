@@ -15,6 +15,8 @@ class TestPendulum(TestCase):
             self.assertIsNone(Pendulum(10., np.pi/4, 0.,
                                        "x position", 10.).create_object(time))
 
+            self.assertIsNone(Pendulum(10., np.pi/4, 0.,
+                                       "x position", 10.).displayObject(time))
 
             '''
             {"pendulum_arm_length": 10,
