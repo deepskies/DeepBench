@@ -9,9 +9,10 @@ class Pendulum(PhysicsObject):
     def __init__(self,
                  pendulum_arm_length: float,
                  starting_angle_radians: float,
-                 #noise_std_percent: dict = {},
-                 noise_std_percent: Union[float, List[float]] = 0.0,
-                 calculation_type: str = "x position",
+                 noise_std_percent: dict = {'pendulum_arm_length': 0.0,
+                                            'starting_angle_radians': 0.0,
+                                            'acceleration_due_to_gravity':
+                                                0.0},
                  acceleration_due_to_gravity: Optional[float] = None,
                  big_G_newton: Optional[float] = None,
                  phi_planet: Optional[float] = None,
@@ -49,8 +50,7 @@ class Pendulum(PhysicsObject):
             >>> pendulum_obj = Pendulum(pendulum_arm_length=10.,
                                         starting_angle_radians=np.pi/4,
                                         acceleration_due_to_gravity=9.8,
-                                        noise_standard_percent = 0.1,
-                                        calculation_type = 'x position'
+                                        noise_standard_percent = 0.1
                                         )
         """
         super().__init__(
@@ -87,32 +87,22 @@ class Pendulum(PhysicsObject):
             # key is a variable in the class
             assert type(item) in [np.array, float]
 
-    def create_noise(self, seed: int = 42, n_steps: int | tuple[int, int] = 10) -> np.array:
-        # Make a list of parameters to add noise to
-        # Here we add noise not just on the final measurement
-        # but via adding it to each parameter and propagating
-        # through to the final measurement (ie x position)
-        parameter_list = [self.pendulum_arm_length,
-                          self.starting_angle_radians,
-                          self.acceleration_due_to_gravity]
-        # Define the standard deviation of noise for each parameter
-        if type(self.noise) is float:  # then its one number
-            std_noise = [self.noise * p for p in parameter_list]
-        else:
-            for i, p in enumerate(parameter_list):
-                std_noise = [self.noise[i] * p for p in parameter_list]
+    def create_noise(self, seed: int = 42, n_steps:
+                     int | tuple[int, int] = 10) -> np.array:
         # Add noise to global parameters
         self.pendulum_arm_length_noisy = np.random.normal(
             loc=self.pendulum_arm_length,
-            scale=std_noise[0]
+            scale=self.pendulum_arm_length * self.noise['pendulum_arm_length']
         )
         self.starting_angle_radians = np.random.normal(
             loc=self.starting_angle_radians,
-            scale=std_noise[1]
+            scale=self.starting_angle_radians *
+            self.noise['starting_angle_radians']
         )
         self.acceleration_due_to_gravity = np.random.normal(
             loc=self.acceleration_due_to_gravity,
-            scale=std_noise[2]
+            scale=self.acceleration_due_to_gravity *
+            self.noise['acceleration_due_to_gravity']
         )
 
     def destroy_noise(self):
@@ -138,7 +128,7 @@ class Pendulum(PhysicsObject):
         return pendulum
 
     def simulate_pendulum_dynamics(self, time: Union[float, np.array[float]]):
-        assert len(time) is not None, "Must enter a time"
+        assert time is not None, "Must enter a time"
         time = np.asarray(time)
         theta_time = self.starting_angle_radians * \
             np.cos(np.sqrt(self.acceleration_due_to_gravity /
