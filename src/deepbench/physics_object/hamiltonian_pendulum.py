@@ -44,23 +44,22 @@ class HamiltonianPendulum(Pendulum):
         S = np.concatenate([dpdt, -dqdt], axis=-1)
         return S
 
-    def simulate_pendulum_dynamics(self, time, **kwargs):
-        timescale = 15
+    def simulate_pendulum_dynamics(self, time):
         t_eval = np.linspace(time[0], time[1],
-                             int(timescale * (time[1] - time[0])))
+                             int(15 * (time[1] - time[0])))
 
-        y0 = None
+        y0 = self.starting_angle_radians
         radius = None
 
         # get initial state
-        if y0 is None:
-            y0 = np.random.rand(2) * 2. - 1
+        if self.starting_angle_radians is None:
+            self.starting_angle_radians = np.random.rand(2) * 2. - 1
         if radius is None:
             radius = np.random.rand() + 1.3
         y0 = y0 / np.sqrt((y0 ** 2).sum()) * radius
 
         spring_ivp = solve_ivp(fun=self.dynamics_fn, t_span=time, y0=y0,
-                               t_eval=t_eval, rtol=1e-10, **kwargs)
+                               t_eval=t_eval, rtol=1e-10)
         q, p = spring_ivp['y'][0], spring_ivp['y'][1]
         dydt = [self.dynamics_fn(None, y) for y in spring_ivp['y'].T]
         dydt = np.stack(dydt).T
