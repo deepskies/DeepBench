@@ -13,7 +13,9 @@ class Pendulum(PhysicsObject):
                  noise_std_percent: dict = {'pendulum_arm_length': 0.0,
                                             'starting_angle_radians': 0.0,
                                             'acceleration_due_to_gravity':
-                                                0.0},
+                                                None,
+                                            'big_G_newton': None,
+                                            'phi_planet': None},
                  acceleration_due_to_gravity: Optional[float] = None,
                  big_G_newton: Optional[float] = None,
                  phi_planet: Optional[float] = None,
@@ -70,29 +72,62 @@ class Pendulum(PhysicsObject):
                     acceleration_due_to_gravity is not provided"
             self.acceleration_due_to_gravity = self.big_G_newton * \
                 self.phi_planet
+            self.initial_parameters = {'pendulum_arm_length':
+                                       self.pendulum_arm_length,
+                                       'starting_angle_radians':
+                                       self.starting_angle_radians,
+                                       'acceleration_due_to_gravity':
+                                       self.acceleration_due_to_gravity,
+                                       'big_G_newton':
+                                       self.big_G_newton,
+                                       'phi_planet':
+                                       self.phi_planet}
         else:
             self.acceleration_due_to_gravity = acceleration_due_to_gravity
+            self.initial_parameters = {'pendulum_arm_length':
+                                       self.pendulum_arm_length,
+                                       'starting_angle_radians':
+                                       self.starting_angle_radians,
+                                       'acceleration_due_to_gravity':
+                                       self.acceleration_due_to_gravity}
         self.mass_pendulum_bob = mass_pendulum_bob
-        self.coefficient_friction = coefficient_friction
-        self.initial_parameters = {'pendulum_arm_length':
-                                   self.pendulum_arm_length,
-                                   'starting_angle_radians':
-                                   self.starting_angle_radians,
-                                   'acceleration_due_to_gravity':
-                                   self.acceleration_due_to_gravity}
+        self.coefficient_friction = coefficient_friction 
 
         # TODO verify the requested noise parameters are variables you can use
 
         for key, item in noise_std_percent.items():
             assert key in [key for key in self.__dict__.keys()]
             # key is a variable in the class
-            assert type(item) in [np.array, float]
+            assert type(item) in [np.array, float], "not in keys"
 
     def create_noise(self, seed: int = 42, n_steps:
                      int | tuple[int, int] = 10) -> np.array:
         # Add noise to global parameters
         rs = rand.RandomState(seed)
-        self.pendulum_arm_length_noisy = rs.normal(
+        if self.big_G_newton is None and self.phi_planet is None:
+            self.acceleration_due_to_gravity = rs.normal(
+                            loc=self.acceleration_due_to_gravity,
+                            scale=self.acceleration_due_to_gravity *
+                            self._noise_level['acceleration_due_to_gravity'],
+                            size=n_steps
+                            )
+        else:
+            self.big_G_newton = rs.normal(
+                            loc=self.big_G_newton,
+                            scale=self.big_G_newton *
+                            self._noise_level['big_G_newton'],
+                            size=n_steps
+                            )
+            self.phi_planet = rs.normal(
+                            loc=self.phi_planet,
+                            scale=self.phi_planet *
+                            self._noise_level['phi_planet'],
+                            size=n_steps
+                            )
+            # redefine acceleration_due_to_gravity = multiple of noisy G and phi
+            self.acceleration_due_to_gravity = self.big_G_newton * \
+                self.phi_planet
+        self.pendulum_arm_length = rs.normal(
             loc=self.pendulum_arm_length,
             scale=self.pendulum_arm_length *
             self._noise_level['pendulum_arm_length'],
@@ -103,13 +138,7 @@ class Pendulum(PhysicsObject):
             scale=self.starting_angle_radians *
             self._noise_level['starting_angle_radians'],
             size=n_steps
-        )
-        self.acceleration_due_to_gravity = rs.normal(
-            loc=self.acceleration_due_to_gravity,
-            scale=self.acceleration_due_to_gravity *
-            self._noise_level['acceleration_due_to_gravity'],
-            size=n_steps
-        )
+        )       
 
     def destroy_noise(self):
         # Re-modify the global parameters to
@@ -120,15 +149,21 @@ class Pendulum(PhysicsObject):
             self.initial_parameters['starting_angle_radians']
         self.acceleration_due_to_gravity = \
             self.initial_parameters['acceleration_due_to_gravity']
+        if self.big_G_newton is not None and self.phi_planet is not None:
+            # then you need to also reset these variables
+            self.big_G_newton = \
+                self.initial_parameters['big_G_newton']
+            self.phi_planet = \
+                self.initial_parameters['phi_planet']
+
         return
 
-    def create_object(self, time: np.array, noiseless: bool = False, seed: int = 42):
+    def create_object(self, time: np.array, noiseless: bool = False,
+                      seed: int = 42):
         self.create_noise(seed=seed, n_steps=time.shape)
         if noiseless:
             self.destroy_noise()
-
         pendulum = self.simulate_pendulum_dynamics(time)
-
         self.destroy_noise()
         return pendulum
 
