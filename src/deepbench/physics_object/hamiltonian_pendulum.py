@@ -49,13 +49,12 @@ class HamiltonianPendulum(Pendulum):
                              int(15 * (time[1] - time[0])))
 
         y0 = self.starting_angle_radians
-        radius = None
+        radius = np.random.rand() + 1.3
 
         # get initial state
         if self.starting_angle_radians is None:
             self.starting_angle_radians = np.random.rand(2) * 2. - 1
-        if radius is None:
-            radius = np.random.rand() + 1.3
+
         y0 = y0 / np.sqrt((y0 ** 2).sum()) * radius
 
         spring_ivp = solve_ivp(fun=self.dynamics_fn, t_span=time, y0=y0,
