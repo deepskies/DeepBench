@@ -1,5 +1,6 @@
 from src.deepbench.physics_object.physics_object import PhysicsObject
 import numpy as np
+import numpy.random as rand
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from typing import Union, Optional
@@ -90,20 +91,24 @@ class Pendulum(PhysicsObject):
     def create_noise(self, seed: int = 42, n_steps:
                      int | tuple[int, int] = 10) -> np.array:
         # Add noise to global parameters
-        self.pendulum_arm_length_noisy = np.random.normal(
+        rs = rand.RandomState(seed)
+        self.pendulum_arm_length_noisy = rs.normal(
             loc=self.pendulum_arm_length,
             scale=self.pendulum_arm_length *
-            self._noise_level['pendulum_arm_length']
+            self._noise_level['pendulum_arm_length'],
+            size=n_steps
         )
-        self.starting_angle_radians = np.random.normal(
+        self.starting_angle_radians = rs.normal(
             loc=self.starting_angle_radians,
             scale=self.starting_angle_radians *
-            self._noise_level['starting_angle_radians']
+            self._noise_level['starting_angle_radians'],
+            size=n_steps
         )
-        self.acceleration_due_to_gravity = np.random.normal(
+        self.acceleration_due_to_gravity = rs.normal(
             loc=self.acceleration_due_to_gravity,
             scale=self.acceleration_due_to_gravity *
-            self._noise_level['acceleration_due_to_gravity']
+            self._noise_level['acceleration_due_to_gravity'],
+            size=n_steps
         )
 
     def destroy_noise(self):
