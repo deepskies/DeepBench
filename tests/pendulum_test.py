@@ -1,6 +1,6 @@
 import numpy as np
 from unittest import TestCase
-from src.deepbench.astro_object.pendulum_object import Pendulum
+from src.deepbench.physics_object.pendulum import Pendulum
 
 
 class TestPendulum(TestCase):
@@ -12,8 +12,13 @@ class TestPendulum(TestCase):
                             starting_angle_radians = np.pi/4,
                             noise = 0]
                             '''
-            self.assertIsNone(Pendulum(10., np.pi/4, 0.,
-                                       "x position", 10.).create_object(time))
+          
+            self.assertIsNone(Pendulum(pendulum_arm_length=10.,
+                starting_angle_radians=np.pi/4,
+                acceleration_due_to_gravity=9.8,
+                noise_std_percent={'pendulum_arm_length': 0.1,
+                                   'starting_angle_radians': 0.1}
+                )).create_object(time)
 
             self.assertIsNone(Pendulum(10., np.pi/4, 0.,
                                        "x position", 10.).displayObject(time))
