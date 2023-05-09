@@ -70,6 +70,11 @@ class Pendulum(PhysicsObject):
             assert self.big_G_newton is not None and self.phi_planet \
                 is not None, "must define big_G_newton and phi_planet if \
                     acceleration_due_to_gravity is not provided"
+            assert self._noise_level['big_G_newton'] is not None \
+                and self._noise_level['phi_planet'] \
+                is not None, "must define big_G_newton and phi_planet \
+                    noise levels if acceleration_due_to_gravity \
+                    is not provided"
             self.acceleration_due_to_gravity = self.big_G_newton * \
                 self.phi_planet
             self.initial_parameters = {'pendulum_arm_length':
@@ -91,7 +96,7 @@ class Pendulum(PhysicsObject):
                                        'acceleration_due_to_gravity':
                                        self.acceleration_due_to_gravity}
         self.mass_pendulum_bob = mass_pendulum_bob
-        self.coefficient_friction = coefficient_friction 
+        self.coefficient_friction = coefficient_friction
 
         # TODO verify the requested noise parameters are variables you can use
 
@@ -125,6 +130,9 @@ class Pendulum(PhysicsObject):
                             size=n_steps
                             )
             # redefine acceleration_due_to_gravity = multiple of noisy G and phi
+            assert self.big_G_newton is not None and self.phi_planet \
+                is not None, "must define big_G_newton and phi_planet if \
+                    acceleration_due_to_gravity is not provided"
             self.acceleration_due_to_gravity = self.big_G_newton * \
                 self.phi_planet
         self.pendulum_arm_length = rs.normal(
@@ -138,7 +146,7 @@ class Pendulum(PhysicsObject):
             scale=self.starting_angle_radians *
             self._noise_level['starting_angle_radians'],
             size=n_steps
-        )       
+        )
 
     def destroy_noise(self):
         # Re-modify the global parameters to
