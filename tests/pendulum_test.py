@@ -4,25 +4,22 @@ from src.deepbench.physics_object.pendulum import Pendulum
 
 
 class TestPendulum(TestCase):
-    def test_1d_init(self):
-        with self.assertRaises(AssertionError):
-            time = [0.]
-            self.assertIsNone(Pendulum(pendulum_arm_length=10.,
-                                       starting_angle_radians=np.pi/4,
-                                       acceleration_due_to_gravity=9.8,
-                                       noise_std_percent=
-                                       {'pendulum_arm_length': 0.1,
-                                        'starting_angle_radians': 0.1}
-                                       )).create_object(time)
+    def test_one_time_init(self):
+        # with self.assertRaises(AssertionError):
+        time = 0.
+        pendulum = Pendulum(pendulum_arm_length=10.,
+                            starting_angle_radians=np.pi/4,
+                            acceleration_due_to_gravity=9.8,
+                            noise_std_percent=
+                            {'pendulum_arm_length': 0.1,
+                             'starting_angle_radians': 0.1,
+                             'acceleration_due_to_gravity': 0.0}
+                            )
+        output = pendulum.create_object(time)
+        self.assertIsNotNone(output)
+        self.assertEqual(np.shape(time), np.shape(output))
 
-            '''
-            pend_noisy = pend.create_object(time)
-            pend_noise_free = pend.simulate_pendulum_dynamics(time)
-            pend.displayObject(time)
-            print(pend)
-            '''
-
-            '''
+        '''
             {"pendulum_arm_length": 10,
                             "starting_angle_radians": np.pi/4,
                             "noise": 0}
@@ -31,14 +28,23 @@ class TestPendulum(TestCase):
         self.assertIsNone(test_sky.image)
         self.assertEqual([{}], test_sky.objects)
         self.assertEqual((14, 14), test_sky.image_shape)'''
+
+    def test_array_time_init(self):
+        time = np.array(np.linspace(0, 100, 100))
+        pendulum = Pendulum(pendulum_arm_length=10.,
+                            starting_angle_radians=np.pi/4,
+                            acceleration_due_to_gravity=9.8,
+                            noise_std_percent=
+                            {'pendulum_arm_length': 0.1,
+                             'starting_angle_radians': 0.1,
+                             'acceleration_due_to_gravity': 0.0}
+                            )
+        output = pendulum.create_object(time)
+        self.assertIsNotNone(output)
+        self.assertEqual(np.shape(time), np.shape(output))
+
+
 '''
-    def test_2d_init(self):
-        image_shape = (12, 12)
-        object_params = [{"object_type": "test_object"}]
-        time_series = TimeSeriesImage(object_params, image_shape)
-
-        self.assertEqual(image_shape, time_series.image_shape)
-
     def test_0d_init(self):
         with self.assertRaises(AssertionError):
             image_shape = ()
