@@ -9,13 +9,13 @@ class TestPendulum(TestCase):
         # the required arguments:
         with self.assertRaises(AssertionError):
             # this raises an error for missing a_g:
-            pendulum = Pendulum(pendulum_arm_length=10.,
-                            starting_angle_radians=np.pi/4,
-                            noise_std_percent=
-                            {'pendulum_arm_length': 0.1,
-                             'starting_angle_radians': 0.1,
-                             'acceleration_due_to_gravity': 0.0}
-                            )
+            Pendulum(pendulum_arm_length=10.,
+                     starting_angle_radians=np.pi/4,
+                     noise_std_percent=
+                     {'pendulum_arm_length': 0.1,
+                      'starting_angle_radians': 0.1,
+                      'acceleration_due_to_gravity': 0.0}
+                     )
         # should raise an error if missing phi_planet but
         # you have big_G_newton
         with self.assertRaises(AssertionError):
@@ -30,8 +30,38 @@ class TestPendulum(TestCase):
         # better raise an error if angle is too big
         with self.assertRaises(AssertionError):
             Pendulum(pendulum_arm_length=10.,
+                     starting_angle_radians=45,
+                     acceleration_due_to_gravity=10.,
+                     noise_std_percent=
+                     {'pendulum_arm_length': 0.1,
+                      'starting_angle_radians': 0.1,
+                      'acceleration_due_to_gravity': 0.0}
+                     )
+        # raise error if missing required noise arg
+        with self.assertRaises(AssertionError):
+            Pendulum(pendulum_arm_length=10.,
                      starting_angle_radians=2*np.pi,
                      acceleration_due_to_gravity=10.,
+                     noise_std_percent=
+                     {'pendulum_arm_length': 0.1,
+                      'starting_angle_radians': 0.1}
+                     )
+        # raise error if misspelled required noise arg
+        with self.assertRaises(AssertionError):
+            Pendulum(pendulum_arm_length=10.,
+                     starting_angle_radians=np.pi/4,
+                     acceleration_due_to_gravity=10.,
+                     noise_std_percent=
+                     {'ppendulum_arm_length': 0.1,
+                      'starting_angle_radians': 0.1,
+                      'acceleration_due_to_gravity': 0.0}
+                     )
+
+    def test_array_input_args(self):
+        with self.assertRaises(AssertionError):
+            Pendulum(pendulum_arm_length=10.,
+                     starting_angle_radians=np.pi/4,
+                     acceleration_due_to_gravity=[10.,11.],
                      noise_std_percent=
                      {'pendulum_arm_length': 0.1,
                       'starting_angle_radians': 0.1,
