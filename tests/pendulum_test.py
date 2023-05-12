@@ -16,14 +16,27 @@ class TestPendulum(TestCase):
                              'starting_angle_radians': 0.1,
                              'acceleration_due_to_gravity': 0.0}
                             )
-            pendulum = Pendulum(pendulum_arm_length=10.,
-                            starting_angle_radians=np.pi/4,
-                            big_G_newton=10.,
-                            noise_std_percent=
-                            {'pendulum_arm_length': 0.1,
-                             'starting_angle_radians': 0.1,
-                             'acceleration_due_to_gravity': 0.0}
-                            )
+        # should raise an error if missing phi_planet but
+        # you have big_G_newton
+        with self.assertRaises(AssertionError):
+            Pendulum(pendulum_arm_length=10.,
+                     starting_angle_radians=np.pi/4,
+                     big_G_newton=10.,
+                     noise_std_percent=
+                     {'pendulum_arm_length': 0.1,
+                      'starting_angle_radians': 0.1,
+                      'acceleration_due_to_gravity': 0.0}
+                     )
+        # better raise an error if angle is too big
+        with self.assertRaises(AssertionError):
+            Pendulum(pendulum_arm_length=10.,
+                     starting_angle_radians=2*np.pi,
+                     acceleration_due_to_gravity=10.,
+                     noise_std_percent=
+                     {'pendulum_arm_length': 0.1,
+                      'starting_angle_radians': 0.1,
+                      'acceleration_due_to_gravity': 0.0}
+                     )
 
     def test_zero_time(self):
         # it better not produce something
