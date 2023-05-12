@@ -59,6 +59,9 @@ class Pendulum(PhysicsObject):
         super().__init__(
             noise_level=noise_std_percent,
         )
+        if acceleration_due_to_gravity is not None and not \
+                isinstance(acceleration_due_to_gravity, float):
+            raise TypeError("acceleration_due_to_gravity should be a float")
 
         self.pendulum_arm_length = pendulum_arm_length
         self.starting_angle_radians = starting_angle_radians
