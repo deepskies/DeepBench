@@ -58,10 +58,10 @@ class TestPendulum(TestCase):
                      )
 
     def test_array_input_args(self):
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(TypeError):
             Pendulum(pendulum_arm_length=10.,
                      starting_angle_radians=np.pi/4,
-                     acceleration_due_to_gravity=[10.,11.],
+                     acceleration_due_to_gravity=[10., 11.],
                      noise_std_percent=
                      {'pendulum_arm_length': 0.1,
                       'starting_angle_radians': 0.1,
