@@ -171,14 +171,6 @@ class Pendulum(PhysicsObject):
                       noiseless: bool = False,
                       seed: int = 42):
         time = np.asarray(time)
-        '''
-        assert type(time) is not list, \
-            "you entered time as a list, changing to array"
-        if type(time) is float:
-            time_shape = 1
-        else:
-            time_shape = time.shape
-        '''
         self.create_noise(seed=seed, n_steps=time.shape)
         if noiseless:
             self.destroy_noise()
