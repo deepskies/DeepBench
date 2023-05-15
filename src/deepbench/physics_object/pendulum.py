@@ -59,6 +59,9 @@ class Pendulum(PhysicsObject):
         super().__init__(
             noise_level=noise_std_percent,
         )
+        if acceleration_due_to_gravity is not None and not \
+                isinstance(acceleration_due_to_gravity, float):
+            raise TypeError("acceleration_due_to_gravity should be a float")
 
         self.pendulum_arm_length = pendulum_arm_length
         self.starting_angle_radians = starting_angle_radians
@@ -129,7 +132,8 @@ class Pendulum(PhysicsObject):
                             self._noise_level['phi_planet'],
                             size=n_steps
                             )
-            # redefine acceleration_due_to_gravity = multiple of noisy G and phi
+            # redefine:
+            # acceleration_due_to_gravity = multiple of noisy G and phi
             assert self.big_G_newton is not None and self.phi_planet \
                 is not None, "must define big_G_newton and phi_planet if \
                     acceleration_due_to_gravity is not provided"
@@ -166,8 +170,10 @@ class Pendulum(PhysicsObject):
 
         return
 
-    def create_object(self, time: np.array, noiseless: bool = False,
+    def create_object(self, time: Union[float, np.array],
+                      noiseless: bool = False,
                       seed: int = 42):
+        time = np.asarray(time)
         self.create_noise(seed=seed, n_steps=time.shape)
         if noiseless:
             self.destroy_noise()
@@ -177,14 +183,13 @@ class Pendulum(PhysicsObject):
 
     def simulate_pendulum_dynamics(self, time: Union[float, np.array]):
         assert time is not None, "Must enter a time"
-        time = np.asarray(time)
         theta_time = self.starting_angle_radians * \
             np.cos(np.sqrt(self.acceleration_due_to_gravity /
                            self.pendulum_arm_length))
         x = self.pendulum_arm_length * np.sin(theta_time * time)
         return x
 
-    def displayObject(self, time:Union[float, np.array]):
+    def displayObject(self, time: Union[float, np.array]):
         plt.clf()
         plt.scatter(time, self.create_object(time),
                     label='noisy')
