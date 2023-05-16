@@ -3,7 +3,7 @@ import numpy as np
 import numpy.random as rand
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
-from typing import Union, Optional
+from typing import Union, Optional, List, Tuple
 
 
 class Pendulum(PhysicsObject):
@@ -108,49 +108,30 @@ class Pendulum(PhysicsObject):
             # key is a variable in the class
             assert type(item) in [np.array, float], "not in keys"
 
-    def create_noise(self, seed: int = 42, n_steps:
-                     int | tuple[int, int] = 10) -> np.array:
-        # Add noise to global parameters
+    def create_noise(self, seed: int = 42,
+                     n_steps: Union[int, Tuple[int, int]] = 10) -> np.array:
         rs = rand.RandomState(seed)
-        if self.big_G_newton is None and self.phi_planet is None:
-            self.acceleration_due_to_gravity = rs.normal(
-                            loc=self.acceleration_due_to_gravity,
-                            scale=self.acceleration_due_to_gravity *
-                            self._noise_level['acceleration_due_to_gravity'],
-                            size=n_steps
-                            )
-        else:
-            self.big_G_newton = rs.normal(
-                            loc=self.big_G_newton,
-                            scale=self.big_G_newton *
-                            self._noise_level['big_G_newton'],
-                            size=n_steps
-                            )
-            self.phi_planet = rs.normal(
-                            loc=self.phi_planet,
-                            scale=self.phi_planet *
-                            self._noise_level['phi_planet'],
-                            size=n_steps
-                            )
-            # redefine:
-            # acceleration_due_to_gravity = multiple of noisy G and phi
-            assert self.big_G_newton is not None and self.phi_planet \
-                is not None, "must define big_G_newton and phi_planet if \
-                    acceleration_due_to_gravity is not provided"
-            self.acceleration_due_to_gravity = self.big_G_newton * \
-                self.phi_planet
-        self.pendulum_arm_length = rs.normal(
-            loc=self.pendulum_arm_length,
-            scale=self.pendulum_arm_length *
-            self._noise_level['pendulum_arm_length'],
-            size=n_steps
-        )
-        self.starting_angle_radians = rs.normal(
-            loc=self.starting_angle_radians,
-            scale=self.starting_angle_radians *
-            self._noise_level['starting_angle_radians'],
-            size=n_steps
-        )
+        parameter_map = {
+            'acceleration_due_to_gravity': self.acceleration_due_to_gravity,
+            'big_G_newton': self.big_G_newton,
+            'phi_planet': self.phi_planet,
+            'pendulum_arm_length': self.pendulum_arm_length,
+            'starting_angle_radians': self.starting_angle_radians
+        }
+
+        for key in self.noise_std_percent.keys():
+            if key not in parameter_map:
+                raise ValueError(f"Invalid parameter name: {key}")
+
+            attribute = parameter_map[key]
+            noise_level = self._noise_level[key]
+
+            attribute = rs.normal(
+                loc=attribute,
+                scale=attribute * noise_level,
+                size=n_steps
+            )
+            setattr(self, key, attribute)
 
     def destroy_noise(self):
         # Re-modify the global parameters to
