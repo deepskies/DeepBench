@@ -3,7 +3,7 @@ import numpy as np
 import numpy.random as rand
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
-from typing import Union, Optional, List, Tuple
+from typing import Union, Optional, Tuple
 
 
 class Pendulum(PhysicsObject):
@@ -136,6 +136,23 @@ class Pendulum(PhysicsObject):
     def destroy_noise(self):
         # Re-modify the global parameters to
         # have the original value
+
+        parameter_map = {
+            'acceleration_due_to_gravity': self.acceleration_due_to_gravity,
+            'big_G_newton': self.big_G_newton,
+            'phi_planet': self.phi_planet,
+            'pendulum_arm_length': self.pendulum_arm_length,
+            'starting_angle_radians': self.starting_angle_radians
+        }
+
+        for key in self.noise_std_percent.keys():
+            if key not in parameter_map:
+                raise ValueError(f"Invalid parameter name: {key}")
+
+            attribute = self.initial_parameters[parameter_map[key]]
+
+            setattr(self, key, attribute)
+        '''
         self.pendulum_arm_length = \
             self.initial_parameters['pendulum_arm_length']
         self.starting_angle_radians = \
@@ -148,7 +165,7 @@ class Pendulum(PhysicsObject):
                 self.initial_parameters['big_G_newton']
             self.phi_planet = \
                 self.initial_parameters['phi_planet']
-
+        '''
         return
 
     def create_object(self, time: Union[float, np.array],
