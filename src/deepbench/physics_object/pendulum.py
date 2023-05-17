@@ -105,8 +105,8 @@ class Pendulum(PhysicsObject):
         for key, item in noise_std_percent.items():
             assert key in [key for key in self.__dict__.keys()]
             # key is a variable in the class
-            assert type(item) in [np.array, float], "not in keys"
-        
+            if type(item)=='NoneType':
+                assert type(item) in [np.array, float], f"{type(item)} not in keys"
         # If the acceleration_due_to_gravity is None,
         # then the accompanying noise parameter also needs to be none
         # otherwise the noise module will be confused
@@ -128,21 +128,40 @@ class Pendulum(PhysicsObject):
             'phi_planet': self.phi_planet
         }
         for key in self._noise_level.keys():
-            if key not in parameter_map:
-                raise ValueError(f"Invalid parameter name: {key}")
+                if key not in parameter_map:
+                    raise ValueError(f"Invalid parameter name: {key}")
 
-            attribute = parameter_map[key]
-            noise_level = self._noise_level[key]
+                attribute = parameter_map[key]
+                noise_level = self._noise_level[key]
 
-            attribute = rs.normal(
-                loc=attribute,
-                scale=attribute * noise_level,
-                size=n_steps
-            )
-            setattr(self, key, attribute)
-        # How do I modify this for when the user wants
-        # this to be hierarchical?
-        # This would happen when what?
+                attribute = rs.normal(
+                    loc=attribute,
+                    scale=attribute * noise_level,
+                    size=n_steps
+                )
+                setattr(self, key, attribute)
+        # Now, if this is the hierarchical case, we can redefine the acceleration
+        # due to gravity term
+        if self._noise_level['acceleration_due_to_gravity'] is None:
+            assert self.big_G_newton is not None and self.phi_planet \
+                is not None, "must define big_G_newton and phi_planet if \
+                    acceleration_due_to_gravity is not provided"
+            self.big_G_newton = rs.normal(
+                            loc=self.big_G_newton,
+                            scale=self.big_G_newton *
+                            self._noise_level['big_G_newton'],
+                            size=n_steps
+                            )
+            self.phi_planet = rs.normal(
+                            loc=self.phi_planet,
+                            scale=self.phi_planet *
+                            self._noise_level['phi_planet'],
+                            size=n_steps
+                            )
+            # redefine:
+            # acceleration_due_to_gravity = multiple of noisy G and phi
+            self.acceleration_due_to_gravity = self.big_G_newton * \
+                self.phi_planet
         return
 
     def destroy_noise(self):
@@ -236,6 +255,7 @@ class Pendulum(PhysicsObject):
         plt.legend()
         plt.show()
 
+    '''
     def animateObject(self, time: Union[float, np.array]):
         # Right now this just plots x and t
         # Instantiate the simulator
@@ -261,3 +281,4 @@ class Pendulum(PhysicsObject):
                              interval=100)
         plt.show(anim)
         return
+    '''

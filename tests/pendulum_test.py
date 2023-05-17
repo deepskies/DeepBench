@@ -160,9 +160,24 @@ class TestPendulum(TestCase):
                              'acceleration_due_to_gravity': 0.1}
                             )
         pendulum.displayObject(time)
-        #self.assertIsNotNone(output)
-        #self.assertEqual(np.shape(time), np.shape(output))
+
+    def test_noise_hierarchical(self):
+        # does noise work for an array of times?
+        time = np.array(np.linspace(0, 10, 20))
+        pendulum = Pendulum(pendulum_arm_length=10.,
+                            starting_angle_radians=np.pi/4,
+                            acceleration_due_to_gravity=None,
+                            big_G_newton=10.,
+                            phi_planet=1.,
+                            noise_std_percent=
+                            {'pendulum_arm_length': 0.0,
+                             'starting_angle_radians': 0.1,
+                             'acceleration_due_to_gravity': None,
+                             'big_G_newton': 0.0,
+                             'phi_planet': 0.0}
+                            )
         pendulum.displayObject(time)
+
 
 '''
     def test_generate_gaussian_noise(self):
