@@ -116,7 +116,7 @@ class Pendulum(PhysicsObject):
             'starting_angle_radians': self.starting_angle_radians,
             'acceleration_due_to_gravity': self.acceleration_due_to_gravity,
             'big_G_newton': self.big_G_newton,
-            'phi_planet': self.phi_planet          
+            'phi_planet': self.phi_planet
         }
 
         for key in self._noise_level.keys():
@@ -132,6 +132,7 @@ class Pendulum(PhysicsObject):
                 size=n_steps
             )
             setattr(self, key, attribute)
+        return
 
     def destroy_noise(self):
         # Re-modify the global parameters to
@@ -144,13 +145,9 @@ class Pendulum(PhysicsObject):
             'phi_planet': self.phi_planet
         }
         for key in self._noise_level.keys():
-            print('key', key)
             if key not in parameter_map:
                 raise ValueError(f"Invalid parameter name: {key}")
-            print(self.initial_parameters)
-            print('parameter_map', parameter_map)
-            print(parameter_map[key])
-            attribute = self.initial_parameters[parameter_map[key]]
+            attribute = self.initial_parameters[key]
             setattr(self, key, attribute)
         '''
         self.pendulum_arm_length = \
@@ -170,30 +167,101 @@ class Pendulum(PhysicsObject):
 
     def create_object(self, time: Union[float, np.array],
                       noiseless: bool = False,
+                      destroynoise: bool = True,
                       seed: int = 42):
         time = np.asarray(time)
         assert time.size > 0, "you must enter one or more points in time"
-        self.create_noise(seed=seed, n_steps=time.shape)
+        if isinstance(time, (float, int)):
+            n_steps = 1
+        else:
+            time = np.asarray(time)
+            n_steps = time.shape
+        print('before noise', self.acceleration_due_to_gravity)
+        self.create_noise(seed=seed, n_steps=n_steps)
+        print('after noise', self.acceleration_due_to_gravity)
         if noiseless:
             self.destroy_noise()
         pendulum = self.simulate_pendulum_dynamics(time)
-        self.destroy_noise()
+        if destroynoise:
+            self.destroy_noise()
+            print('after destroying noise', self.acceleration_due_to_gravity)
         return pendulum
 
     def simulate_pendulum_dynamics(self, time: Union[float, np.array]):
-        assert time is not None, "Must enter a time"
+        assert time.size > 0, "you must enter one or more points in time"
+        # Check if parameters are single values or arrays with the same length as time
+        if isinstance(self.pendulum_arm_length, (float, int)):
+            pendulum_arm_length_values = np.full_like(np.asarray(time), self.pendulum_arm_length)
+        else:
+            pendulum_arm_length_values = np.asarray(self.pendulum_arm_length)
+
+        if isinstance(self.starting_angle_radians, (float, int)):
+            starting_angle_values = np.full_like(np.asarray(time), self.starting_angle_radians)
+        else:
+            starting_angle_values = np.asarray(self.starting_angle_radians)
+
+        if isinstance(self.acceleration_due_to_gravity, (float, int)):
+            acceleration_values = np.full_like(np.asarray(time), self.acceleration_due_to_gravity)
+        else:
+            acceleration_values = np.asarray(self.acceleration_due_to_gravity)
+
+        # Calculate theta_time based on the parameters
+        theta_time = starting_angle_values * np.cos(np.sqrt(acceleration_values / pendulum_arm_length_values))
+
+        # Calculate x using the modified parameters and time
+        if isinstance(time, (float, int)):
+            x = pendulum_arm_length_values * np.sin(theta_time * time)
+        else:
+            time = np.asarray(time)
+            x = pendulum_arm_length_values * np.sin(theta_time * time)
+
+
+        '''
+        # Check if parameters are single values or arrays with the same length as time
+        if isinstance(self.pendulum_arm_length, (float, int)):
+            pendulum_arm_length_values = np.full_like(np.asarray(time), self.pendulum_arm_length)
+            starting_angle_radians_values = np.full_like(np.asarray(time), self.starting_angle_radians)
+            acceleration_due_to_gravity_values = np.full_like(np.asarray(time), self.acceleration_due_to_gravity)
+        else:
+            pendulum_arm_length_values = np.asarray(self.pendulum_arm_length)
+            starting_angle_radians_values = np.asarray(self.starting_angle_radians)
+            acceleration_due_to_gravity_values = np.asarray(self.acceleration_due_to_gravity)
+
+        
+
+        # Calculate theta_time based on the parameters
+        print(starting_angle_radians_values)
+        print(acceleration_due_to_gravity_values)
+        print(pendulum_arm_length_values)
+        print(time)
+        theta_time = starting_angle_radians_values * np.cos(np.sqrt(acceleration_due_to_gravity_values / pendulum_arm_length_values))
+        print('theta_time', theta_time)
+        # Calculate x using the modified parameters and time
+        if isinstance(time, (float, int)):
+            x = pendulum_arm_length_values * np.sin(theta_time * time)
+        else:
+            time = np.asarray(time)
+            x = pendulum_arm_length_values * np.sin(theta_time * time)
+
+        # Calculate x using the modified parameters and time
+        #x = pendulum_arm_length_values * np.sin(theta_time * time)
+        '''
+        '''
         theta_time = self.starting_angle_radians * \
             np.cos(np.sqrt(self.acceleration_due_to_gravity /
                            self.pendulum_arm_length))
         x = self.pendulum_arm_length * np.sin(theta_time * time)
+        '''
         return x
 
     def displayObject(self, time: Union[float, np.array]):
+        noisy = self.create_object(time, destroynoise=False)
+        noise_free = self.create_object(time, destroynoise=True)
         plt.clf()
-        plt.scatter(time, self.create_object(time),
-                    label='noisy')
-        plt.scatter(time, self.simulate_pendulum_dynamics(time),
-                    label='noise free')
+        plt.plot(time, noisy, color='#EF5D60')
+        plt.scatter(time, noisy, label='noisy', color='#EF5D60')
+        plt.plot(time, noise_free, color='#E09F7D')
+        plt.scatter(time, noise_free, label='noise free', color='#E09F7D')
         plt.legend()
         plt.show()
 

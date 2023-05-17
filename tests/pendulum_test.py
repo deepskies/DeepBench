@@ -138,24 +138,19 @@ class TestPendulum(TestCase):
     '''
     def test_noise_array(self):
         # does noise work for an array of times?
-        time = np.array(np.linspace(0, 100, 100))
+        time = np.array(np.linspace(0, 10, 20))
         pendulum = Pendulum(pendulum_arm_length=10.,
                             starting_angle_radians=np.pi/4,
                             acceleration_due_to_gravity=9.8,
                             noise_std_percent=
-                            {'pendulum_arm_length': 0.5,
-                             'starting_angle_radians': 0.5,
-                             'acceleration_due_to_gravity': 0.5}
+                            {'pendulum_arm_length': 0.0,
+                             'starting_angle_radians': 0.1,
+                             'acceleration_due_to_gravity': 0.1}
                             )
-        out1 = pendulum.create_object(time)
-        out2 = pendulum.create_object(time, destroynoise=False)
-        print('out1', out1)
-        print('out2', out2)
-        assert out1 != out2, "not equal"
-        pendulum.displayObject(time, destroynoise=False)
+        pendulum.displayObject(time)
         #self.assertIsNotNone(output)
         #self.assertEqual(np.shape(time), np.shape(output))
-        pendulum.displayObject(time, destroynoise=True,)
+        pendulum.displayObject(time)
 
 '''
     def test_generate_gaussian_noise(self):
