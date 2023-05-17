@@ -72,7 +72,8 @@ class TestPendulum(TestCase):
         # it better not produce something
         # when you give it no time
         time = []
-        pendulum = Pendulum(pendulum_arm_length=10.,
+        with self.assertRaises(AssertionError):
+            pendulum = Pendulum(pendulum_arm_length=10.,
                             starting_angle_radians=np.pi/4,
                             acceleration_due_to_gravity=9.8,
                             noise_std_percent=
@@ -80,9 +81,9 @@ class TestPendulum(TestCase):
                              'starting_angle_radians': 0.1,
                              'acceleration_due_to_gravity': 0.0}
                             )
-        output = pendulum.create_object(time)
-        self.assertIsNotNone(output, f"output = {output}")
-        self.assertEqual(np.shape(time), np.shape(output))
+            output = pendulum.create_object(time)
+        #self.assertIsNotNone(output, f"output = {output}")
+        #self.assertEqual(np.shape(time), np.shape(output))
 
     def test_one_time(self):
         # testing if it produces a one item output

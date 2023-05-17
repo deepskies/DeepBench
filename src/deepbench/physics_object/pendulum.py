@@ -112,14 +112,14 @@ class Pendulum(PhysicsObject):
                      n_steps: Union[int, Tuple[int, int]] = 10) -> np.array:
         rs = rand.RandomState(seed)
         parameter_map = {
+            'pendulum_arm_length': self.pendulum_arm_length,
+            'starting_angle_radians': self.starting_angle_radians,
             'acceleration_due_to_gravity': self.acceleration_due_to_gravity,
             'big_G_newton': self.big_G_newton,
-            'phi_planet': self.phi_planet,
-            'pendulum_arm_length': self.pendulum_arm_length,
-            'starting_angle_radians': self.starting_angle_radians
+            'phi_planet': self.phi_planet          
         }
 
-        for key in self.noise_std_percent.keys():
+        for key in self._noise_level.keys():
             if key not in parameter_map:
                 raise ValueError(f"Invalid parameter name: {key}")
 
@@ -136,21 +136,21 @@ class Pendulum(PhysicsObject):
     def destroy_noise(self):
         # Re-modify the global parameters to
         # have the original value
-
         parameter_map = {
+            'pendulum_arm_length': self.pendulum_arm_length,
+            'starting_angle_radians': self.starting_angle_radians,
             'acceleration_due_to_gravity': self.acceleration_due_to_gravity,
             'big_G_newton': self.big_G_newton,
-            'phi_planet': self.phi_planet,
-            'pendulum_arm_length': self.pendulum_arm_length,
-            'starting_angle_radians': self.starting_angle_radians
+            'phi_planet': self.phi_planet
         }
-
-        for key in self.noise_std_percent.keys():
+        for key in self._noise_level.keys():
+            print('key', key)
             if key not in parameter_map:
                 raise ValueError(f"Invalid parameter name: {key}")
-
+            print(self.initial_parameters)
+            print('parameter_map', parameter_map)
+            print(parameter_map[key])
             attribute = self.initial_parameters[parameter_map[key]]
-
             setattr(self, key, attribute)
         '''
         self.pendulum_arm_length = \
@@ -172,6 +172,7 @@ class Pendulum(PhysicsObject):
                       noiseless: bool = False,
                       seed: int = 42):
         time = np.asarray(time)
+        assert time.size > 0, "you must enter one or more points in time"
         self.create_noise(seed=seed, n_steps=time.shape)
         if noiseless:
             self.destroy_noise()
