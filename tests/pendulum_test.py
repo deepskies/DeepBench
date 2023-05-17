@@ -57,6 +57,18 @@ class TestPendulum(TestCase):
                       'acceleration_due_to_gravity': 0.0}
                      )
 
+    def test_hierarchical_fail(self):
+        with self.assertRaises(AssertionError):
+            Pendulum(pendulum_arm_length=10.,
+                     starting_angle_radians=np.pi/4,
+                     acceleration_due_to_gravity=None,
+                     big_G_newton=10.,
+                     phi_planet=1.,
+                     noise_std_percent=
+                     {'pendulum_arm_length': 0.1,
+                     'starting_angle_radians': 0.1,
+                     'acceleration_due_to_gravity': 0.0}
+                     )
     def test_array_input_args(self):
         with self.assertRaises(TypeError):
             Pendulum(pendulum_arm_length=10.,

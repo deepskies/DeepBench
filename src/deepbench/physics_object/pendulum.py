@@ -73,11 +73,11 @@ class Pendulum(PhysicsObject):
             assert self.big_G_newton is not None and self.phi_planet \
                 is not None, "must define big_G_newton and phi_planet if \
                     acceleration_due_to_gravity is not provided"
-            assert self._noise_level['big_G_newton'] is not None \
-                and self._noise_level['phi_planet'] \
-                is not None, "must define big_G_newton and phi_planet \
-                    noise levels if acceleration_due_to_gravity \
-                    is not provided"
+            #assert self._noise_level['big_G_newton'] is not None \
+            #    and self._noise_level['phi_planet'] \
+            #    is not None, "must define big_G_newton and phi_planet \
+            #        noise levels if acceleration_due_to_gravity \
+            #        is not provided"
             self.acceleration_due_to_gravity = self.big_G_newton * \
                 self.phi_planet
             self.initial_parameters = {'pendulum_arm_length':
@@ -101,12 +101,21 @@ class Pendulum(PhysicsObject):
         self.mass_pendulum_bob = mass_pendulum_bob
         self.coefficient_friction = coefficient_friction
 
-        # TODO verify the requested noise parameters are variables you can use
-
+        # Verify the requested noise parameters are variables you can use
         for key, item in noise_std_percent.items():
             assert key in [key for key in self.__dict__.keys()]
             # key is a variable in the class
             assert type(item) in [np.array, float], "not in keys"
+        
+        # If the acceleration_due_to_gravity is None,
+        # then the accompanying noise parameter also needs to be none
+        # otherwise the noise module will be confused
+        # about if we're doing the hierarchical case
+        if acceleration_due_to_gravity is None:
+            assert noise_std_percent['acceleration_due_to_gravity'] is None, \
+                "if acceleration due to gravity is not defined (None) then \
+                the accompanying noise term must be None as well so that \
+                the noise model knows this is the hierarchical case"
 
     def create_noise(self, seed: int = 42,
                      n_steps: Union[int, Tuple[int, int]] = 10) -> np.array:
@@ -118,7 +127,6 @@ class Pendulum(PhysicsObject):
             'big_G_newton': self.big_G_newton,
             'phi_planet': self.phi_planet
         }
-
         for key in self._noise_level.keys():
             if key not in parameter_map:
                 raise ValueError(f"Invalid parameter name: {key}")
@@ -132,6 +140,9 @@ class Pendulum(PhysicsObject):
                 size=n_steps
             )
             setattr(self, key, attribute)
+        # How do I modify this for when the user wants
+        # this to be hierarchical?
+        # This would happen when what?
         return
 
     def destroy_noise(self):
@@ -186,70 +197,33 @@ class Pendulum(PhysicsObject):
     def simulate_pendulum_dynamics(self, time: Union[float, np.array]):
         time = np.asarray(time)
         assert time.size > 0, "you must enter one or more points in time"
-        # Check if parameters are single values or arrays with the same length as time
+        # Check if parameters are single values
+        # or arrays with the same length as time
         if isinstance(self.pendulum_arm_length, (float, int)):
-            pendulum_arm_length_values = np.full_like(np.asarray(time), self.pendulum_arm_length)
+            pendulum_arm_length_values = np.full_like(np.asarray(time),
+                                                      self.pendulum_arm_length)
         else:
             pendulum_arm_length_values = np.asarray(self.pendulum_arm_length)
 
         if isinstance(self.starting_angle_radians, (float, int)):
-            starting_angle_values = np.full_like(np.asarray(time), self.starting_angle_radians)
+            starting_angle_values = np.full_like(np.asarray(time),
+                                                 self.starting_angle_radians)
         else:
             starting_angle_values = np.asarray(self.starting_angle_radians)
 
         if isinstance(self.acceleration_due_to_gravity, (float, int)):
-            acceleration_values = np.full_like(np.asarray(time), self.acceleration_due_to_gravity)
+            acceleration_values = \
+                np.full_like(np.asarray(time),
+                             self.acceleration_due_to_gravity)
         else:
             acceleration_values = np.asarray(self.acceleration_due_to_gravity)
 
         # Calculate theta_time based on the parameters
-        theta_time = starting_angle_values * np.cos(np.sqrt(acceleration_values / pendulum_arm_length_values))
+        theta_time = starting_angle_values * \
+            np.cos(np.sqrt(acceleration_values / pendulum_arm_length_values))
 
         # Calculate x using the modified parameters and time
-        if isinstance(time, (float, int)):
-            x = pendulum_arm_length_values * np.sin(theta_time * time)
-        else:
-            time = np.asarray(time)
-            x = pendulum_arm_length_values * np.sin(theta_time * time)
-
-
-        '''
-        # Check if parameters are single values or arrays with the same length as time
-        if isinstance(self.pendulum_arm_length, (float, int)):
-            pendulum_arm_length_values = np.full_like(np.asarray(time), self.pendulum_arm_length)
-            starting_angle_radians_values = np.full_like(np.asarray(time), self.starting_angle_radians)
-            acceleration_due_to_gravity_values = np.full_like(np.asarray(time), self.acceleration_due_to_gravity)
-        else:
-            pendulum_arm_length_values = np.asarray(self.pendulum_arm_length)
-            starting_angle_radians_values = np.asarray(self.starting_angle_radians)
-            acceleration_due_to_gravity_values = np.asarray(self.acceleration_due_to_gravity)
-
-
-
-        # Calculate theta_time based on the parameters
-        print(starting_angle_radians_values)
-        print(acceleration_due_to_gravity_values)
-        print(pendulum_arm_length_values)
-        print(time)
-        theta_time = starting_angle_radians_values * np.cos(np.sqrt(acceleration_due_to_gravity_values / pendulum_arm_length_values))
-        print('theta_time', theta_time)
-        # Calculate x using the modified parameters and time
-        if isinstance(time, (float, int)):
-            x = pendulum_arm_length_values * np.sin(theta_time * time)
-        else:
-            time = np.asarray(time)
-            x = pendulum_arm_length_values * np.sin(theta_time * time)
-
-        # Calculate x using the modified parameters and time
-        #x = pendulum_arm_length_values * np.sin(theta_time * time)
-        '''
-        '''
-        theta_time = self.starting_angle_radians * \
-            np.cos(np.sqrt(self.acceleration_due_to_gravity /
-                           self.pendulum_arm_length))
-        x = self.pendulum_arm_length * np.sin(theta_time * time)
-        '''
-        return x
+        return pendulum_arm_length_values * np.sin(theta_time * time)
 
     def displayObject(self, time: Union[float, np.array]):
         noisy = self.create_object(time)
