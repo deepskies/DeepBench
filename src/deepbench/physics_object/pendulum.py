@@ -176,18 +176,15 @@ class Pendulum(PhysicsObject):
         else:
             time = np.asarray(time)
             n_steps = time.shape
-        print('before noise', self.acceleration_due_to_gravity)
         self.create_noise(seed=seed, n_steps=n_steps)
-        print('after noise', self.acceleration_due_to_gravity)
         if noiseless:
             self.destroy_noise()
         pendulum = self.simulate_pendulum_dynamics(time)
-        if destroynoise:
-            self.destroy_noise()
-            print('after destroying noise', self.acceleration_due_to_gravity)
+        self.destroy_noise()
         return pendulum
 
     def simulate_pendulum_dynamics(self, time: Union[float, np.array]):
+        time = np.asarray(time)
         assert time.size > 0, "you must enter one or more points in time"
         # Check if parameters are single values or arrays with the same length as time
         if isinstance(self.pendulum_arm_length, (float, int)):
@@ -227,7 +224,7 @@ class Pendulum(PhysicsObject):
             starting_angle_radians_values = np.asarray(self.starting_angle_radians)
             acceleration_due_to_gravity_values = np.asarray(self.acceleration_due_to_gravity)
 
-        
+
 
         # Calculate theta_time based on the parameters
         print(starting_angle_radians_values)
@@ -255,8 +252,8 @@ class Pendulum(PhysicsObject):
         return x
 
     def displayObject(self, time: Union[float, np.array]):
-        noisy = self.create_object(time, destroynoise=False)
-        noise_free = self.create_object(time, destroynoise=True)
+        noisy = self.create_object(time)
+        noise_free = self.create_object(time, noiseless=True)
         plt.clf()
         plt.plot(time, noisy, color='#EF5D60')
         plt.scatter(time, noisy, label='noisy', color='#EF5D60')
