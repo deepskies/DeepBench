@@ -119,6 +119,20 @@ class Pendulum(PhysicsObject):
 
     def create_noise(self, seed: int = 42,
                      n_steps: Union[int, Tuple[int, int]] = 10) -> np.array:
+        """
+        Creates noise on top of simulate_pendulum_dynamics
+
+        Args:
+            seed (int): Random seed used to generate Gaussian noise
+            n_steps (int or Tuple[int,int]): The shape of the noise to be
+                created. This is specified in create_object using the shape
+                of the input time array (or float).
+
+        Examples (see create_object):
+
+            >>> pendulum_object = Pendulum(...SEE ABOVE...)
+            >>> noisy_pendulum = pendulum_object.create_noise()
+        """
         rs = rand.RandomState(seed)
         parameter_map = {
             'pendulum_arm_length': self.pendulum_arm_length,
@@ -179,25 +193,10 @@ class Pendulum(PhysicsObject):
                 raise ValueError(f"Invalid parameter name: {key}")
             attribute = self.initial_parameters[key]
             setattr(self, key, attribute)
-        '''
-        self.pendulum_arm_length = \
-            self.initial_parameters['pendulum_arm_length']
-        self.starting_angle_radians = \
-            self.initial_parameters['starting_angle_radians']
-        self.acceleration_due_to_gravity = \
-            self.initial_parameters['acceleration_due_to_gravity']
-        if self.big_G_newton is not None and self.phi_planet is not None:
-            # then you need to also reset these variables
-            self.big_G_newton = \
-                self.initial_parameters['big_G_newton']
-            self.phi_planet = \
-                self.initial_parameters['phi_planet']
-        '''
         return
 
     def create_object(self, time: Union[float, np.array],
                       noiseless: bool = False,
-                      destroynoise: bool = True,
                       seed: int = 42):
         time = np.asarray(time)
         assert time.size > 0, "you must enter one or more points in time"
