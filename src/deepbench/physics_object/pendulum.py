@@ -117,10 +117,22 @@ class Pendulum(PhysicsObject):
                 the accompanying noise term must be None as well so that \
                 the noise model knows this is the hierarchical case"
 
+        # Finally define the parameter map used to later modify parameters
+        # in create_noise and destroy_noise:
+        self.parameter_map = {
+            'pendulum_arm_length': self.pendulum_arm_length,
+            'starting_angle_radians': self.starting_angle_radians,
+            'acceleration_due_to_gravity': self.acceleration_due_to_gravity,
+            'big_G_newton': self.big_G_newton,
+            'phi_planet': self.phi_planet
+        }
+
     def create_noise(self, seed: int = 42,
                      n_steps: Union[int, Tuple[int, int]] = 10) -> np.array:
         """
         Creates noise on top of simulate_pendulum_dynamics
+        Also deals with the hierarchical case, where acceleration_due_to_gravity
+        is defined via big_G_newton and phi_planet
 
         Args:
             seed (int): Random seed used to generate Gaussian noise
@@ -128,26 +140,17 @@ class Pendulum(PhysicsObject):
                 created. This is specified in create_object using the shape
                 of the input time array (or float).
 
-        Examples (see create_object):
-
-            >>> pendulum_object = Pendulum(...SEE ABOVE...)
-            >>> noisy_pendulum = pendulum_object.create_noise()
+        Examples (see create_object)
         """
         rs = rand.RandomState(seed)
-        parameter_map = {
-            'pendulum_arm_length': self.pendulum_arm_length,
-            'starting_angle_radians': self.starting_angle_radians,
-            'acceleration_due_to_gravity': self.acceleration_due_to_gravity,
-            'big_G_newton': self.big_G_newton,
-            'phi_planet': self.phi_planet
-        }
         for key in self._noise_level.keys():
-                if key not in parameter_map:
-                    raise ValueError(f"Invalid parameter name: {key}")
+            if key not in self.parameter_map:
+                raise ValueError(f"Invalid parameter name: {key}")
 
-                attribute = parameter_map[key]
-                noise_level = self._noise_level[key]
-
+            attribute = self.parameter_map[key]
+            noise_level = self._noise_level[key]
+            print('key', key, 'attribute', attribute, 'noise level', noise_level)
+            if noise_level is not None:
                 attribute = rs.normal(
                     loc=attribute,
                     scale=attribute * noise_level,
@@ -181,15 +184,8 @@ class Pendulum(PhysicsObject):
     def destroy_noise(self):
         # Re-modify the global parameters to
         # have the original value
-        parameter_map = {
-            'pendulum_arm_length': self.pendulum_arm_length,
-            'starting_angle_radians': self.starting_angle_radians,
-            'acceleration_due_to_gravity': self.acceleration_due_to_gravity,
-            'big_G_newton': self.big_G_newton,
-            'phi_planet': self.phi_planet
-        }
         for key in self._noise_level.keys():
-            if key not in parameter_map:
+            if key not in self.parameter_map:
                 raise ValueError(f"Invalid parameter name: {key}")
             attribute = self.initial_parameters[key]
             setattr(self, key, attribute)
