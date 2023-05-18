@@ -163,22 +163,29 @@ class Pendulum(PhysicsObject):
             assert self.big_G_newton is not None and self.phi_planet \
                 is not None, "must define big_G_newton and phi_planet if \
                     acceleration_due_to_gravity is not provided"
-            self.big_G_newton = rs.normal(
-                            loc=self.big_G_newton,
-                            scale=self.big_G_newton *
-                            self._noise_level['big_G_newton'],
-                            size=n_steps
-                            )
-            self.phi_planet = rs.normal(
-                            loc=self.phi_planet,
-                            scale=self.phi_planet *
-                            self._noise_level['phi_planet'],
-                            size=n_steps
-                            )
+            if self._noise_level['big_G_newton'] is not None:
+                self.big_G_newton = rs.normal(
+                                loc=self.big_G_newton,
+                                scale=self.big_G_newton *
+                                self._noise_level['big_G_newton'],
+                                size=n_steps
+                                )
+            if self._noise_level['phi_planet'] is not None:
+                self.phi_planet = rs.normal(
+                                loc=self.phi_planet,
+                                scale=self.phi_planet *
+                                self._noise_level['phi_planet'],
+                                size=n_steps
+                                )
             # redefine:
             # acceleration_due_to_gravity = multiple of noisy G and phi
-            self.acceleration_due_to_gravity = self.big_G_newton * \
-                self.phi_planet
+            if self.big_G_newton is not None and self.phi_planet is not None:
+                self.acceleration_due_to_gravity = self.big_G_newton * \
+                    self.phi_planet
+            else:
+                assert f"Either big G or phi_planet is None \
+                    (G = {self.big_G_newton}, ø = {self.phi_planet}); \
+                        this is not allowed with hierarchical noise"
         return
 
     def destroy_noise(self):
@@ -195,7 +202,7 @@ class Pendulum(PhysicsObject):
                       noiseless: bool = False,
                       seed: int = 42):
         """
-        Given a single or array of times, simulates the pendulum position at 
+        Given a single or array of times, simulates the pendulum position at
         each of these times and optionally adds Gaussian noise to each
         parameter.
 
