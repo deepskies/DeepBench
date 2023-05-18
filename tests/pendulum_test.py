@@ -159,7 +159,11 @@ class TestPendulum(TestCase):
                              'starting_angle_radians': 0.1,
                              'acceleration_due_to_gravity': 0.1}
                             )
-        pendulum.displayObject(time)
+        #pendulum.displayObject(time)
+        pendulum_noisy = pendulum.create_object(time, noiseless=False)
+        pendulum_noiseless = pendulum.create_object(time, noiseless=True)
+        assert len(pendulum_noisy) == len(pendulum_noiseless) == len(time)
+        assert pendulum_noisy.any() == pendulum_noiseless.any()
 
     def test_noise_hierarchical(self):
         # does noise work for an array of times?
@@ -176,7 +180,11 @@ class TestPendulum(TestCase):
                              'big_G_newton': 0.0,
                              'phi_planet': 0.0}
                             )
-        pendulum.displayObject(time)
+        #pendulum.displayObject(time)
+        pendulum_noisy = pendulum.create_object(time, noiseless=False)
+        pendulum_noiseless = pendulum.create_object(time, noiseless=True)
+        assert len(pendulum_noisy) == len(pendulum_noiseless) == len(time)
+        assert pendulum_noisy.any() == pendulum_noiseless.any()
 
 
 '''
