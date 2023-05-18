@@ -194,6 +194,23 @@ class Pendulum(PhysicsObject):
     def create_object(self, time: Union[float, np.array],
                       noiseless: bool = False,
                       seed: int = 42):
+        """
+        Given a single or array of times, simulates the pendulum position at 
+        each of these times and optionally adds Gaussian noise to each
+        parameter.
+
+        Args:
+            time (Union[float, np.array]): A single moment in time, or
+                an array of times (s)
+            noiseless (bool): Enables a noise realization if True.
+                Default is set to False
+            seed (int): Random seed used to generate Gaussian noise
+
+        Example:
+            >>> pendulum = Pendulum(...SEE ABOVE...)
+            >>> time = np.array(np.linspace(0, 10, 20))
+            >>> pend_position = pendulum.create_object(time, noiseless=True)
+        """
         time = np.asarray(time)
         assert time.size > 0, "you must enter one or more points in time"
         if isinstance(time, (float, int)):
