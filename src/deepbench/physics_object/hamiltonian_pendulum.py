@@ -21,11 +21,6 @@ class HamiltonianPendulum(Pendulum):
                     acceleration_due_to_gravity=acceleration_due_to_gravity,
                     mass_pendulum_bob=mass_pendulum_bob,
                     )
-        self.pendulum_arm_length = pendulum_arm_length
-        self.starting_angle_radians = starting_angle_radians
-        self.noise = noise
-        self.acceleration_due_to_gravity = acceleration_due_to_gravity
-        self.mass_pendulum_bob = mass_pendulum_bob
 
     def hamiltonian_fn(self, coords):
         q, p = np.split(coords, 2)
