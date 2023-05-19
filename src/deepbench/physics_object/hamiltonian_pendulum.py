@@ -100,9 +100,8 @@ class HamiltonianPendulum(Pendulum):
 
         return q, p, dqdt, dpdt, t_eval
 
-    "get_field() is used to visualize the the gradiant vector field."
-
     def get_field(self, xmin=-1.2, xmax=1.2, ymin=-1.2, ymax=1.2, gridsize=20):
+        """get_field() is used to visualize the the gradiant vector field."""
         field = {"meta": locals()}
 
         b, a = np.meshgrid(
