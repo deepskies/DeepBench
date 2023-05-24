@@ -273,24 +273,35 @@ class Pendulum(PhysicsObject):
         plt.clf()
         plt.plot(time, noisy, color="#EF5D60")
         plt.scatter(time, noisy, label="noisy", color="#EF5D60")
-        plt.plot(time, noise_free, color="#E09F7D")
-        plt.scatter(time, noise_free, label="noise free", color="#E09F7D")
+        plt.plot(time, noise_free, color="#0E131F")
+        plt.scatter(time, noise_free, label="noise free", color="#0E131F")
         plt.legend()
         plt.show()
 
-        # make it an option to plot multiple noise draws:
+        # plot multiple noise draws and show the standard
+        # deviation:
         noise_free = self.create_object(time, noiseless=True)
         plt.clf()
-        for i in range(10):
-            noisy = self.create_object(time)  # , seed=42)
-            plt.plot(time, noisy, color="#EF5D60")
-            plt.scatter(time, noisy, label="noisy", color="#EF5D60")
+        num_random = 1000
+        noisy_ys = np.zeros((num_random, len(time)))
+        for i in range(num_random):
+            noisy = self.create_object(time)
+            noisy_ys[i, :] = noisy
+        ci_list = [np.std(abs(noisy_ys[:, t])) for t, _ in enumerate(time)]
+        plt.fill_between(
+            time,
+            (noise_free - ci_list),
+            (noise_free + ci_list),
+            color="#EF5D60",
+            alpha=0.5,
+            edgecolor="None",
+        )
         plt.plot(time, noise_free, color="#0E131F", zorder=100)
         plt.scatter(time, noise_free, label="noise free", color="#0E131F", zorder=100)
         plt.legend()
+        plt.ylabel("x position")
+        plt.xlabel("time [s]")
         plt.show()
-
-        # what about showing the true range of Gaussian noise?
 
     """
     def animateObject(self, time: Union[float, np.array]):
