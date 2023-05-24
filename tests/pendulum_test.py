@@ -150,7 +150,7 @@ class TestPendulum(TestCase):
     '''
     def test_noise_array(self):
         # does noise work for an array of times?
-        time = np.array(np.linspace(0, 10, 20))
+        time = np.array(np.linspace(0, 50, 200))
         pendulum = Pendulum(pendulum_arm_length=10.,
                             starting_angle_radians=np.pi/4,
                             acceleration_due_to_gravity=9.8,
@@ -159,7 +159,7 @@ class TestPendulum(TestCase):
                              'starting_angle_radians': 0.1,
                              'acceleration_due_to_gravity': 0.1}
                             )
-        #pendulum.displayObject(time)
+        pendulum.displayObject(time)
         pendulum_noisy = pendulum.create_object(time, noiseless=False)
         pendulum_noiseless = pendulum.create_object(time, noiseless=True)
         assert len(pendulum_noisy) == len(pendulum_noiseless) == len(time)
