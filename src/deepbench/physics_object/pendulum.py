@@ -7,21 +7,23 @@ from typing import Union, Optional, Tuple
 
 
 class Pendulum(PhysicsObject):
-    def __init__(self,
-                 pendulum_arm_length: float,
-                 starting_angle_radians: float,
-                 noise_std_percent: dict = {'pendulum_arm_length': 0.0,
-                                            'starting_angle_radians': 0.0,
-                                            'acceleration_due_to_gravity':
-                                                None,
-                                            'big_G_newton': None,
-                                            'phi_planet': None},
-                 acceleration_due_to_gravity: Optional[float] = None,
-                 big_G_newton: Optional[float] = None,
-                 phi_planet: Optional[float] = None,
-                 mass_pendulum_bob: Optional[float] = 10.0,
-                 coefficient_friction: Optional[float] = 0.0
-                 ):
+    def __init__(
+        self,
+        pendulum_arm_length: float,
+        starting_angle_radians: float,
+        noise_std_percent: dict = {
+            "pendulum_arm_length": 0.0,
+            "starting_angle_radians": 0.0,
+            "acceleration_due_to_gravity": None,
+            "big_G_newton": None,
+            "phi_planet": None,
+        },
+        acceleration_due_to_gravity: Optional[float] = None,
+        big_G_newton: Optional[float] = None,
+        phi_planet: Optional[float] = None,
+        mass_pendulum_bob: Optional[float] = 10.0,
+        coefficient_friction: Optional[float] = 0.0,
+    ):
         """
         The initialization function for the Pendulum class.
 
@@ -59,45 +61,43 @@ class Pendulum(PhysicsObject):
         super().__init__(
             noise_level=noise_std_percent,
         )
-        if acceleration_due_to_gravity is not None and not \
-                isinstance(acceleration_due_to_gravity, float):
+        if acceleration_due_to_gravity is not None and not isinstance(
+            acceleration_due_to_gravity, float
+        ):
             raise TypeError("acceleration_due_to_gravity should be a float")
 
         self.pendulum_arm_length = pendulum_arm_length
         self.starting_angle_radians = starting_angle_radians
-        assert self.starting_angle_radians < np.pi, \
-            "The angle better not be in degrees or else"
+        assert (
+            self.starting_angle_radians < np.pi
+        ), "The angle better not be in degrees or else"
         self.big_G_newton = big_G_newton
         self.phi_planet = phi_planet
         if acceleration_due_to_gravity is None:
-            assert self.big_G_newton is not None and self.phi_planet \
-                is not None, "must define big_G_newton and phi_planet if \
+            assert (
+                self.big_G_newton is not None and self.phi_planet is not None
+            ), "must define big_G_newton and phi_planet if \
                     acceleration_due_to_gravity is not provided"
-            #assert self._noise_level['big_G_newton'] is not None \
+            # assert self._noise_level['big_G_newton'] is not None \
             #    and self._noise_level['phi_planet'] \
             #    is not None, "must define big_G_newton and phi_planet \
             #        noise levels if acceleration_due_to_gravity \
             #        is not provided"
-            self.acceleration_due_to_gravity = self.big_G_newton * \
-                self.phi_planet
-            self.initial_parameters = {'pendulum_arm_length':
-                                       self.pendulum_arm_length,
-                                       'starting_angle_radians':
-                                       self.starting_angle_radians,
-                                       'acceleration_due_to_gravity':
-                                       self.acceleration_due_to_gravity,
-                                       'big_G_newton':
-                                       self.big_G_newton,
-                                       'phi_planet':
-                                       self.phi_planet}
+            self.acceleration_due_to_gravity = self.big_G_newton * self.phi_planet
+            self.initial_parameters = {
+                "pendulum_arm_length": self.pendulum_arm_length,
+                "starting_angle_radians": self.starting_angle_radians,
+                "acceleration_due_to_gravity": self.acceleration_due_to_gravity,
+                "big_G_newton": self.big_G_newton,
+                "phi_planet": self.phi_planet,
+            }
         else:
             self.acceleration_due_to_gravity = acceleration_due_to_gravity
-            self.initial_parameters = {'pendulum_arm_length':
-                                       self.pendulum_arm_length,
-                                       'starting_angle_radians':
-                                       self.starting_angle_radians,
-                                       'acceleration_due_to_gravity':
-                                       self.acceleration_due_to_gravity}
+            self.initial_parameters = {
+                "pendulum_arm_length": self.pendulum_arm_length,
+                "starting_angle_radians": self.starting_angle_radians,
+                "acceleration_due_to_gravity": self.acceleration_due_to_gravity,
+            }
         self.mass_pendulum_bob = mass_pendulum_bob
         self.coefficient_friction = coefficient_friction
 
@@ -105,30 +105,32 @@ class Pendulum(PhysicsObject):
         for key, item in noise_std_percent.items():
             assert key in [key for key in self.__dict__.keys()]
             # key is a variable in the class
-            if type(item)=='NoneType':
+            if type(item) == "NoneType":
                 assert type(item) in [np.array, float], f"{type(item)} not in keys"
         # If the acceleration_due_to_gravity is None,
         # then the accompanying noise parameter also needs to be none
         # otherwise the noise module will be confused
         # about if we're doing the hierarchical case
         if acceleration_due_to_gravity is None:
-            assert noise_std_percent['acceleration_due_to_gravity'] is None, \
-                "if acceleration due to gravity is not defined (None) then \
+            assert (
+                noise_std_percent["acceleration_due_to_gravity"] is None
+            ), "if acceleration due to gravity is not defined (None) then \
                 the accompanying noise term must be None as well so that \
                 the noise model knows this is the hierarchical case"
 
         # Finally define the parameter map used to later modify parameters
         # in create_noise and destroy_noise:
         self.parameter_map = {
-            'pendulum_arm_length': self.pendulum_arm_length,
-            'starting_angle_radians': self.starting_angle_radians,
-            'acceleration_due_to_gravity': self.acceleration_due_to_gravity,
-            'big_G_newton': self.big_G_newton,
-            'phi_planet': self.phi_planet
+            "pendulum_arm_length": self.pendulum_arm_length,
+            "starting_angle_radians": self.starting_angle_radians,
+            "acceleration_due_to_gravity": self.acceleration_due_to_gravity,
+            "big_G_newton": self.big_G_newton,
+            "phi_planet": self.phi_planet,
         }
 
-    def create_noise(self, seed: int = 42,
-                     n_steps: Union[int, Tuple[int, int]] = 10) -> np.array:
+    def create_noise(
+        self, seed: int = None, n_steps: Union[int, Tuple[int, int]] = 10
+    ) -> np.array:
         """
         Creates noise on top of simulate_pendulum_dynamics
         Also deals with the hierarchical case, where acceleration_due_to_gravity
@@ -142,46 +144,45 @@ class Pendulum(PhysicsObject):
 
         Examples (see create_object)
         """
-        rs = rand.RandomState(seed)
+        if seed:
+            rs = rand.RandomState(seed)
+        else:
+            rs = rand.RandomState()
         for key in self._noise_level.keys():
             if key not in self.parameter_map:
                 raise ValueError(f"Invalid parameter name: {key}")
 
             attribute = self.parameter_map[key]
             noise_level = self._noise_level[key]
-            print('key', key, 'attribute', attribute, 'noise level', noise_level)
+            print("key", key, "attribute", attribute, "noise level", noise_level)
             if noise_level is not None:
                 attribute = rs.normal(
-                    loc=attribute,
-                    scale=attribute * noise_level,
-                    size=n_steps
+                    loc=attribute, scale=attribute * noise_level, size=n_steps
                 )
                 setattr(self, key, attribute)
         # Now, if this is the hierarchical case, we can redefine the acceleration
         # due to gravity term
-        if self._noise_level['acceleration_due_to_gravity'] is None:
-            assert self.big_G_newton is not None and self.phi_planet \
-                is not None, "must define big_G_newton and phi_planet if \
+        if self._noise_level["acceleration_due_to_gravity"] is None:
+            assert (
+                self.big_G_newton is not None and self.phi_planet is not None
+            ), "must define big_G_newton and phi_planet if \
                     acceleration_due_to_gravity is not provided"
-            if self._noise_level['big_G_newton'] is not None:
+            if self._noise_level["big_G_newton"] is not None:
                 self.big_G_newton = rs.normal(
-                                loc=self.big_G_newton,
-                                scale=self.big_G_newton *
-                                self._noise_level['big_G_newton'],
-                                size=n_steps
-                                )
-            if self._noise_level['phi_planet'] is not None:
+                    loc=self.big_G_newton,
+                    scale=self.big_G_newton * self._noise_level["big_G_newton"],
+                    size=n_steps,
+                )
+            if self._noise_level["phi_planet"] is not None:
                 self.phi_planet = rs.normal(
-                                loc=self.phi_planet,
-                                scale=self.phi_planet *
-                                self._noise_level['phi_planet'],
-                                size=n_steps
-                                )
+                    loc=self.phi_planet,
+                    scale=self.phi_planet * self._noise_level["phi_planet"],
+                    size=n_steps,
+                )
             # redefine:
             # acceleration_due_to_gravity = multiple of noisy G and phi
             if self.big_G_newton is not None and self.phi_planet is not None:
-                self.acceleration_due_to_gravity = self.big_G_newton * \
-                    self.phi_planet
+                self.acceleration_due_to_gravity = self.big_G_newton * self.phi_planet
             else:
                 assert f"Either big G or phi_planet is None \
                     (G = {self.big_G_newton}, ø = {self.phi_planet}); \
@@ -198,9 +199,9 @@ class Pendulum(PhysicsObject):
             setattr(self, key, attribute)
         return
 
-    def create_object(self, time: Union[float, np.array],
-                      noiseless: bool = False,
-                      seed: int = 42):
+    def create_object(
+        self, time: Union[float, np.array], noiseless: bool = False, seed: int = None
+    ):
         """
         Given a single or array of times, simulates the pendulum position at
         each of these times and optionally adds Gaussian noise to each
@@ -238,27 +239,30 @@ class Pendulum(PhysicsObject):
         # Check if parameters are single values
         # or arrays with the same length as time
         if isinstance(self.pendulum_arm_length, (float, int)):
-            pendulum_arm_length_values = np.full_like(np.asarray(time),
-                                                      self.pendulum_arm_length)
+            pendulum_arm_length_values = np.full_like(
+                np.asarray(time), self.pendulum_arm_length
+            )
         else:
             pendulum_arm_length_values = np.asarray(self.pendulum_arm_length)
 
         if isinstance(self.starting_angle_radians, (float, int)):
-            starting_angle_values = np.full_like(np.asarray(time),
-                                                 self.starting_angle_radians)
+            starting_angle_values = np.full_like(
+                np.asarray(time), self.starting_angle_radians
+            )
         else:
             starting_angle_values = np.asarray(self.starting_angle_radians)
 
         if isinstance(self.acceleration_due_to_gravity, (float, int)):
-            acceleration_values = \
-                np.full_like(np.asarray(time),
-                             self.acceleration_due_to_gravity)
+            acceleration_values = np.full_like(
+                np.asarray(time), self.acceleration_due_to_gravity
+            )
         else:
             acceleration_values = np.asarray(self.acceleration_due_to_gravity)
 
         # Calculate theta_time based on the parameters
-        theta_time = starting_angle_values * \
-            np.cos(np.sqrt(acceleration_values / pendulum_arm_length_values))
+        theta_time = starting_angle_values * np.cos(
+            np.sqrt(acceleration_values / pendulum_arm_length_values)
+        )
 
         # Calculate x using the modified parameters and time
         return pendulum_arm_length_values * np.sin(theta_time * time)
@@ -267,14 +271,28 @@ class Pendulum(PhysicsObject):
         noisy = self.create_object(time)
         noise_free = self.create_object(time, noiseless=True)
         plt.clf()
-        plt.plot(time, noisy, color='#EF5D60')
-        plt.scatter(time, noisy, label='noisy', color='#EF5D60')
-        plt.plot(time, noise_free, color='#E09F7D')
-        plt.scatter(time, noise_free, label='noise free', color='#E09F7D')
+        plt.plot(time, noisy, color="#EF5D60")
+        plt.scatter(time, noisy, label="noisy", color="#EF5D60")
+        plt.plot(time, noise_free, color="#E09F7D")
+        plt.scatter(time, noise_free, label="noise free", color="#E09F7D")
         plt.legend()
         plt.show()
 
-    '''
+        # make it an option to plot multiple noise draws:
+        noise_free = self.create_object(time, noiseless=True)
+        plt.clf()
+        for i in range(10):
+            noisy = self.create_object(time)  # , seed=42)
+            plt.plot(time, noisy, color="#EF5D60")
+            plt.scatter(time, noisy, label="noisy", color="#EF5D60")
+        plt.plot(time, noise_free, color="#0E131F", zorder=100)
+        plt.scatter(time, noise_free, label="noise free", color="#0E131F", zorder=100)
+        plt.legend()
+        plt.show()
+
+        # what about showing the true range of Gaussian noise?
+
+    """
     def animateObject(self, time: Union[float, np.array]):
         # Right now this just plots x and t
         # Instantiate the simulator
@@ -300,4 +318,4 @@ class Pendulum(PhysicsObject):
                              interval=100)
         plt.show(anim)
         return
-    '''
+    """
