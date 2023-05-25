@@ -104,9 +104,6 @@ class Pendulum(PhysicsObject):
         # Verify the requested noise parameters are variables you can use
         for key, item in noise_std_percent.items():
             assert key in [key for key in self.__dict__.keys()]
-            # key is a variable in the class
-            if type(item) == "NoneType":
-                assert type(item) in [np.array, float], f"{type(item)} not in keys"
         # If the acceleration_due_to_gravity is None,
         # then the accompanying noise parameter also needs to be none
         # otherwise the noise module will be confused
@@ -129,12 +126,16 @@ class Pendulum(PhysicsObject):
         }
 
     def create_noise(
-        self, seed: int = None, n_steps: Union[int, Tuple[int, int]] = 10
+        self,
+        seed: int = None,
+        n_steps: Union[int, Tuple[int, int]] = 10,
+        verbose: bool = False,
     ) -> np.array:
         """
         Creates noise on top of simulate_pendulum_dynamics
-        Also deals with the hierarchical case, where acceleration_due_to_gravity
-        is defined via big_G_newton and phi_planet
+        Also deals with the hierarchical case, where
+        acceleration_due_to_gravity is defined via
+        big_G_newton and phi_planet
 
         Args:
             seed (int): Random seed used to generate Gaussian noise
@@ -154,14 +155,15 @@ class Pendulum(PhysicsObject):
 
             attribute = self.parameter_map[key]
             noise_level = self._noise_level[key]
-            print("key", key, "attribute", attribute, "noise level", noise_level)
+            if verbose:
+                print("key", key, "attribute", attribute, "noise level", noise_level)
             if noise_level is not None:
                 attribute = rs.normal(
                     loc=attribute, scale=attribute * noise_level, size=n_steps
                 )
                 setattr(self, key, attribute)
-        # Now, if this is the hierarchical case, we can redefine the acceleration
-        # due to gravity term
+        # Now, if this is the hierarchical case, we can redefine
+        # the acceleration_due_to_gravity term
         if self._noise_level["acceleration_due_to_gravity"] is None:
             assert (
                 self.big_G_newton is not None and self.phi_planet is not None
@@ -200,7 +202,11 @@ class Pendulum(PhysicsObject):
         return
 
     def create_object(
-        self, time: Union[float, np.array], noiseless: bool = False, seed: int = None
+        self,
+        time: Union[float, np.array],
+        noiseless: bool = False,
+        seed: int = None,
+        verbose: bool = False,
     ):
         """
         Given a single or array of times, simulates the pendulum position at
@@ -260,6 +266,12 @@ class Pendulum(PhysicsObject):
             acceleration_values = np.asarray(self.acceleration_due_to_gravity)
 
         # Calculate theta_time based on the parameters
+        assert (
+            acceleration_values.any() > 0
+        ), "f{acceleration_values} not greater than zero"
+        assert (
+            pendulum_arm_length_values.any() > 0
+        ), "f{pendulum_arm_length_values} not greater than zero"
         theta_time = starting_angle_values * np.cos(
             np.sqrt(acceleration_values / pendulum_arm_length_values)
         )
