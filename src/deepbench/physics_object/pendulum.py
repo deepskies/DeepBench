@@ -302,6 +302,7 @@ class Pendulum(PhysicsObject):
         plt.ylabel("x position")
         plt.xlabel("time [s]")
         plt.show()
+        return noise_free, noisy_ys
 
     """
     def animateObject(self, time: Union[float, np.array]):
