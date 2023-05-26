@@ -206,8 +206,7 @@ class TestPendulum(TestCase):
                 "phi_planet": 0.0,
             },
         )
-        # pendulum.displayObject(time)
-        pendulum_noisy = pendulum.create_object(time, noiseless=False)
+        pendulum_noisy = pendulum.create_object(time, noiseless=False, seed=42)
         pendulum_noiseless = pendulum.create_object(time, noiseless=True)
         assert len(pendulum_noisy) == len(pendulum_noiseless) == len(time)
         assert pendulum_noisy.any() == pendulum_noiseless.any()

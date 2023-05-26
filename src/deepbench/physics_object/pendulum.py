@@ -4,6 +4,14 @@ import numpy.random as rand
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from typing import Union, Optional, Tuple
+import logging
+
+# create logger with 'spam_application'
+logger = logging.getLogger('randomseeds')
+logger.setLevel(logging.DEBUG)
+# create file handler which logs even debug messages
+fh = logging.FileHandler('randomseeds.log')
+logger.addHandler(fh)
 
 
 class Pendulum(PhysicsObject):
@@ -127,6 +135,7 @@ class Pendulum(PhysicsObject):
 
     def create_noise(
         self,
+        noiseless: bool = False,
         seed: int = None,
         n_steps: Union[int, Tuple[int, int]] = 10,
         verbose: bool = False,
@@ -149,6 +158,9 @@ class Pendulum(PhysicsObject):
             rs = rand.RandomState(seed)
         else:
             rs = rand.RandomState()
+        # Save the random state only if noisy
+        if noiseless is False:
+            logger.info(str(rs.get_state()[1][0]))
         for key in self._noise_level.keys():
             if key not in self.parameter_map:
                 raise ValueError(f"Invalid parameter name: {key}")
@@ -232,7 +244,7 @@ class Pendulum(PhysicsObject):
         else:
             time = np.asarray(time)
             n_steps = time.shape
-        self.create_noise(seed=seed, n_steps=n_steps)
+        self.create_noise(seed=seed, noiseless=noiseless, n_steps=n_steps)
         if noiseless:
             self.destroy_noise()
         pendulum = self.simulate_pendulum_dynamics(time)
@@ -294,7 +306,7 @@ class Pendulum(PhysicsObject):
         # deviation:
         noise_free = self.create_object(time, noiseless=True)
         plt.clf()
-        num_random = 1000
+        num_random = 10
         noisy_ys = np.zeros((num_random, len(time)))
         for i in range(num_random):
             noisy = self.create_object(time)
