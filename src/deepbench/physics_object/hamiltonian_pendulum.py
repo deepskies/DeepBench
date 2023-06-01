@@ -2,8 +2,8 @@ from src.deepbench.physics_object.pendulum import Pendulum
 
 import autograd
 import autograd.numpy as np
-import scipy.integrate.solve_ivp as solve_ivp
-from typing import Union
+from scipy.integrate import solve_ivp
+from typing import Union, Optional
 
 
 class HamiltonianPendulum(Pendulum):
@@ -12,7 +12,7 @@ class HamiltonianPendulum(Pendulum):
         pendulum_arm_length: float,
         starting_angle_radians: float,
         acceleration_due_to_gravity: Union[float, None] = None,
-        mass_pendulum_bob: Union[float, None] = None,
+        mass_pendulum_bob: Optional[float] = 10.0,
         noise_std_percent: dict = {
             "pendulum_arm_length": 0.0,
             "starting_angle_radians": 0.0,
@@ -55,28 +55,47 @@ class HamiltonianPendulum(Pendulum):
             mass_pendulum_bob=mass_pendulum_bob,
         )
 
-    def hamiltonian_fn(self, coords):
+    def hamiltonian_fn(self, coords, m, L, g):
         q, p = np.split(coords, 2)
-        kinetic_term = ((self.pendulum_arm_length**2) * (p**2)) / (
-            2 * self.mass_pendulum_bob
-        )
-        potential_term = (
-            self.mass_pendulum_bob
-            * self.acceleration_due_to_gravity
-            * self.pendulum_arm_length
-        ) * (1 - np.cos(q))
-        H = kinetic_term + potential_term
+        # m = self.mass_pendulum_bob
+        # L = self.pendulum_arm_length
+        # g = self.acceleration_due_to_gravity
+        # kinetic_term = ((self.pendulum_arm_length**2) * (p**2)) / (
+        #     2 * self.mass_pendulum_bob
+        # )
+        # potential_term = (
+        #     self.mass_pendulum_bob
+        #     * self.acceleration_due_to_gravity
+        #     * self.pendulum_arm_length
+        # ) * (1 - np.cos(q))
+        # H = kinetic_term + potential_term
+        H = (m * g * L) * (1 - np.cos(q)) + ((L**2) * (p**2)) / (2 * m)
         return H
 
     def dynamics_fn(self, t, coords):
         # derives the gradient of the hamiltonian function
-        dcoords = autograd.grad(self.hamiltonian_fn)(coords)
+        # print(f'mass: {self.mass_pendulum_bob} length: {self.pendulum_arm_length} g: {self.acceleration_due_to_gravity}')
+        dcoords = autograd.grad(self.hamiltonian_fn)(
+            coords,
+            self.mass_pendulum_bob,
+            self.pendulum_arm_length,
+            self.acceleration_due_to_gravity,
+        )
+
+        # dcoords = autograd.grad(self.hamiltonian_fn)(coords, 2, 10, 9.8)
         dqdt, dpdt = np.split(dcoords, 2)
         S = np.concatenate([dpdt, -dqdt], axis=-1)
         return S
 
-    def simulate_pendulum_dynamics(self, time):
-        t_eval = np.linspace(time[0], time[1], int(15 * (time[1] - time[0])))
+    def create_object(self, time, noiseless=True):
+        assert noiseless
+        return super().create_object(time, noiseless)
+
+    def simulate_pendulum_dynamics(self, time, **kwargs):
+        assert time.size > 1, "you must enter more than one point in time"
+
+        t_eval = np.array(time)
+        t_span = np.array([time[0], time[-1]])
 
         radius = np.random.rand() + 1.3
 
@@ -84,14 +103,16 @@ class HamiltonianPendulum(Pendulum):
         if self.starting_angle_radians is None:
             self.starting_angle_radians = np.random.rand(2) * 2.0 - 1
 
-        y0 = (
-            self.starting_angle_radians
-            / np.sqrt((self.starting_angle_radians**2).sum())
-            * radius
-        )
+        y0 = np.array([2, 0])
+        y0 = y0 / np.sqrt((y0**2).sum()) * radius
 
         spring_ivp = solve_ivp(
-            fun=self.dynamics_fn, t_span=time, y0=y0, t_eval=t_eval, rtol=1e-10
+            fun=self.dynamics_fn,
+            t_span=t_span,
+            y0=y0,
+            t_eval=t_eval,
+            rtol=1e-10,
+            **kwargs
         )
         q, p = spring_ivp["y"][0], spring_ivp["y"][1]
         dydt = [self.dynamics_fn(None, y) for y in spring_ivp["y"].T]
