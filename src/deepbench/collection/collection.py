@@ -1,13 +1,9 @@
-import sys
-
-from src.deepbench.image.sky_image import SkyImage
-from src.deepbench.image.shape_image import ShapeImage
-from src.deepbench.physics_object.physics_object import PhysicsObject
+import src.deepbench.image as image
+import src.deepbench.physics_object as physics
 
 
 class Collection:
     def __init__(self, object_config: dict):
-
         self.object_type = object_config["object_type"]
         self.object_name = object_config["object_name"]
 
@@ -15,18 +11,18 @@ class Collection:
         self.included_params = object_config["object_parameters"]
 
         object_parent_class = {
-            "sky": SkyImage,
-            "shape": ShapeImage,
-            "physics": PhysicsObject,
+            "sky": image.sky_image.SkyImage,
+            "shape": image.shape_image.ShapeImage,
+            "physics": physics.physics_object.PhysicsObject,
         }[self.object_type]
 
-        possible_engines = {
-            engine.__name__: engine
-            for engine in sys.modules
-            if issubclass(engine, object_parent_class)
+        self.object_engine = {
+            cls.__name__: cls for cls in object_parent_class.__subclasses__()
         }
 
-        self.object_engine = possible_engines[self.object_name]
+        self.object_engine[object_parent_class.__name__] = object_parent_class
+
+        self.object_engine = self.object_engine[self.object_name]
 
         self.objects = {}
         self.n_objects = 0

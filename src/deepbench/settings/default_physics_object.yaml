@@ -1,0 +1,7 @@
+object_type: "physics"
+object_name: "Pendulum"
+
+total_objects: 3
+object_parameters: {
+
+}
