@@ -22,7 +22,7 @@ class Pendulum(PhysicsObject):
         noise_std_percent: dict = {
             "pendulum_arm_length": 0.0,
             "starting_angle_radians": 0.0,
-            "acceleration_due_to_gravity": None,
+            "acceleration_due_to_gravity": 0.0,
             "big_G_newton": None,
             "phi_planet": None,
         },
