@@ -1,6 +1,20 @@
 import numpy as np
 from unittest import TestCase
 from src.deepbench.physics_object.pendulum import Pendulum
+import os
+import pytest
+
+"""
+@pytest.fixture()
+def resource(request):
+    print("setup")
+    os.remove('randomseeds.log')
+    def teardown():
+
+        print("teardown")
+    request.addfinalizer(teardown)
+    return "resource"
+"""
 
 
 class TestPendulum(TestCase):
@@ -227,42 +241,28 @@ class TestPendulum(TestCase):
         y, noisy_y = pendulum.displayObject(time)
         assert np.shape(y)[0] == np.shape(noisy_y)[1]
 
-
-"""
-    def test_generate_gaussian_noise(self):
-        object_params = [{"object_type": "test_object"}]
-        image_shape = (14, 14)
-        one_image_sky = TimeSeriesImage(object_params, image_shape)
-        one_image_sky.combine_objects()
-        one_image_sky.generate_noise("gaussian")
-
-        self.assertIsNotNone(one_image_sky.image)
-        self.assertEqual(image_shape, one_image_sky.image.shape)
-
-    def test_generate_poisson_noise(self):
-        object_params = [{"object_type": "test_object"}]
-        image_shape = (14, 14)
-        one_image_sky = TimeSeriesImage(object_params, image_shape)
-        one_image_sky.combine_objects()
-        one_image_sky.generate_noise("poisson")
-
-        self.assertIsNotNone(one_image_sky.image)
-        self.assertEqual(image_shape, one_image_sky.image.shape)
-
-    def test_add_fake_noise(self):
-        with self.assertRaises(NotImplementedError):
-            object_params = [{"object_type": "test_object"}]
-            image_shape = (14, 14)
-            one_image_sky = TimeSeriesImage(object_params, image_shape)
-            one_image_sky.combine_objects()
-            one_image_sky.generate_noise("Fake Noise")
-
-    def test_image_not_made(self):
-        with self.assertRaises(AssertionError):
-            object_params = [{"object_type": "test_object"}]
-            image_shape = (14, 14)
-            one_image_sky = TimeSeriesImage(object_params, image_shape)
-
-            ##Go straight to noise instead of making objects first
-            one_image_sky.generate_noise("gaussian")
-"""
+    def test_logfile(self):
+        # is the logfile getting overwritten for each init?
+        # first remove it to later see if its there
+        time = np.array(np.linspace(0, 50, 200))
+        pendulum = Pendulum(
+            pendulum_arm_length=10.0,
+            starting_angle_radians=np.pi / 4,
+            acceleration_due_to_gravity=9.8,
+            noise_std_percent={
+                "pendulum_arm_length": 0.0,
+                "starting_angle_radians": 0.1,
+                "acceleration_due_to_gravity": 0.1,
+            },
+        )
+        # Is the logfile there?
+        assert os.path.exists("randomseeds.log")
+        # Is it empty?
+        assert os.stat("randomseeds.log").st_size == 0, "randomseeds is not empty"
+        # Now add noise:
+        pendulum.create_object(time, seed=23, noiseless=False)
+        assert (
+            os.stat("randomseeds.log").st_size != 0
+        ), "randomseeds is empty after noise added, incorrect"
+        file = open("randomseeds.log")
+        assert file.read() == "23\n"
