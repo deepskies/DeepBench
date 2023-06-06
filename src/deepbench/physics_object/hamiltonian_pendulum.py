@@ -119,6 +119,14 @@ class HamiltonianPendulum(Pendulum):
         dydt = np.stack(dydt).T
         dqdt, dpdt = np.split(dydt, 2)  # split the dydt into dqdt and dpdt
 
+        # add noise
+        noise_std = 0.1
+        q += (
+            np.random.randn(*q.shape) * noise_std
+        )  # creates a random array of size q.shape and is scaled with noise_std then adds to q for noise
+        p += (
+            np.random.randn(*p.shape) * noise_std
+        )  # creates a random array of size p.shape and is scaled with noise_std then adds to p for noise
         return q, p, dqdt, dpdt, t_eval
 
     def get_field(self, xmin=-1.2, xmax=1.2, ymin=-1.2, ymax=1.2, gridsize=20):
