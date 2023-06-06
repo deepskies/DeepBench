@@ -21,6 +21,7 @@ class TestSkyImage(TestCase):
             SkyImage([{}], im_shape)
 
     def test_3dim_size(self):
+
         im_shape = (14, 14, 3)
         test_sky = SkyImage([{}], im_shape)
 
