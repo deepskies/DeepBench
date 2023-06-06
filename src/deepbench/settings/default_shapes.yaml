@@ -1,7 +1,14 @@
 object_type: "shape"
 object_name: "ShapeImage"
 
-total_objects: 3
-object_parameters: {
+total_runs: 3
+image_parameters:
+  image_shape:
+  - 28
+  - 28
 
-}
+
+object_parameters:
+  {
+
+  }

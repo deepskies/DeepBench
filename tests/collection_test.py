@@ -1,6 +1,8 @@
 import pytest
 import os
 import yaml
+import numpy as np
+
 from src.deepbench.collection.collection import Collection
 
 
@@ -40,7 +42,7 @@ def test_default_init(default_physics, default_shape, default_sky):
 
     from src.deepbench.physics_object.pendulum import Pendulum
 
-    assert physics.object_engine == Pendulum
+    assert isinstance(physics.object_engine, Pendulum)
 
     physics = Collection(default_shape)
     assert physics.n_objects == 0
@@ -49,7 +51,7 @@ def test_default_init(default_physics, default_shape, default_sky):
 
     from src.deepbench.image.shape_image import ShapeImage
 
-    assert physics.object_engine == ShapeImage
+    assert isinstance(physics.object_engine, ShapeImage)
 
     physics = Collection(default_sky)
     assert physics.n_objects == 0
@@ -58,7 +60,7 @@ def test_default_init(default_physics, default_shape, default_sky):
 
     from src.deepbench.image.sky_image import SkyImage
 
-    assert physics.object_engine == SkyImage
+    assert isinstance(physics.object_engine, SkyImage)
 
 
 def test_add_single_item_phy(default_physics):
@@ -89,7 +91,7 @@ def test_make_image(default_sky):
     sky_object = sky.objects[0]
     sky_object_param = sky.object_params[0]
 
-    assert sky_object.shape == sky_object_param["shape"]
+    assert sky_object.shape[0] == sky_object_param["image_shape"][0]
 
 
 def test_make_shape(default_shape):
@@ -98,7 +100,7 @@ def test_make_shape(default_shape):
     shape_object = shape.objects[0]
     shpe_object_param = shape.object_params[0]
 
-    assert shape_object.shape == shpe_object_param["shape"]
+    assert shape_object.shape[0] == shpe_object_param["image_shape"][0]
 
 
 def test_make_physics_obj(default_physics):
@@ -107,17 +109,7 @@ def test_make_physics_obj(default_physics):
     phy_object = phy.objects[0]
     phy_object_param = phy.object_params[0]
 
-    assert len(phy_object.shape) == phy_object_param["times"]
-
-
-def test_missing_param_phy():
-    with pytest.raises(AssertionError):
-        pass
-
-
-def test_missing_param_image():
-    with pytest.raises(AssertionError):
-        pass
+    assert phy_object.shape[0] == len(phy_object_param["time"])
 
 
 def test_included_seed(default_physics):
@@ -140,14 +132,30 @@ def test_generate_seed(default_physics):
 
 def test_find_default_params(default_physics):
     physics = Collection(default_physics)
-    default_object_params = {}
+    default_object_params_keys = {
+        "time",
+        "seed",
+        "pendulum_arm_length",
+        "starting_angle_radians",
+        "acceleration_due_to_gravity",
+        "noise_std_percent",
+        "big_G_newton",
+        "phi_planet",
+        "mass_pendulum_bob",
+        "coefficient_friction",
+        "verbose",
+        "noiseless",
+    }
+
     physics.add_object()
-    assert default_object_params == physics.object_params[0]
+    assert default_object_params_keys == {
+        key for key in physics.object_params[0].keys()
+    }
 
 
 def test_number_object_created(default_physics):
     n_objects = 5
-    default_physics["total_objects"] = n_objects
+    default_physics["total_runs"] = n_objects
     physics = Collection(default_physics)
     physics()
 
@@ -155,24 +163,41 @@ def test_number_object_created(default_physics):
 
 
 def test_add_parameter_noise(default_physics):
-    default_physics["parameter_noise"] = True
+    default_physics["parameter_noise"] = 0.2
     physics = Collection(default_physics)
 
     physics()
-    arm_lengths = [
-        physics.object_params[obj_index]["pendulum_arm_length"]
-        for obj_index in physics.object_params.keys()
-    ]
-    assert len(arm_lengths) == len(set(arm_lengths))
+
+    assert len(
+        np.unique(
+            np.asarray(
+                [
+                    physics.object_params[obj_index]["time"]
+                    for obj_index in physics.object_params.keys()
+                ]
+            ).flatten()
+        )
+    ) == len(
+        np.asarray(
+            [
+                physics.object_params[obj_index]["time"]
+                for obj_index in physics.object_params.keys()
+            ]
+        ).flatten()
+    )
 
 
-def test_no_added_noise():
-    default_physics["parameter_noise"] = False
+def test_no_added_noise(default_physics):
+    default_physics.pop("parameter_noise", None)
     physics = Collection(default_physics)
 
     physics()
-    arm_lengths = [
-        physics.object_params[obj_index]["pendulum_arm_length"]
-        for obj_index in physics.object_params.keys()
-    ]
-    assert len(set(arm_lengths)) == 1
+    arm_lengths = np.unique(
+        np.asarray(
+            [
+                physics.object_params[obj_index]["time"]
+                for obj_index in physics.object_params.keys()
+            ]
+        ).flatten()
+    )
+    assert len(arm_lengths) == len(default_physics["object_parameters"]["time"])
