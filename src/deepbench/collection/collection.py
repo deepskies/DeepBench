@@ -7,6 +7,18 @@ import numpy as np
 
 
 class Collection:
+    """
+
+    Take a configuration file (dictionary) and produce the simulation output,
+    automatically passing arguments where they need to be.
+
+    Handles both compositional images (ones with multiple objects)
+    and single object images
+
+    Holds onto all the parameters used to make these files, including the default parameters, for replication.
+
+    """
+
     def __init__(self, object_config: dict):
         self.object_type = object_config["object_type"]
         self.object_name = object_config["object_name"]
