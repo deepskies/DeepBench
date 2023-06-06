@@ -49,7 +49,6 @@ class AstroObject(ABC):
         """
         raise NotImplementedError()
 
-    @staticmethod
     def create_psf(self, image_shape, gaussian_blur=0.7) -> np.ndarray:
         """
         Creates the Point Spread Function to append to the object.
@@ -67,7 +66,7 @@ class AstroObject(ABC):
         return ndimage.gaussian_filter(image_shape, sigma=gaussian_blur)
 
     # UPDATE THIS METHODS DOCSTRINGS.
-    @staticmethod
+
     def create_noise(self, seed=42, galaxy=False) -> np.ndarray:
         """
         Creates the Poisson noise added to the object.
@@ -89,7 +88,6 @@ class AstroObject(ABC):
             rs = rand.RandomState(seed)
             return rs.poisson(self._noise_level, size=self._image.shape)
 
-    @staticmethod
     def create_meshgrid(self) -> np.ndarray:
         """
         Creates a meshgrid for the object.
@@ -101,8 +99,8 @@ class AstroObject(ABC):
             >>> example_obj.create_meshgrid()
         """
         meshgrid = np.meshgrid(
-            np.arange(np.shape(self._image.shape)[0]),
-            np.arange(np.shape(self._image.shape)[1]),
+            np.arange(self._image.shape[0]),
+            np.arange(self._image.shape[1]),
         )
 
         return meshgrid

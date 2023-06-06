@@ -1,20 +1,43 @@
 from src.deepbench.image.image import Image
-from scipy import ndimage
-import numpy as np
-
-import warnings
+from src.deepbench import astro_object
 
 
 class SkyImage(Image):
-    def __init__(self, objects, image_shape):
+    def __init__(self, image_shape, object_noise_level=0, object_noise_type="guassian"):
 
         assert len(image_shape) >= 2, "Image must be 2D or higher."
-        assert len(objects) >= 1, "Please pass at least one object per image"
+        self.object_noise_level = object_noise_level
+        self.object_noise_type = object_noise_type
 
-        super().__init__(objects, image_shape)
+        super().__init__(image_shape)
 
-    def combine_objects(self):
-        self.image = np.zeros(self.image_shape)
+    def _generate_astro_object(self, object_type, object_parameters):
+        """
+        Utilize the astro_object module and generate instances of the classes
+
+        :param object_type: String identifier of the class.
+            Pick from ["star", "strong_lens”, "galaxy", "spiral_galaxy", "n_body"]
+        :param object_parameters: Dictionary of the parameters required for the selected class
+            Any passed image_shape will be overwritten into Image.image_shape.
+        :return: Instance of the selected class initialized with passed object parameters.
+        """
+
+        astro_object_map = {
+            "star": astro_object.star_object.StarObject,
+            "galaxy": astro_object.galaxy_object.GalaxyObject,
+            "spiral_galaxy": astro_object.spiral_galaxy.SpiralGalaxyObject,
+            "n_body": astro_object.n_body_object.NBodyObject,
+        }
+
+        if object_type not in astro_object_map.keys():
+            raise NotImplementedError(
+                f"Object type {object_type}, is not available. "
+                f"Please select object from {astro_object_map.keys()}"
+            )
+
+        return astro_object_map[object_type](**object_parameters)
+
+    def combine_objects(self, objects, instance_params, object_params, seed=42):
 
         """
         Utilize Image._generate_astro_objects to overlay all selected astro objects into one image
@@ -29,56 +52,13 @@ class SkyImage(Image):
         }]
 
         """
-
-        for sky_object in self.objects:
-
-            if "object_type" in sky_object.keys():
-                object_type = sky_object["object_type"]
-
-                object_parameters = (
-                    {}
-                    if "object_parameters" not in sky_object.keys()
-                    else sky_object["object_parameters"]
-                )
-                additional_sky_object = self._generate_astro_object(
-                    object_type, object_parameters
-                )
-
-                object_image = additional_sky_object.create_object()
-
+        self.image = self.create_empty_shape()
+        for sky_object, sky_params in zip(objects, instance_params):
+            sky_params["image_dimensions"] = self.image_shape[0]
+            additional_sky_object = self._generate_astro_object(sky_object, sky_params)
+            for object in object_params:
+                object_image = additional_sky_object.create_object(**object)
                 self.image += object_image
 
-            else:
-                # TODO Test for this check
-                warnings.warn(
-                    "Parameter 'object_type' is needed to generate sky objects"
-                )
-
-    def generate_noise(self, noise_type, **kwargs):
-        """
-        Add noise to an image
-        Updates SkyImage.image
-
-        :param noise_type: Type of noise add. Select from [“gaussian”,“poisson”]
-        :param kwargs: arg required for the noise. ["gaussian"->sigma, "poisson"->lam]
-        """
-        noise_map = {
-            "gaussian": self._generate_gaussian_noise,
-            "poisson": self._generate_poisson_noise,
-        }
-
-        if noise_type not in noise_map.keys():
-            raise NotImplementedError(f"{noise_type} noise type not available")
-
-        assert (
-            self.image is not None
-        ), "Image not generated, please run SkyImage.combine_objects"
-
-        noise = noise_map[noise_type](**kwargs)
-        self.image += noise
-
-    def _generate_gaussian_noise(self, sigma=1):
-        return ndimage.gaussian_filter(self.image, sigma=sigma)
-
-    def _generate_poisson_noise(self, image_noise=1):
-        return np.random.poisson(lam=image_noise, size=self.image.shape)
+        self.generate_noise(seed)
+        return self.image

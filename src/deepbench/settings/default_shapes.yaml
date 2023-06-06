@@ -8,7 +8,11 @@ image_parameters:
   - 28
 
 
-object_parameters:
-  {
-
-  }
+object_parameters: {
+   rectangle: {
+    object: {
+        fill: True
+    },
+      instance: {}
+   }
+}

@@ -1,18 +1,26 @@
 from abc import abstractmethod, ABC
+from typing import Tuple
 from PIL import Image as PILImage
 import os
 import numpy as np
 
-from src.deepbench import astro_object
-
 
 class Image(ABC):
     @abstractmethod
-    def __init__(self, object_list, image_shape):
-        # TODO Change to something less ambiguous than 'objects'
-        self.objects = object_list
+    def __init__(
+        self,
+        image_shape: Tuple[int, int],
+        object_noise_type: str = "gaussian",
+        object_noise_level: float = 0.0,
+    ):
         self.image_shape = image_shape
-        self.image = None
+        self.image = np.zeros(self.image_shape)
+
+        self.object_noise_type = object_noise_type
+        self.object_noise_level = object_noise_level
+
+    def create_empty_shape(self):
+        return np.zeros(self.image_shape)
 
     def __len__(self):
         return len(self.objects)
@@ -20,47 +28,29 @@ class Image(ABC):
     def _image_parameters(self):
         return self.image_shape, self.objects
 
-    def combine_objects(self):
+    def combine_objects(self, objects, object_params, seed=42):
         raise NotImplementedError
 
-    def generate_noise(self, noise_type):
-        raise NotImplementedError
-
-    def _generate_astro_object(self, object_type, object_parameters):
+    def generate_noise(self, seed=42):
         """
-        Utilize the astro_object module and generate instances of the classes
+        Add noise to an image
+        Updates SkyImage.image
 
-        :param object_type: String identifier of the class.
-            Pick from ["star", "strong_lens”, "galaxy", "spiral_galaxy", "n_body"]
-        :param object_parameters: Dictionary of the parameters required for the selected class
-            Any passed image_shape will be overwritten into Image.image_shape.
-        :return: Instance of the selected class initialized with passed object parameters.
         """
+        noise_map = {
+            "gaussian": self._generate_gaussian_noise,
+            "poisson": self._generate_poisson_noise,
+        }
 
-        if object_type == "test_object":
-            astro_object_map = {"test_object": ObjectForTesting}
-
-        else:
-            # TODO Replace with real class names and verify naming scheme
-            # TODO Check where Sin objects are/if they're included
-            # TODO Remove this if/else once astro objects are implimented
-            astro_object_map = {
-                "star": astro_object.star_object.StarObject,
-                "strong_lens": astro_object.strong_lens_object.StrongLensObject,
-                "galaxy": astro_object.galaxy_object.GalaxyObject,
-                "spiral_galaxy": astro_object.spiral_galaxy_object.SpiralGalaxyObject,
-                "n_body": astro_object.n_body_object.NBodyObject,
-            }
-
-        if object_type not in astro_object_map.keys():
+        if self.object_noise_type not in noise_map.keys():
             raise NotImplementedError(
-                f"Object type {object_type}, is not available. "
-                f"Please select object from {astro_object_map.keys()}"
+                f"{self.object_noise_type} noise type not available"
             )
 
-        object_parameters["image_shape"] = self.image_shape
+        assert self.image is not None, "Image not generated, please run combine_objects"
 
-        return astro_object_map[object_type](**object_parameters)
+        noise = noise_map[self.object_noise_type](seed)
+        self.image += noise
 
     def save_image(self, save_dir="results", image_name="image_1", image_format="jpg"):
         """
@@ -86,10 +76,12 @@ class Image(ABC):
 
         image.save(save_path)
 
+    def _generate_gaussian_noise(self, seed=42):
+        return np.random.default_rng(seed=seed).normal(
+            scale=self.object_noise_level, size=self.image_shape
+        )
 
-class ObjectForTesting:
-    def __init__(self, image_shape):
-        self.image = np.zeros(image_shape)
-
-    def create_object(self):
-        return self.image
+    def _generate_poisson_noise(self, seed=42):
+        return np.random.default_rng(seed=seed).poisson(
+            lam=self.object_noise_level, size=self.image.shape
+        )

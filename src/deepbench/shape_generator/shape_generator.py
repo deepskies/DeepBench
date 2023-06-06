@@ -297,7 +297,7 @@ class ShapeGenerator:
                 f"Image shape input of length {self.n_dimensions}; but input must be length >=2"
             )
 
-        if 0 in self.n_dimensions:
+        if 0 in self.image_shape:
             raise ValueError(f"Image size must be greater than 0")
 
-        return np.zeros(self.n_dimensions)
+        return np.zeros(self.image_shape)
