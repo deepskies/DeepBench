@@ -131,7 +131,8 @@ class Pendulum(PhysicsObject):
         log_file = "randomseeds.log"
         if os.path.exists(log_file):
             os.remove(log_file)
-        # this will overwrite logger each time a new pendulum class is initialized
+        # this will overwrite logger each time a new pendulum class
+        # is initialized
         logger = logging.getLogger("randomseeds")
         logger.setLevel(logging.DEBUG)
         # create file handler which logs even debug messages
