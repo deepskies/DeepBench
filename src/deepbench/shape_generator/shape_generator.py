@@ -9,8 +9,7 @@ class ShapeGenerator:
         self.image_shape = image_shape
         self.n_dimensions = len(self.image_shape)
 
-    @staticmethod
-    def resize(image, resize_dimensions=(28, 28)):
+    def resize(self, image, resize_dimensions=(28, 28)):
         """
         Resize a numpy array
         :param image: Numpy array to resize
@@ -201,7 +200,6 @@ class ShapeGenerator:
 
         return arc_array
 
-    @staticmethod
     def create_line(self, start=(0, 0), end=(28, 28), line_width=1):
         """
         Generate a numpy array of a line
