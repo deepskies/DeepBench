@@ -15,17 +15,24 @@ class Collection:
             "shape": image.shape_image.ShapeImage,
             "physics": physics.physics_object.PhysicsObject,
         }[self.object_type]
-
         self.object_engine = {
             cls.__name__: cls for cls in object_parent_class.__subclasses__()
         }
-
         self.object_engine[object_parent_class.__name__] = object_parent_class
 
-        self.object_engine = self.object_engine[self.object_name]
+        self.object_engine = self.object_engine[self.object_name](
+            **self.included_params
+        )
 
-        self.objects = {}
         self.n_objects = 0
+        self.objects = {}
+        self.object_params = {}
+
+    def add_parameter_noise(self):
+        pass
+
+    def create_random_seed(self):
+        pass
 
     def add_object(self):
         random_seed = ""
