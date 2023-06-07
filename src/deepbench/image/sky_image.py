@@ -3,13 +3,10 @@ from src.deepbench import astro_object
 
 
 class SkyImage(Image):
-    def __init__(self, image_shape, object_noise_level=0, object_noise_type="guassian"):
+    def __init__(self, image_shape, object_noise_level=0, object_noise_type="gaussian"):
 
         assert len(image_shape) >= 2, "Image must be 2D or higher."
-        self.object_noise_level = object_noise_level
-        self.object_noise_type = object_noise_type
-
-        super().__init__(image_shape)
+        super().__init__(image_shape, object_noise_type, object_noise_level)
 
     def _generate_astro_object(self, object_type, object_parameters):
         """
@@ -52,13 +49,21 @@ class SkyImage(Image):
         }]
 
         """
-        self.image = self.create_empty_shape()
+        image = self.create_empty_shape()
+        if type(objects) == str:
+            objects = [objects]
+        if type(instance_params) == dict:
+            instance_params = [instance_params]
+        if type(object_params) == dict:
+            object_params = [object_params]
+
         for sky_object, sky_params in zip(objects, instance_params):
             sky_params["image_dimensions"] = self.image_shape[0]
             additional_sky_object = self._generate_astro_object(sky_object, sky_params)
             for object in object_params:
                 object_image = additional_sky_object.create_object(**object)
-                self.image += object_image
+                image += object_image
 
-        self.generate_noise(seed)
-        return self.image
+        noise = self.generate_noise(seed)
+        image += noise
+        return image

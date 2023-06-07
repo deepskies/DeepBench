@@ -1,5 +1,5 @@
 from src.deepbench.astro_object.astro_object import AstroObject
-from src.deepbench.shape_generator.shape_generator import ShapeGenerator
+from src.deepbench.image.sky_image import SkyImage
 from astropy.modeling.models import Sersic2D
 
 import numpy as np
@@ -15,7 +15,7 @@ class GalaxyObject(AstroObject):
         amplitude=1,
         radius=25,
         n=1.0,
-        noise_level = 0.2,
+        noise_level=0.2,
         ellipse=random.uniform(0.1, 0.9),
         theta=random.uniform(-1.5, 1.5),
     ):
@@ -37,7 +37,8 @@ class GalaxyObject(AstroObject):
             image_dimensions=image_dimensions,
             radius=radius,
             amplitude=amplitude,
-            noise_level=noise_level)
+            noise_level=noise_level,
+        )
 
         self._n = n
         self._ellipse = ellipse
@@ -58,7 +59,7 @@ class GalaxyObject(AstroObject):
 
         return profile(x, y)
 
-    def create_object(self, center_x = 5.0, center_y = 5.0) -> np.ndarray:
+    def create_object(self, center_x=5.0, center_y=5.0) -> np.ndarray:
         """
         Create the star object from a Moffat distribution and Poisson and PSF noise.
 
@@ -76,14 +77,10 @@ class GalaxyObject(AstroObject):
         """
 
         # Create the empty image shape.
-        image_shape = ShapeGenerator.create_empty_shape(self._image)
-
         # Create the Poisson noise profile specific to Galaxy objects.
         noise_profile = self.create_noise(galaxy=True)
 
-        image_shape = self.create_Sersic_profile(
-            center_x=center_x, center_y=center_y
-        )
+        image_shape = self.create_Sersic_profile(center_x=center_x, center_y=center_y)
 
         # Append the noise profiles to the object.
         image_shape += noise_profile

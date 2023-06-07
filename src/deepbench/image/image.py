@@ -41,16 +41,14 @@ class Image(ABC):
             "gaussian": self._generate_gaussian_noise,
             "poisson": self._generate_poisson_noise,
         }
+        print(self.object_noise_type)
+        print(noise_map.keys())
 
         if self.object_noise_type not in noise_map.keys():
-            raise NotImplementedError(
-                f"{self.object_noise_type} noise type not available"
-            )
-
-        assert self.image is not None, "Image not generated, please run combine_objects"
+            raise NotImplementedError(f"{self.object_noise_type} noise not available")
 
         noise = noise_map[self.object_noise_type](seed)
-        self.image += noise
+        return noise
 
     def save_image(self, save_dir="results", image_name="image_1", image_format="jpg"):
         """
