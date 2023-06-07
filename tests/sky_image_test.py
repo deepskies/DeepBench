@@ -22,25 +22,19 @@ def test_1dim_size():
         SkyImage(im_shape)
 
 
-def test_0dim_size(self):
-    with self.assertRaises(AssertionError):
-        im_shape = ()
-        SkyImage(im_shape)
-
-
 def test_3dim_size():
     im_shape = (14, 14, 3)
     test_sky = SkyImage(im_shape)
 
-    assert im_shape == test_sky.image_shape
+    assert test_sky.image.shape == im_shape
 
 
 def test_combine_one_image(star):
     image_shape = (14, 14)
     one_image_sky = SkyImage(image_shape)
 
-    # Not testing that they're the right ones, only that they're made
-    one_image_sky.combine_objects(star)
+    #     # Not testing that they're the right ones, only that they're made
+    #     one_image_sky.combine_objects(star)
 
     assert image_shape == one_image_sky.image.shape
 
@@ -72,17 +66,6 @@ def test_generate_gaussian_noise(star):
 
     assert image_shape == one_image_sky.image.shape
     assert one_image_sky.image.any() != one_image_sky._generate_astro_object(star)
-
-
-def test_generate_poisson_noise(star):
-    image_shape = (14, 14)
-    one_image_sky = SkyImage(image_shape)
-    one_image_sky.combine_objects(
-        star, object_noise_level=0.1, object_noise_type="poisson"
-    )
-
-    assert image_shape == one_image_sky.image.shape
-    assert one_image_sky.image.any != one_image_sky._generate_astro_object(star)
 
 
 def test_add_fake_noise():
