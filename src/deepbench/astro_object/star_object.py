@@ -40,7 +40,6 @@ class StarObject(AstroObject):
             noise_level=noise,
         )
 
-
     def create_Moffat_profile(
         self, center_x: float, center_y: float, alpha=1.0
     ) -> np.ndarray:
@@ -64,8 +63,8 @@ class StarObject(AstroObject):
         x, y = self.create_meshgrid()
         profile = Moffat2D(
             amplitude=self._amplitude,
-            x_center=center_x,
-            y_center=center_y,
+            x_0=center_x,
+            y_0=center_y,
             gamma=self._radius,
             alpha=alpha,
         )
@@ -92,12 +91,14 @@ class StarObject(AstroObject):
         """
 
         # Create the empty image shape.
-        image_shape = ShapeGenerator.create_empty_shape(self._image)
+        image_shape = self._image.copy()
 
         # Create the Poisson noise profile.
         noise_profile = self.create_noise()
 
-        image_shape = self.create_Moffat_profile(center_x=center_x, center_y=center_y, alpha=alpha)
+        image_shape = self.create_Moffat_profile(
+            center_x=center_x, center_y=center_y, alpha=alpha
+        )
 
         # Append the noise profiles to the object.
         image_shape += noise_profile

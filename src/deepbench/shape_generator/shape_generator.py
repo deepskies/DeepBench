@@ -5,11 +5,11 @@ from skimage import transform
 
 
 class ShapeGenerator:
-    def __init__(self):
-        pass
+    def __init__(self, image_shape=(28, 28)):
+        self.image_shape = image_shape
+        self.n_dimensions = len(self.image_shape)
 
-    @staticmethod
-    def resize(image, resize_dimensions=(28, 28)):
+    def resize(self, image, resize_dimensions=(28, 28)):
         """
         Resize a numpy array
         :param image: Numpy array to resize
@@ -29,27 +29,26 @@ class ShapeGenerator:
         resized_image = transform.resize(image, resize_dimensions)
         return resized_image
 
-    @staticmethod
-    def _convert_patch_to_image(image, image_shape=(28, 28), cutout=None):
+    def _convert_patch_to_image(self, image, cutout=None):
         """
         Converts a matplot path or patch object into a numpy array of the designated size
         :param image: Matplotlib image object to convert
         :param image_shape: [tuple(*int)] Size of the desired image
         :return: numpy array of shape image_shape, containing the image
         """
-        n_dim = len(image_shape)
-        image_shape = tuple(map(lambda dim: int(np.ceil(dim)), image_shape))
+        n_dim = len(self.image_shape)
+        self.image_shape = tuple(map(lambda dim: int(np.ceil(dim)), self.image_shape))
 
         if n_dim < 2:
             raise ValueError(
                 f"Image shape input of length {n_dim}; but input must be length >=2"
             )
 
-        if 0 in image_shape:
+        if 0 in self.image_shape:
             raise ValueError(f"Image size must be greater than 0")
 
-        x = np.arange(0, image_shape[0])
-        y = np.arange(0, image_shape[1])
+        x = np.arange(0, self.image_shape[0])
+        y = np.arange(0, self.image_shape[1])
         meshgrid = np.meshgrid(x, y)
 
         coordinates = np.array(list(zip(*(c.flat for c in meshgrid))))
@@ -57,7 +56,7 @@ class ShapeGenerator:
         valid_coordinates = Path(image.get_verts()).contains_points(coordinates)
         shape_points = coordinates[valid_coordinates]
 
-        out_array = np.zeros(image_shape)
+        out_array = np.zeros(self.image_shape)
         out_array[shape_points[:, 0], shape_points[:, 1]] = 1.0
 
         if cutout is not None:
@@ -67,9 +66,8 @@ class ShapeGenerator:
 
         return out_array
 
-    @staticmethod
     def create_rectangle(
-        image_shape=(28, 28),
+        self,
         center=(14, 14),
         width=10,
         height=10,
@@ -88,11 +86,10 @@ class ShapeGenerator:
         :return: Numpy array of size image_shape containing a rectangle
         """
 
-        n_dim = len(image_shape)
         n_center_dim = len(center)
-        if n_dim != n_center_dim:
+        if self.n_dimensions != n_center_dim:
             raise ValueError(
-                f"Image shape input of length {n_dim}; but supplied center coordinates with dimension f{n_center_dim}"
+                f"Image shape input of length {self.n_dimensions}; but supplied center coordinates with dimension f{n_center_dim}"
             )
 
         width += line_width
@@ -111,18 +108,15 @@ class ShapeGenerator:
                 xy=xy_cutout, width=cutout_w, height=cutout_h, angle=angle
             )
 
-        rectangle_array = ShapeGenerator._convert_patch_to_image(
-            rectangle, image_shape=image_shape, cutout=cutout
-        )
+        rectangle_array = self._convert_patch_to_image(rectangle, cutout=cutout)
 
         if rectangle_array.ravel().sum() == 0.0:
             raise UserWarning("Image out of bounds, no shape displayed")
 
         return rectangle_array
 
-    @staticmethod
     def create_regular_polygon(
-        image_shape=(28, 28),
+        self,
         center=(14, 14),
         angle=45,
         vertices=3,
@@ -144,11 +138,10 @@ class ShapeGenerator:
 
         radius = abs(radius)
 
-        n_dim = len(image_shape)
         n_center_dim = len(center)
-        if n_dim != n_center_dim:
+        if self.n_dimensions != n_center_dim:
             raise ValueError(
-                f"Image shape input of length {n_dim}; but supplied center coordinates with dimension f{n_center_dim}"
+                f"Image shape input of length {n_center_dim}; but supplied center coordinates with dimension f{n_center_dim}"
             )
         if vertices <= 0:
             raise ValueError(f"Cannot plot a polygon with {vertices}")
@@ -171,18 +164,15 @@ class ShapeGenerator:
                 orientation=angle,
             )
 
-        polygon_array = ShapeGenerator._convert_patch_to_image(
-            polygon, image_shape=image_shape, cutout=cutout
-        )
+        polygon_array = self._convert_patch_to_image(polygon, cutout=cutout)
 
         if polygon_array.ravel().sum() == 0.0:
             raise UserWarning("Image out of bounds, no shape displayed")
 
         return polygon_array
 
-    @staticmethod
     def create_arc(
-        image_shape=(28, 28),
+        self,
         center=(14, 14),
         radius=10,
         theta1=0,
@@ -203,15 +193,14 @@ class ShapeGenerator:
         arc = patches.Wedge(
             center=center, r=radius, theta1=theta1, theta2=theta2, width=line_width
         )
-        arc_array = ShapeGenerator._convert_patch_to_image(arc, image_shape=image_shape)
+        arc_array = self._convert_patch_to_image(arc)
 
         if arc_array.ravel().sum() == 0.0:
             raise UserWarning("Image out of bounds, no shape displayed")
 
         return arc_array
 
-    @staticmethod
-    def create_line(image_shape=(28, 28), start=(0, 0), end=(28, 28), line_width=1):
+    def create_line(self, start=(0, 0), end=(28, 28), line_width=1):
         """
         Generate a numpy array of a line
         :param image_shape:  tuple(*int) Shape of the output arrray (pixels)
@@ -247,18 +236,15 @@ class ShapeGenerator:
             height=height_rect,
             angle=angle_degrees,
         )
-        line_array = ShapeGenerator._convert_patch_to_image(
-            line, image_shape=image_shape
-        )
+        line_array = self._convert_patch_to_image(line)
 
         if line_array.ravel().sum() == 0.0:
             raise UserWarning("Image out of bounds, no shape displayed")
 
         return line_array
 
-    @staticmethod
     def create_ellipse(
-        image_shape=(28, 28),
+        self,
         center=(14, 14),
         width=10,
         height=10,
@@ -277,9 +263,9 @@ class ShapeGenerator:
         :return: Numpy array containing the ellipse
         """
 
-        if len(image_shape) != len(center):
+        if self.n_dimensions != len(center):
             raise ValueError(
-                f"Dimension mismatch, image had dimensions of {len(image_shape)}, "
+                f"Dimension mismatch, image had dimensions of {self.n_dimensions}, "
                 f"but center point had dimensions of {len(center)}"
             )
 
@@ -297,26 +283,21 @@ class ShapeGenerator:
                 xy=xy_cutout, width=width_cutout, height=height_cutout, angle=angle
             )
 
-        ellipse_array = ShapeGenerator._convert_patch_to_image(
-            ellipse, image_shape=image_shape, cutout=cutout
-        )
+        ellipse_array = self._convert_patch_to_image(ellipse, cutout=cutout)
 
         if ellipse_array.ravel().sum() == 0.0:
             raise UserWarning("Image out of bounds, no shape displayed")
 
         return ellipse_array
 
-    @staticmethod
-    def create_empty_shape(image_shape=(28, 28)):
-        n_dim = len(image_shape)
-        image_shape = tuple(map(lambda dim: int(np.ceil(dim)), image_shape))
+    def create_empty_shape(self):
 
-        if n_dim < 2:
+        if self.n_dimensions < 2:
             raise ValueError(
-                f"Image shape input of length {n_dim}; but input must be length >=2"
+                f"Image shape input of length {self.n_dimensions}; but input must be length >=2"
             )
 
-        if 0 in image_shape:
+        if 0 in self.image_shape:
             raise ValueError(f"Image size must be greater than 0")
 
-        return np.zeros(image_shape)
+        return np.zeros(self.image_shape)

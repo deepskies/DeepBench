@@ -1,0 +1,18 @@
+object_type: "shape"
+object_name: "ShapeImage"
+
+total_runs: 3
+image_parameters:
+  image_shape:
+  - 28
+  - 28
+
+
+object_parameters: {
+   rectangle: {
+    object: {
+        fill: True
+    },
+      instance: {}
+   }
+}
