@@ -13,6 +13,9 @@ class Image(ABC):
         object_noise_type: str = "gaussian",
         object_noise_level: float = 0.0,
     ):
+        assert len(image_shape) >= 2
+        "All images must be in at least 2d."
+
         self.image_shape = image_shape
         self.image = np.zeros(self.image_shape)
 
@@ -41,8 +44,6 @@ class Image(ABC):
             "gaussian": self._generate_gaussian_noise,
             "poisson": self._generate_poisson_noise,
         }
-        print(self.object_noise_type)
-        print(noise_map.keys())
 
         if self.object_noise_type not in noise_map.keys():
             raise NotImplementedError(f"{self.object_noise_type} noise not available")
