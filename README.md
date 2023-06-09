@@ -1,5 +1,4 @@
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/deepskies/DeepBench/build-bench)
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/deeepskies/DeepBench/test-bench?label=test)
+![GitHub Workflow Status](https://github.com/deepskies/DeepBench/actions/workflows/test-bench.yml/badge.svg?label=test)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
  [![PyPI version](https://badge.fury.io/py/deepbench.svg)](https://badge.fury.io/py/deepbench)
 
