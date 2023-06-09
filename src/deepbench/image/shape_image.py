@@ -13,7 +13,6 @@ class ShapeImage(Image):
     ):
         self.shapes = ShapeGenerator(image_shape=image_shape)
         self.method_map = self._get_methods()
-        print(self.method_map)
         super().__init__(
             image_shape=image_shape,
             object_noise_level=object_noise_level,
@@ -32,7 +31,9 @@ class ShapeImage(Image):
         return {method[0].split("_")[-1]: method[1] for method in methods}
 
     def _create_object(self, shape, shape_params):
-        assert shape in self.method_map.keys()
+
+        if shape not in self.method_map.keys():
+            raise NotImplementedError()
         return self.method_map[shape](self.shapes, **shape_params)
 
     def combine_objects(self, objects, instance_params, object_params, seed=42):
@@ -50,10 +51,18 @@ class ShapeImage(Image):
         }]
 
         """
-        self.image = self.shapes.create_empty_shape()
+        image = self.shapes.create_empty_shape()
+
+        if type(objects) == str:
+            objects = [objects]
+        if type(instance_params) == dict:
+            instance_params = [instance_params]
+        if type(object_params) == dict:
+            object_params = [object_params]
 
         for shape, _ in zip(objects, instance_params):
             for object in object_params:
-                self.image += self._create_object(shape, object)
-        self.generate_noise(seed)
-        return self.image
+                image += self._create_object(shape, object)
+        noise = self.generate_noise(seed)
+        image += noise
+        return image

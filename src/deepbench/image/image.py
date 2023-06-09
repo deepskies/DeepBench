@@ -13,6 +13,9 @@ class Image(ABC):
         object_noise_type: str = "gaussian",
         object_noise_level: float = 0.0,
     ):
+        assert len(image_shape) >= 2
+        "All images must be in at least 2d."
+
         self.image_shape = image_shape
         self.image = np.zeros(self.image_shape)
 
@@ -43,14 +46,10 @@ class Image(ABC):
         }
 
         if self.object_noise_type not in noise_map.keys():
-            raise NotImplementedError(
-                f"{self.object_noise_type} noise type not available"
-            )
-
-        assert self.image is not None, "Image not generated, please run combine_objects"
+            raise NotImplementedError(f"{self.object_noise_type} noise not available")
 
         noise = noise_map[self.object_noise_type](seed)
-        self.image += noise
+        return noise
 
     def save_image(self, save_dir="results", image_name="image_1", image_format="jpg"):
         """
