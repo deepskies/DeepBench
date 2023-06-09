@@ -5,11 +5,11 @@
 
 
 
-# DeepBench
+![DeepBench Logo](docs/repository_support/DeepSkies_Logos_DeepBench.png)
 
 ### What is it?
 Simulation library for very simple simulations to *benchmark* machine learning algorithms.
-![DeepBench Logo](docs/repository_support/DeepSkies_Logos_DeepBench.png)
+
 
 
 ### Why do we need it? Why is it useful?
@@ -161,32 +161,28 @@ for x_pos, y_pos in zip(x_position, y_position):
 ```
 
 
-## Original Development Team
+## Contributions
+### Original Team
 1. Craig Brechmos
 2. Renee Hlozek
 3. Brian Nord
 
+### Refactor and Deployment
+1. Ashia Livaudais
+2. M. Voetberg
 
-## How to contribute
-I'm really glad you're reading this, because we need volunteer developers to help this project come to fruition.
+### Pendulum Team
+1. Becky Nevin
+2. Omari Paul
 
-### Testing
+## Contributing
+[Please view the deepskies contribution guidelines before submitting a code addition](https://github.com/deepskies/.github/blob/main/CONTRIBUTING.md)
 
-### Submitting changes
+## Acknowledgement
 
-Please send a [GitHub Pull Request to simplephysicaliage](https://github.com/deepskies/SimplePhysicalImage/pull/new/master) with a clear list of what you've done (read more about [pull requests](http://help.github.com/pull-requests/)). When you send a pull request, we will love you forever if you include examples. We can always use more test coverage. Please follow our coding conventions (below) and make sure all of your commits are atomic (one feature per commit).
 
-Always write a clear log message for your commits. One-line messages are fine for small changes, but bigger changes should look like this:
+This work was produced by Fermi Research Alliance, LLC under Contract No. DE-AC02-07CH11359 with the U.S. Department of Energy. Publisher acknowledges the U.S. Government license to provide public access under the DOE Public Access Plan DOE Public Access Plan.
+Neither the United States nor the United States Department of Energy, nor any of their employees, makes any warranty, express or implied, or assumes any legal liability or responsibility for the accuracy, completeness, or usefulness of any data, apparatus, product, or process disclosed, or represents that its use would not infringe privately owned rights.
 
-    $ git commit -m "A brief summary of the commit
-    >
-    > A paragraph describing what changed and its impact."
-
-### Coding conventions
-
-Start reading our code and you'll get the hang of it. We optimize for readability:
-
-  * We indent using tabs
-  * We ALWAYS put spaces after list items and method parameters (`[1, 2, 3]`, not `[1,2,3]`), around operators (`x += 1`, not `x+=1`), and around hash arrows.
-  * This is open source software. Consider the people who will read your code, and make it look nice for them. It's sort of like driving a car: Perhaps you love doing donuts when you're alone, but with passengers the goal is to make the ride as smooth as possible.
+We acknowledge the Deep Skies Lab as a community of multi-domain experts and collaborators who’ve facilitated an environment of open discussion, idea-generation, and collaboration. This community was important for the development of this project.
 
