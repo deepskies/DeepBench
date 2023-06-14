@@ -3,14 +3,14 @@ import os
 import yaml
 import numpy as np
 
-from src.deepbench.collection.collection import Collection
+from deepbench.collection import Collection
 
 
 @pytest.fixture()
 def default_physics():
     return yaml.safe_load(
         open(
-            f"{os.path.dirname(__file__)}/../src/deepbench/settings/default_physics_object.yaml"
+            f"{os.path.dirname(__file__)}/../deepbench/settings/default_physics_object.yaml"
         )
     )
 
@@ -19,7 +19,7 @@ def default_physics():
 def default_sky():
     return yaml.safe_load(
         open(
-            f"{os.path.dirname(__file__)}/../src/deepbench/settings/default_sky_object.yaml"
+            f"{os.path.dirname(__file__)}/../deepbench/settings/default_sky_object.yaml"
         )
     )
 
@@ -27,9 +27,7 @@ def default_sky():
 @pytest.fixture()
 def default_shape():
     return yaml.safe_load(
-        open(
-            f"{os.path.dirname(__file__)}/../src/deepbench/settings/default_shapes.yaml"
-        )
+        open(f"{os.path.dirname(__file__)}/../deepbench/settings/default_shapes.yaml")
     )
 
 
@@ -40,7 +38,7 @@ def test_default_init(default_physics, default_shape, default_sky):
     assert physics.object_type == "physics"
     assert physics.object_name == "Pendulum"
 
-    from src.deepbench.physics_object.pendulum import Pendulum
+    from deepbench.physics_object import Pendulum
 
     assert isinstance(physics.object_engine, Pendulum)
 
@@ -49,7 +47,7 @@ def test_default_init(default_physics, default_shape, default_sky):
     assert physics.object_type == "shape"
     assert physics.object_name == "ShapeImage"
 
-    from src.deepbench.image.shape_image import ShapeImage
+    from deepbench.image import ShapeImage
 
     assert isinstance(physics.object_engine, ShapeImage)
 
@@ -58,7 +56,7 @@ def test_default_init(default_physics, default_shape, default_sky):
     assert physics.object_type == "sky"
     assert physics.object_name == "SkyImage"
 
-    from src.deepbench.image.sky_image import SkyImage
+    from deepbench.image import SkyImage
 
     assert isinstance(physics.object_engine, SkyImage)
 

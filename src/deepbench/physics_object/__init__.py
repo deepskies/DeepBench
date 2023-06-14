@@ -1,2 +1,0 @@
-from src.deepbench.physics_object.hamiltonian_pendulum import HamiltonianPendulum
-from src.deepbench.physics_object.pendulum import Pendulum

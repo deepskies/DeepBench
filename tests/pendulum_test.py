@@ -1,6 +1,6 @@
 import numpy as np
 from unittest import TestCase
-from src.deepbench.physics_object.pendulum import Pendulum
+from deepbench.physics_object import Pendulum
 import os
 import pytest
 

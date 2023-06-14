@@ -1,5 +1,5 @@
 import pytest
-from src.deepbench.shape_generator.shape_generator import ShapeGenerator
+from deepbench.shapes import Shapes as ShapeGenerator
 
 import numpy as np
 import matplotlib.patches as patch

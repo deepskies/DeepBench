@@ -1,5 +1,5 @@
 import pytest
-from src.deepbench.image.shape_image import ShapeImage
+from deepbench.image import ShapeImage
 
 
 @pytest.fixture()
