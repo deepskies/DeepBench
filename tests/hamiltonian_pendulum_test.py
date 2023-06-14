@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 from unittest import TestCase
-from src.deepbench.physics_object.hamiltonian_pendulum import HamiltonianPendulum
+from deepbench.physics_object import HamiltonianPendulum
 
 
 class TestHamiltonianPendulum(TestCase):

@@ -1,0 +1,4 @@
+from deepbench.astro_object.galaxy_object import GalaxyObject
+from deepbench.astro_object.n_body_object import NBodyObject
+from deepbench.astro_object.spiral_galaxy import SpiralGalaxyObject
+from deepbench.astro_object.star_object import StarObject

@@ -1,5 +1,5 @@
 import pytest
-from src.deepbench.image.sky_image import SkyImage
+from deepbench.image import SkyImage
 
 
 @pytest.fixture()
