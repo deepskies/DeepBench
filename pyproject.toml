@@ -1,14 +1,14 @@
 [tool.poetry]
 name = "DeepBench"
-version = "0.1.0"
+version = "0.1.1"
 description = "Physics Benchmark Dataset Generator"
 license = "Apache 2.0"
 authors = ["Ashia Lewis <pantagruelspendulum@protonmail.com>", "Maggie Voetberg <maggiev@fnal.gov>"]
 maintainers = ["Ashia Lewis <pantagruelspendulum@protonmail.com>", "Maggie Voetberg <maggiev@fnal.gov>"]
 readme = "README.md"
-homepage = "https://github.com/AeRabelais/DeepBenchmark"
-repository = "https://github.com/AeRabelais/DeepBenchmark"
-documentation = "https://github.com/AeRabelais/DeepBenchmark/tree/main/docs"
+homepage = "https://github.com/deepskies/DeepBenchmark"
+repository = "https://github.com/deepskies/DeepBenchmark"
+documentation = "https://github.com/deepskies/DeepBenchmark/tree/main/docs"
 
 [tool.poetry.dependencies]
 python = ">=3.8,<3.11,"
