@@ -69,7 +69,7 @@ poetry run pytest --cov
 * Produce 3 instance of a pendulum over 10 different times with some level of noise.
 ```
 import numpy as np
-from deepbench import Collection
+from deepbench.collection import Collection
 
 configuration = {
 	"object_type": "physics",
@@ -98,7 +98,7 @@ parameters = phy_objects.object_parameters
 
 ```
 import numpy as np
-from deepbench import Collection
+from deepbench.collection import Collection
 
 configuration = {
 	"object_type": "shape",
@@ -143,10 +143,10 @@ parameters = shape_image.object_parameters
 ### Fine-Grained Control
 * Make a whole bunch of stars
 ```
-from deepbench.astro_object.star_object import Star
+from deepbench.astro_object import StarObject
 import numpy as np
 
-star = Star(
+star = StarObject(
         image_dimensions = (28,28),
         noise = 0.3,
         radius= 0.8,
