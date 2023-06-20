@@ -17,21 +17,18 @@ class Collection:
 
     Holds onto all the parameters used to make these files, including the default parameters, for replication.
 
+    Args:
+        object_config (dict): dictionary containing the parameters for the simulation output. Required fields:
+            - object_type: [sky, shape, physics, astro] : overall type of image
+            - object_name: Name of the class used in the image generation (e.g. - Pendulum, Star)
+            - total_runs: Number of times the simulation will be executed
+            - image_parameters: parameters for the image itself. In single object images, this is the parameters for the parent class.
+            - object parameters: list of objects that will be included in each image and their parameters
+
     """
 
     def __init__(self, object_config: dict):
-        """
-        Take a configuration file and produce a dataset object.
 
-        Args:
-            object_config (dict): dictionary containing the parameters for the simulation output
-            Required fields:
-                - object_type: [sky, shape, physics, astro] : overall type of image
-                - object_name: Name of the class used in the image generation (e.g. - Pendulum, Star)
-                - total_runs: Number of times the simulation will be executed
-                - image_parameters: parameters for the image itself. In single object images, this is the parameters for the parent class.
-                - object parameters: list of objects that will be included in each image and their parameters
-        """
         self.object_type = object_config["object_type"]
         self.object_name = object_config["object_name"]
 
@@ -94,7 +91,7 @@ class Collection:
         Locate the default parameters for any simulation being called, via the `inspect.signature` method
 
         Returns:
-            dictionary: all the parameters either default to the called object or modified by the program
+            dict: all the parameters either default to the called object or modified by the program
         """
         init_signature = inspect.signature(
             self.object_engine_classes[self.object_name].__init__

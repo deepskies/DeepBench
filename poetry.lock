@@ -1534,6 +1534,27 @@ lint = ["docutils-stubs", "flake8 (>=3.5.0)", "flake8-simplify", "isort", "mypy 
 test = ["cython", "filelock", "html5lib", "pytest (>=4.6)"]
 
 [[package]]
+name = "sphinx-autodoc-typehints"
+version = "1.23.2"
+description = "Type hints (PEP 484) support for the Sphinx autodoc extension"
+category = "dev"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "sphinx_autodoc_typehints-1.23.2-py3-none-any.whl", hash = "sha256:92d0074e48acf26551795e1fad3416709fa7f1d67b809ce76e4aa093e032ad90"},
+    {file = "sphinx_autodoc_typehints-1.23.2.tar.gz", hash = "sha256:dd8e999eb7d31643d42eb7d4673e0551c44af31a9e0fc07ddbc893b063d88658"},
+]
+
+[package.dependencies]
+sphinx = ">=7.0.1"
+
+[package.extras]
+docs = ["furo (>=2023.5.20)", "sphinx (>=7.0.1)"]
+numpy = ["nptyping (>=2.5)"]
+testing = ["covdefaults (>=2.3)", "coverage (>=7.2.7)", "diff-cover (>=7.5)", "pytest (>=7.3.1)", "pytest-cov (>=4.1)", "sphobjinv (>=2.3.1)", "typing-extensions (>=4.6.3)"]
+type-comment = ["typed-ast (>=1.5.4)"]
+
+[[package]]
 name = "sphinxcontrib-applehelp"
 version = "1.0.4"
 description = "sphinxcontrib-applehelp is a Sphinx extension which outputs Apple help books"
@@ -1716,4 +1737,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<4.0,"
-content-hash = "074afdadc6aa42a7d2ce83a6131df5e7bd89d8b11967f479cc79943a29f9920c"
+content-hash = "0eb74737bf050aec2c5e63f0061c952185735ef3409a56a5f647fcf7ad72507c"

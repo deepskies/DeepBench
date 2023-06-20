@@ -6,11 +6,13 @@ from deepbench import astro_object
 class SkyImage(Image):
     def __init__(self, image_shape, object_noise_level=0, object_noise_type="gaussian"):
         """
+        Create an image that is a composition of multiple astronomy objects
 
         Args:
-            image_shape (_type_): _description_
-            object_noise_level (int, optional): _description_. Defaults to 0.
-            object_noise_type (str, optional): _description_. Defaults to "gaussian".
+            image_shape (tuple(int, int)): Shape of the output image
+            object_noise_level (int, optional): Level of noise added to the full image. Defaults to 0.
+            object_noise_type (str, optional): Type of noise added. Defaults to "gaussian".
+
         """
         assert len(image_shape) >= 2, "Image must be 2D or higher."
         super().__init__(image_shape, object_noise_type, object_noise_level)
@@ -59,6 +61,7 @@ class SkyImage(Image):
 
         Returns:
             ndarray : image with objects and noise
+
         """
         image = self.create_empty_shape()
         if type(objects) == str:

@@ -5,19 +5,23 @@ from deepbench.image.image import Image
 
 
 class ShapeImage(Image):
+    """
+    Create an image that is a composition of multiple shapes
+
+    Args:
+        image_shape (Tuple[int, int]): Dimensions of the shape
+        object_noise_type (str, optional): Noise distribution applied to image. Defaults to "gaussian".
+        object_noise_level (float, optional): How much noise to add (scale 0 to 1). Defaults to 0.0.
+
+    """
+
     def __init__(
         self,
         image_shape: Tuple[int, int],
         object_noise_type: str = "gaussian",
         object_noise_level: float = 0.0,
     ):
-        """
 
-        Args:
-            image_shape (Tuple[int, int]): _description_
-            object_noise_type (str, optional): _description_. Defaults to "gaussian".
-            object_noise_level (float, optional): _description_. Defaults to 0.0.
-        """
         self.shapes = ShapeGenerator(image_shape=image_shape)
         self.method_map = self._get_methods()
         super().__init__(
@@ -45,7 +49,6 @@ class ShapeImage(Image):
         return self.method_map[shape](self.shapes, **shape_params)
 
     def combine_objects(self, objects, instance_params, object_params, seed=42):
-
         """
         Utilize Image._generate_astro_objects to overlay all selected astro objects into one image
         If object parameters are not included in object list, defaults are used.
@@ -66,6 +69,7 @@ class ShapeImage(Image):
 
         Returns:
             ndarray : image with objects and noise
+
         """
         image = self.shapes.create_empty_shape()
 

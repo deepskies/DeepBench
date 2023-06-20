@@ -7,6 +7,34 @@ from typing import Union, Optional
 
 
 class HamiltonianPendulum(Pendulum):
+    """
+    The Hamiltonian Pendulum class.
+
+    Args:
+        pendulum_arm_length (float): The length of the pendulum arm
+        starting_angle_radians (float): The starting angle of the pendulum
+            (angle from the 'ceiling')
+        noise_std_percent (dict): A dictionary of the Gaussian noise
+            level to be applied to each parameter. The default is no
+            noise. Each number is the standard deviation when
+            multiplied by the parameter. See create_noise().
+        acceleration_due_to_gravity (float): little g, local gravity
+            coefficient
+        mass_pendulum_bob (float): Mass of the pendulum bob,
+            this is optional if calculation_type is position only.
+
+    Examples:
+
+        >>> pendulum_obj = HamiltonianPendulum(pendulum_arm_length=10.,
+                                    starting_angle_radians=np.pi/4,
+                                    acceleration_due_to_gravity=9.8,
+                                    noise_std_percent=
+                                    {'pendulum_arm_length': 0.1,
+                                     'starting_angle_radians': 0.1,
+                                     'acceleration_due_to_gravity': 0.1}
+                                    )
+    """
+
     def __init__(
         self,
         pendulum_arm_length: float,
@@ -20,33 +48,7 @@ class HamiltonianPendulum(Pendulum):
             "acceleration_due_to_gravity": None,
         },
     ):
-        """
-        The initialization function for the Hamiltonian Pendulum class.
 
-        Args:
-            pendulum_arm_length (float): The length of the pendulum arm
-            starting_angle_radians (float): The starting angle of the pendulum
-                (angle from the 'ceiling')
-            noise_std_percent (dict): A dictionary of the Gaussian noise
-                level to be applied to each parameter. The default is no
-                noise. Each number is the standard deviation when
-                multiplied by the parameter. See create_noise().
-            acceleration_due_to_gravity (float): little g, local gravity
-                coefficient
-            mass_pendulum_bob (float): Mass of the pendulum bob,
-                this is optional if calculation_type is position only.
-
-        Examples:
-
-            >>> pendulum_obj = HamiltonianPendulum(pendulum_arm_length=10.,
-                                        starting_angle_radians=np.pi/4,
-                                        acceleration_due_to_gravity=9.8,
-                                        noise_std_percent=
-                                        {'pendulum_arm_length': 0.1,
-                                         'starting_angle_radians': 0.1,
-                                         'acceleration_due_to_gravity': 0.1}
-                                        )
-        """
         super().__init__(
             pendulum_arm_length=pendulum_arm_length,
             starting_angle_radians=starting_angle_radians,
@@ -97,8 +99,14 @@ class HamiltonianPendulum(Pendulum):
                 an array of times (s)
             noiseless (bool): Add noise to the pendulum parameters
             seed (int): Random seed for parameters
-        return:
-            tuple(*np.ndarray): q, p, dqdt, dpdt, t of the pendulum
+
+        Returns:
+            tuple
+            q (np.ndarry): position.
+            p (np.ndarry): momentum.
+            dqdt (np.ndarry): velocity.
+            dpdt (np.ndarry) - force.
+            t_eval (np.ndarry) - times.
         """
 
         if not noiseless:
@@ -114,12 +122,12 @@ class HamiltonianPendulum(Pendulum):
             time (np.ndarray): Times to simulate
 
         Returns:
-            tuple(*np.ndarray):
-                q - position
-                p - momentum
-                dqdt - velocity
-                dpdt - force
-                t_eval - times
+            tuple
+            q (np.ndarry): position.
+            p (np.ndarry): momentum.
+            dqdt (np.ndarry): velocity.
+            dpdt (np.ndarry) - force.
+            t_eval (np.ndarry) - times.
         """
 
         assert time.size > 1, "you must enter more than one point in time"
