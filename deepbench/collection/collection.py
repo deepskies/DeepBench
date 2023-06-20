@@ -20,6 +20,18 @@ class Collection:
     """
 
     def __init__(self, object_config: dict):
+        """
+        Take a configuration file and produce a dataset object.
+
+        Args:
+            object_config (dict): dictionary containing the parameters for the simulation output
+            Required fields:
+                - object_type: [sky, shape, physics, astro] : overall type of image
+                - object_name: Name of the class used in the image generation (e.g. - Pendulum, Star)
+                - total_runs: Number of times the simulation will be executed
+                - image_parameters: parameters for the image itself. In single object images, this is the parameters for the parent class.
+                - object parameters: list of objects that will be included in each image and their parameters
+        """
         self.object_type = object_config["object_type"]
         self.object_name = object_config["object_name"]
 
@@ -54,11 +66,12 @@ class Collection:
             self.parameter_noise = object_config["parameter_noise"]
 
     def add_parameter_noise(self, seed, params):
-        """_summary_
+        """
+        Add noise to the image wide parameters
 
         Args:
             seed (int): integer stored by the program to denote the noise seed added to the object
-            params (dict): parameters for to add noise to
+            params (dict): parameters that have noise added to them.
 
         Returns:
             dict: parameters with added uniform noise
