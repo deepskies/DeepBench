@@ -73,6 +73,7 @@ class AstroObject(ABC):
 
         Args:
             seed (int): The random initialization seed used for reproducibility.
+            galaxy (bool): Scale the weight to keep with the intensity scale of a galaxy
 
         Returns:
             ndarray: A random sample drawn from a Poisson distribution.
@@ -107,8 +108,10 @@ class AstroObject(ABC):
 
     @abstractmethod
     def displayObject(self):
+        """
+        Display the object created in a 2d plot
 
-        # Yet to implement. Will essentially just display a matplotlib image of the Object.
-
-        print("Code Container.")
+        Raises:
+            NotImplementedError: Raised if not implimented in the child class
+        """
         raise NotImplementedError()
