@@ -11,6 +11,13 @@ class ShapeImage(Image):
         object_noise_type: str = "gaussian",
         object_noise_level: float = 0.0,
     ):
+        """
+
+        Args:
+            image_shape (Tuple[int, int]): _description_
+            object_noise_type (str, optional): _description_. Defaults to "gaussian".
+            object_noise_level (float, optional): _description_. Defaults to 0.0.
+        """
         self.shapes = ShapeGenerator(image_shape=image_shape)
         self.method_map = self._get_methods()
         super().__init__(
@@ -20,6 +27,7 @@ class ShapeImage(Image):
         )
 
     def _get_methods(self):
+
         methods = [
             method
             for method in inspect.getmembers(
@@ -50,6 +58,14 @@ class ShapeImage(Image):
             "object_parameters":{<parameters for that object>}
         }]
 
+        Args:
+            objects (list): str discriptors of the included object
+            instance_params (list): Parameters for the instance of the object (ei, overall noise)
+            object_params (list): Parameters of each object (ei: position in frame)
+            seed (int, optional): random seed for noise. Defaults to 42.
+
+        Returns:
+            ndarray : image with objects and noise
         """
         image = self.shapes.create_empty_shape()
 

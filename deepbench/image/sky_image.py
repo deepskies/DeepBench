@@ -1,23 +1,21 @@
+from typing import Union
 from deepbench.image.image import Image
 from deepbench import astro_object
 
 
 class SkyImage(Image):
     def __init__(self, image_shape, object_noise_level=0, object_noise_type="gaussian"):
+        """
 
+        Args:
+            image_shape (_type_): _description_
+            object_noise_level (int, optional): _description_. Defaults to 0.
+            object_noise_type (str, optional): _description_. Defaults to "gaussian".
+        """
         assert len(image_shape) >= 2, "Image must be 2D or higher."
         super().__init__(image_shape, object_noise_type, object_noise_level)
 
     def _generate_astro_object(self, object_type, object_parameters):
-        """
-        Utilize the astro_object module and generate instances of the classes
-
-        :param object_type: String identifier of the class.
-            Pick from ["star", "strong_lens”, "galaxy", "spiral_galaxy", "n_body"]
-        :param object_parameters: Dictionary of the parameters required for the selected class
-            Any passed image_shape will be overwritten into Image.image_shape.
-        :return: Instance of the selected class initialized with passed object parameters.
-        """
 
         astro_object_map = {
             "star": astro_object.star_object.StarObject,
@@ -34,8 +32,13 @@ class SkyImage(Image):
 
         return astro_object_map[object_type](**object_parameters)
 
-    def combine_objects(self, objects, instance_params, object_params, seed=42):
-
+    def combine_objects(
+        self,
+        objects: Union[list, str],
+        instance_params: Union[list, dict],
+        object_params: Union[list, dict],
+        seed: int = 42,
+    ):
         """
         Utilize Image._generate_astro_objects to overlay all selected astro objects into one image
         If object parameters are not included in object list, defaults are used.
@@ -48,6 +51,14 @@ class SkyImage(Image):
             "object_parameters":{<parameters for that object>}
         }]
 
+        Args:
+            objects (list): str discriptors of the included object
+            instance_params (list): Parameters for the instance of the object (ei, overall noise)
+            object_params (list): Parameters of each object (ei: position in frame)
+            seed (int, optional): random seed for noise. Defaults to 42.
+
+        Returns:
+            ndarray : image with objects and noise
         """
         image = self.create_empty_shape()
         if type(objects) == str:
