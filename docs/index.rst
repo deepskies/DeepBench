@@ -10,6 +10,11 @@ Welcome to DeepBench's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   collection
+   image
+   astro_object
+   physics_object
+   shapes
 
 
 Indices and tables
