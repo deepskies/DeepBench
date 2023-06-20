@@ -38,7 +38,7 @@ class ShapeGenerator:
         return resized_image
 
     def _convert_patch_to_image(
-        self, image: patches.ArrayLike, cutout: patches.ArrayLike = None
+        self, image: patches.Patch, cutout: patches.Path = None
     ):
 
         n_dim = len(self.image_shape)
@@ -121,17 +121,14 @@ class ShapeGenerator:
 
         rectangle_array = self._convert_patch_to_image(rectangle, cutout=cutout)
 
-        if rectangle_array.ravel().sum() == 0.0:
-            raise UserWarning("Image out of bounds, no shape displayed")
-
         return rectangle_array
 
     def create_regular_polygon(
         self,
         center: tuple = (np.random.randint(10, 16), np.random.randint(10, 16)),
-        angle: Union[int, float] = np.random.random(20, 90),
+        angle: Union[int, float] = np.random.uniform(20, 90),
         vertices: int = 3,
-        radius: Union[int, float] = np.random.random(8, 12),
+        radius: Union[int, float] = np.random.uniform(8, 12),
         line_width=1,
         fill=False,
     ):
@@ -181,17 +178,14 @@ class ShapeGenerator:
 
         polygon_array = self._convert_patch_to_image(polygon, cutout=cutout)
 
-        if polygon_array.ravel().sum() == 0.0:
-            raise UserWarning("Image out of bounds, no shape displayed")
-
         return polygon_array
 
     def create_arc(
         self,
         center: tuple = (np.random.randint(10, 16), np.random.randint(10, 16)),
-        radius: Union[int, float] = np.random.random(8, 12),
-        theta1: Union[int, float] = np.random.random(0, 45),
-        theta2: Union[int, float] = np.random.random(85, 120),
+        radius: Union[int, float] = np.random.uniform(8, 12),
+        theta1: Union[int, float] = np.random.uniform(0, 45),
+        theta2: Union[int, float] = np.random.uniform(85, 120),
         line_width: int = 1,
     ):
         """
@@ -213,9 +207,6 @@ class ShapeGenerator:
             center=center, r=radius, theta1=theta1, theta2=theta2, width=line_width
         )
         arc_array = self._convert_patch_to_image(arc)
-
-        if arc_array.ravel().sum() == 0.0:
-            raise UserWarning("Image out of bounds, no shape displayed")
 
         return arc_array
 
@@ -266,9 +257,6 @@ class ShapeGenerator:
         )
         line_array = self._convert_patch_to_image(line)
 
-        if line_array.ravel().sum() == 0.0:
-            raise UserWarning("Image out of bounds, no shape displayed")
-
         return line_array
 
     def create_ellipse(
@@ -318,9 +306,6 @@ class ShapeGenerator:
             )
 
         ellipse_array = self._convert_patch_to_image(ellipse, cutout=cutout)
-
-        if ellipse_array.ravel().sum() == 0.0:
-            raise UserWarning("Image out of bounds, no shape displayed")
 
         return ellipse_array
 

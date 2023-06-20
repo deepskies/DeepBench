@@ -80,11 +80,7 @@ class Pendulum(PhysicsObject):
                 self.big_G_newton is not None and self.phi_planet is not None
             ), "must define big_G_newton and phi_planet if \
                     acceleration_due_to_gravity is not provided"
-            # assert self._noise_level['big_G_newton'] is not None \
-            #    and self._noise_level['phi_planet'] \
-            #    is not None, "must define big_G_newton and phi_planet \
-            #        noise levels if acceleration_due_to_gravity \
-            #        is not provided"
+
             self.acceleration_due_to_gravity = self.big_G_newton * self.phi_planet
             self.initial_parameters = {
                 "pendulum_arm_length": self.pendulum_arm_length,
@@ -208,9 +204,12 @@ class Pendulum(PhysicsObject):
                 assert f"Either big G or phi_planet is None \
                     (G = {self.big_G_newton}, ø = {self.phi_planet}); \
                         this is not allowed with hierarchical noise"
-        return
 
     def destroy_noise(self):
+        """
+        Remove noise from the paramters
+
+        """
         # Re-modify the global parameters to
         # have the original value
         for key in self._noise_level.keys():
@@ -218,7 +217,6 @@ class Pendulum(PhysicsObject):
                 raise ValueError(f"Invalid parameter name: {key}")
             attribute = self.initial_parameters[key]
             setattr(self, key, attribute)
-        return
 
     def create_object(
         self,
@@ -240,7 +238,7 @@ class Pendulum(PhysicsObject):
             seed (int): Random seed used to generate Gaussian noise
 
         Example:
-            >>> pendulum = Pendulum(...SEE ABOVE...)
+            >>> pendulum = Pendulum()
             >>> time = np.array(np.linspace(0, 10, 20))
             >>> pend_position = pendulum.create_object(time, noiseless=True)
         """
@@ -259,6 +257,15 @@ class Pendulum(PhysicsObject):
         return pendulum
 
     def simulate_pendulum_dynamics(self, time: Union[float, np.array]):
+        """
+        Simulate a pendulum with Neutonian physics
+
+        Args:
+            time (Union[float, np.array]): times to simulate
+
+        Returns:
+            np.ndarray: position of the pendulum.
+        """
         time = np.asarray(time)
         assert time.size > 0, "you must enter one or more points in time"
         # Check if parameters are single values
@@ -299,6 +306,15 @@ class Pendulum(PhysicsObject):
         return pendulum_arm_length_values * np.sin(theta_time * time)
 
     def displayObject(self, time: Union[float, np.array]):
+        """
+        Display the pendulum over times.
+
+        Args:
+            time (Union[float, np.array]): times to display the pendulum position
+
+        Returns:
+            tuple(np.ndarray, np.ndarray): noiseless, noisy arrays at times "time"
+        """
         noisy = self.create_object(time)
         noise_free = self.create_object(time, noiseless=True)
         plt.clf()
@@ -334,31 +350,3 @@ class Pendulum(PhysicsObject):
         plt.xlabel("time [s]")
         plt.show()
         return noise_free, noisy_ys
-
-    """
-    def animateObject(self, time: Union[float, np.array]):
-        # Right now this just plots x and t
-        # Instantiate the simulator
-        pendulum = self.create_object(time)
-        plt.clf()
-        # Create the figure and axis
-        fig = plt.figure(figsize=(10, 3))
-        ax1 = fig.add_subplot(111)
-
-        def update(i):
-            # Calculate the position and velocity at the current time step
-            # Clear the previous plot
-            # Plot the quantity output from the pendulum
-            pendulum_now = pendulum[i]
-            ax1.plot([time, 0], [pendulum_now, 1.4])
-            ax1.scatter(time[i], pendulum_now)
-            ax1.set_title(f'{self.calculation_type} = '
-                          + str(round(pendulum_now, 1)))
-        if isinstance(time, float):
-            time = [time]
-        anim = FuncAnimation(fig, update,
-                             frames=range(1, len(time)),
-                             interval=100)
-        plt.show(anim)
-        return
-    """
