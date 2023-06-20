@@ -45,7 +45,8 @@ class GalaxyObject(AstroObject):
         self._theta = theta
 
     def create_Sersic_profile(self, center_x, center_y):
-        """_summary_
+        """
+        Wrapper for https://docs.astropy.org/en/stable/api/astropy.modeling.functional_models.Sersic2D.html
 
         Args:
             center_x (float): x position of the center of the galaxy

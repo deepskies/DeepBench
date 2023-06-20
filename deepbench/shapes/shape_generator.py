@@ -1,3 +1,4 @@
+from typing import Union
 import numpy as np
 from matplotlib.path import Path
 from matplotlib import patches
@@ -5,16 +6,23 @@ from skimage import transform
 
 
 class ShapeGenerator:
-    def __init__(self, image_shape=(28, 28)):
+    def __init__(self, image_shape: tuple = (28, 28)):
         self.image_shape = image_shape
         self.n_dimensions = len(self.image_shape)
 
-    def resize(self, image, resize_dimensions=(28, 28)):
+    def resize(self, image: np.ndarray, resize_dimensions: tuple = (28, 28)):
         """
-        Resize a numpy array
-        :param image: Numpy array to resize
-        :param resize_dimensions: tuple(*int) Dimensions to reshape the image to
-        :return: numpy array of shape resize_dimensions
+        Resize an array-like
+
+        Args:
+            image (np.ndarray): shape to resize
+            resize_dimensions (tuple, optional): resize to shape. Defaults to (28, 28).
+
+        Raises:
+            ValueError: invalid size, either too small (0,0) or having the number of incorrect dimensions
+
+        Returns:
+            np.ndarry: array of size (resize_dimensions)
         """
         resize_dimensions = tuple(map(lambda dim: int(np.ceil(dim)), resize_dimensions))
         if len(image.shape) != len(resize_dimensions):
@@ -29,13 +37,10 @@ class ShapeGenerator:
         resized_image = transform.resize(image, resize_dimensions)
         return resized_image
 
-    def _convert_patch_to_image(self, image, cutout=None):
-        """
-        Converts a matplot path or patch object into a numpy array of the designated size
-        :param image: Matplotlib image object to convert
-        :param image_shape: [tuple(*int)] Size of the desired image
-        :return: numpy array of shape image_shape, containing the image
-        """
+    def _convert_patch_to_image(
+        self, image: patches.ArrayLike, cutout: patches.ArrayLike = None
+    ):
+
         n_dim = len(self.image_shape)
         self.image_shape = tuple(map(lambda dim: int(np.ceil(dim)), self.image_shape))
 
@@ -68,22 +73,28 @@ class ShapeGenerator:
 
     def create_rectangle(
         self,
-        center=(14, 14),
-        width=10,
-        height=10,
-        angle=0,
-        line_width=1,
-        fill=False,
+        center: tuple = (np.random.randint(10, 16), np.random.randint(10, 16)),
+        width: int = np.random.randint(10, 16),
+        height: int = np.random.randint(10, 16),
+        angle: Union[float, int] = 0,
+        line_width: int = 1,
+        fill: bool = False,
     ):
+
         """
-        :param image_shape: [tuple(*int)] Shape of the image output
-        :param center: [tuple(*int)] Center of the rectangle (coordinate)
-        :param width: [int] Horizontal width of the rectangle (in pixels)
-        :param height: [int] Vertical height of the rectangle (in pixels)
-        :param angle: [float] Angle to rotate, in degrees
-        :param line_width: [int] Width (in pixels)
-        :param fill: [bool] to color in the center of the rectangle
-        :return: Numpy array of size image_shape containing a rectangle
+        Make a rectangle.
+
+        Args:
+            center (tuple(*int), optional): Center of the rectangle (coordinate). Defaults to (14, 14).
+            width (int, optional): Horizontal width of the rectangle (in pixels). Defaults to random int.
+            height (int, optional): Vertical height of the rectangle (in pixels). Defaults to random int.
+            angle (Union[float, int], optional): tilt the rectangle (degrees). Defaults to 0.
+            line_width (int, optional): line width of the outline. Defaults to 1.
+            fill (bool, optional): Fill in the rectangle. Defaults to False.
+
+
+        Returns:
+           np.ndarray: A Rectangle image
         """
 
         n_center_dim = len(center)
@@ -117,23 +128,27 @@ class ShapeGenerator:
 
     def create_regular_polygon(
         self,
-        center=(14, 14),
-        angle=45,
-        vertices=3,
-        radius=10,
-        line_width=2,
+        center: tuple = (np.random.randint(10, 16), np.random.randint(10, 16)),
+        angle: Union[int, float] = np.random.random(20, 90),
+        vertices: int = 3,
+        radius: Union[int, float] = np.random.random(8, 12),
+        line_width=1,
         fill=False,
     ):
         """
         Create a polygon with equal length sides
-        :param image_shape: tuple[*int] Size of the output image (pixels)
-        :param center: tuple[*int] Where to center the object
-        :param angle: float Angle of rotation (degrees)
-        :param vertices: int number of vertices (3=triangle, 4=square, etc)
-        :param radius: int Distance from vertex to vertex
-        :param line_width: int Width of lines (pixels)
-        :param fill: bool Fill center of the object
-        :return: Numpy array of shape image_shape containing the polygon
+
+        Args:
+            center (tuple[*int], optional): Where to center the object.
+            angle (Union[int, float], optional): Angle of rotation (degrees)
+            vertices (int, optional): Number of verticies. Defaults to 3, a triangle.
+            radius (int, optional): distance from vertex to vertex Defaults to 10.
+            line_width (int, optional): line width of the outline. Defaults to 1.
+            fill (bool, optional): Fill in the rectangle. Defaults to False.
+
+
+        Returns:
+           np.ndarray: A polygon image
         """
 
         radius = abs(radius)
@@ -173,21 +188,25 @@ class ShapeGenerator:
 
     def create_arc(
         self,
-        center=(14, 14),
-        radius=10,
-        theta1=0,
-        theta2=90,
-        line_width=1,
+        center: tuple = (np.random.randint(10, 16), np.random.randint(10, 16)),
+        radius: Union[int, float] = np.random.random(8, 12),
+        theta1: Union[int, float] = np.random.random(0, 45),
+        theta2: Union[int, float] = np.random.random(85, 120),
+        line_width: int = 1,
     ):
         """
         Create an arc with radius "radius" arcing from theta1 to theta2
-        :param image_shape: Shape of the output array (pixels)
-        :param center: tuple[*int]Center point of the arc
-        :param radius: int distance from the arc to the center point
-        :param theta1: float starting point of the arc (degrees)
-        :param theta2: float ending point of the arc (degrees)
-        :param line_width: int thickness of the arc (pixels)
-        :return: Numpy array of the arc
+
+        Args:
+            center (tuple, optional): Center point of the arc. Defaults to (np.random.randint(10, 16), np.random.randint(10, 16)).
+            radius (Union[int, float], optional): distance from the arc to the center point. Defaults to np.random.random(8, 12).
+            theta1 (Union[int, float], optional): starting point of the arc (degrees). Defaults to np.random.random(0, 45).
+            theta2 (Union[int, float], optional): ending point of the arc (degrees). Defaults to np.random.random(85, 120).
+            line_width (int, optional):  thickness of the arc (pixels) Defaults to 1.
+
+
+        Returns:
+            np.ndarray: The arc image
         """
 
         arc = patches.Wedge(
@@ -200,14 +219,23 @@ class ShapeGenerator:
 
         return arc_array
 
-    def create_line(self, start=(0, 0), end=(28, 28), line_width=1):
+    def create_line(
+        self,
+        start: tuple = (np.random.randint(0, 10), np.random.randint(0, 10)),
+        end: tuple = (np.random.randint(12, 28), np.random.randint(12, 28)),
+        line_width: int = 1,
+    ):
+
         """
         Generate a numpy array of a line
-        :param image_shape:  tuple(*int) Shape of the output arrray (pixels)
-        :param start: tuple(*int) Starting corner of the line
-        :param end: tuple(*int) Ending corner of the line
-        :param line_width: int Thickness of the line (pixels)
-        :return: Numpy array containing the line
+
+        Args:
+            start (tuple, optional): Starting corner of the line. Defaults to (np.random.randint(0, 10), np.random.randint(0, 10)).
+            end (tuple, optional): Ending corner of the line. Defaults to (np.random.randint(12, 28), np.random.randint(12, 28)).
+            line_width (int, optional): Thickness of the line (pixels). Defaults to 1.
+
+        Returns:
+            np.ndarray
         """
 
         if len(start) != len(end):
@@ -245,22 +273,28 @@ class ShapeGenerator:
 
     def create_ellipse(
         self,
-        center=(14, 14),
-        width=10,
-        height=10,
-        angle=0,
-        line_width=1,
-        fill=False,
+        center: tuple = (np.random.randint(10, 16), np.random.randint(10, 16)),
+        width: int = np.random.randint(10, 16),
+        height: int = np.random.randint(10, 16),
+        angle: Union[float, int] = 0,
+        line_width: int = 1,
+        fill: bool = False,
     ):
         """
-        :param image_shape: tuple(*int) Shape of the output arrray (pixels)
-        :param center: tuple(*int) Center point of the ellipse
-        :param width: int Horizontal length of the ellipse (pixels)
-        :param height: int Vertical height of the ellipse (pixels)
-        :param angle: float Rotation angle of the ellipse (degrees)
-        :param line_width: int Width of the ellipse's border (pixels)
-        :param fill: bool Fill the center of the ellipse
-        :return: Numpy array containing the ellipse
+        Create an ellipse/circle (where width/height are the same)
+
+        Args:
+            center (tuple, optional): Center point of the ellipse. Defaults to (np.random.randint(10, 16), np.random.randint(10, 16)).
+            width (int, optional): Horizontal length of the ellipse (pixels). Defaults to np.random.randint(10, 16).
+            height (int, optional): Vertical height of the ellipse (pixels). Defaults to np.random.randint(10, 16).
+            angle (Union[float, int], optional):  Rotation angle of the ellipse (degrees). Defaults to 0.
+            line_width (int, optional):  Width of the ellipse's border (pixels). Defaults to 1.
+            fill (bool, optional): Fill the center of the ellipse. Defaults to False.
+
+
+        Returns:
+           np.ndarray
+
         """
 
         if self.n_dimensions != len(center):
@@ -291,7 +325,12 @@ class ShapeGenerator:
         return ellipse_array
 
     def create_empty_shape(self):
+        """
+        Create an array of 0s with shape self.image_shape
 
+        Returns:
+            np.ndarray
+        """
         if self.n_dimensions < 2:
             raise ValueError(
                 f"Image shape input of length {self.n_dimensions}; but input must be length >=2"
