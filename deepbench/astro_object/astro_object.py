@@ -10,8 +10,8 @@ class AstroObject(ABC):
     Args:
         image_dimensions (Union[int, float, List[int], List[float]]): The dimension(s) of the object to be produced.
         radius (Union[int, float]): The radius of the object to be produced.
-        amplitude (Union[int, float]): The amplitude of the object to be produced.
-        noise_level (Union[float, list[float]]): The Poisson noise level to be applied to the object.
+        amplitude (Union[int, float]): The amplitude (brightness) of the object to be produced.
+        noise_level (Union[float, list[float]]): The Poisson noise level (lambda, the  expected seperation) to be applied to the object.
 
     Examples:
 

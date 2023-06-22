@@ -9,9 +9,9 @@ class ShapeImage(Image):
     Create an image that is a composition of multiple shapes
 
     Args:
-        image_shape (Tuple[int, int]): Dimensions of the shape
+        image_shape (Tuple[int, int]): Dimensions of the shape image.
         object_noise_type (str, optional): Noise distribution applied to image. Defaults to "gaussian".
-        object_noise_level (float, optional): How much noise to add (scale 0 to 1). Defaults to 0.0.
+        object_noise_level (float, optional): Relative noise level (scale 0 to 1). Defaults to 0.0.
 
     """
 
@@ -48,7 +48,7 @@ class ShapeImage(Image):
             raise NotImplementedError()
         return self.method_map[shape](self.shapes, **shape_params)
 
-    def combine_objects(self, objects, instance_params, object_params, seed=42):
+    def combine_objects(self, objects, object_params, instance_params=None, seed=42):
         """
         Utilize Image._generate_astro_objects to overlay all selected astro objects into one image
         If object parameters are not included in object list, defaults are used.
@@ -63,7 +63,6 @@ class ShapeImage(Image):
 
         Args:
             objects (list): str discriptors of the included object
-            instance_params (list): Parameters for the instance of the object (ie, overall noise)
             object_params (list): Parameters of each object (ie, position in frame)
             seed (int, optional): random seed for noise. Defaults to 42.
 
@@ -75,14 +74,13 @@ class ShapeImage(Image):
 
         if type(objects) == str:
             objects = [objects]
-        if type(instance_params) == dict:
-            instance_params = [instance_params]
+
         if type(object_params) == dict:
             object_params = [object_params]
 
-        for shape, _ in zip(objects, instance_params):
-            for object in object_params:
-                image += self._create_object(shape, object)
+        for shape, params in zip(objects, object_params):
+            image += self._create_object(shape, params)
+            
         noise = self.generate_noise(seed)
         image += noise
         return image

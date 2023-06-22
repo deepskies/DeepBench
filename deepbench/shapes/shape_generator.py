@@ -189,7 +189,7 @@ class ShapeGenerator:
         line_width: int = 1,
     ):
         """
-        Create an arc with radius "radius" arcing from theta1 to theta2
+        Create an arc with radius "radius" arcing from theta1 to theta2 counter-clockwise
 
         Args:
             center (tuple, optional): Center point of the arc. Defaults to (np.random.randint(10, 16), np.random.randint(10, 16)).

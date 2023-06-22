@@ -16,11 +16,15 @@ class GalaxyObject(AstroObject):
     Args:
         image_dimensions (Union[int, float, List[int], List[float]]): The dimension(s) of the object to be produced.
         amplitude (Union[int, float]): The amplitude of the object to be produced, surface brightness at radius.
-        noise_level (Union[float, list[float]]): The Poisson noise level to be applied to the object.
+        noise_level (Union[float, list[float]]): The Poisson noise level (lambda, the  expected seperation) to be applied to the object.
         radius (int, optional): Effective half-light radius of the galaxy. Defaults to 25.
         n (float, optional): Sersic Index. Defaults to 1.0.
-        ellipse (float, optional): Galaxy Ellicitcy. Defaults to random.uniform(0.1, 0.9).
-        theta (float, optional): _description_. Defaults to random.uniform(-1.5, 1.5).
+        ellipse (float, optional): Galaxy Ellipticity. Defaults to random.uniform(0.1, 0.9).
+        theta (float, optional): The rotation of the galaxy in radians. Defaults to random.uniform(-1.5, 1.5).
+    Examples:
+
+        >>> example_galaxy = GalaxyObject(image_dimensions=28)
+
     """
 
     def __init__(
