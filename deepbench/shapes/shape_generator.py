@@ -22,7 +22,7 @@ class ShapeGenerator:
             ValueError: invalid size, either too small (0,0) or having the number of incorrect dimensions
 
         Returns:
-            np.ndarry: array of size (resize_dimensions)
+            np.ndarray: array of size (resize_dimensions)
         """
         resize_dimensions = tuple(map(lambda dim: int(np.ceil(dim)), resize_dimensions))
         if len(image.shape) != len(resize_dimensions):

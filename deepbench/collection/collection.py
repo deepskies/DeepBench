@@ -68,7 +68,7 @@ class Collection:
 
         Args:
             seed (int): integer stored by the program to denote the noise seed added to the object
-            params (dict): parameters that have noise added to them.
+            params (dict): parameters that have added noise.
 
         Returns:
             dict: parameters with added uniform noise

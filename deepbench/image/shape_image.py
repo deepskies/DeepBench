@@ -63,8 +63,8 @@ class ShapeImage(Image):
 
         Args:
             objects (list): str discriptors of the included object
-            instance_params (list): Parameters for the instance of the object (ei, overall noise)
-            object_params (list): Parameters of each object (ei: position in frame)
+            instance_params (list): Parameters for the instance of the object (ie, overall noise)
+            object_params (list): Parameters of each object (ie, position in frame)
             seed (int, optional): random seed for noise. Defaults to 42.
 
         Returns:

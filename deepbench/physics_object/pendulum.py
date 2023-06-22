@@ -207,7 +207,7 @@ class Pendulum(PhysicsObject):
 
     def destroy_noise(self):
         """
-        Remove noise from the paramters
+        Remove noise from the parameters
 
         """
         # Re-modify the global parameters to

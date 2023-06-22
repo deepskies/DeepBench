@@ -69,7 +69,7 @@ class HamiltonianPendulum(Pendulum):
         derives the gradient of the hamiltonian function
 
         Args:
-            coords (np.ndarry): coordinates of the pendulum
+            coords (np.ndarray): coordinates of the pendulum
 
         Returns:
             np.ndarray:time derivates of p and q.
@@ -102,11 +102,11 @@ class HamiltonianPendulum(Pendulum):
 
         Returns:
             tuple
-            q (np.ndarry): position.
-            p (np.ndarry): momentum.
-            dqdt (np.ndarry): velocity.
-            dpdt (np.ndarry) - force.
-            t_eval (np.ndarry) - times.
+            q (np.ndarray): position.
+            p (np.ndarray): momentum.
+            dqdt (np.ndarray): velocity.
+            dpdt (np.ndarray) - force.
+            t_eval (np.ndarray) - times.
         """
 
         if not noiseless:
@@ -123,11 +123,11 @@ class HamiltonianPendulum(Pendulum):
 
         Returns:
             tuple
-            q (np.ndarry): position.
-            p (np.ndarry): momentum.
-            dqdt (np.ndarry): velocity.
-            dpdt (np.ndarry) - force.
-            t_eval (np.ndarry) - times.
+            q (np.ndarray): position.
+            p (np.ndarray): momentum.
+            dqdt (np.ndarray): velocity.
+            dpdt (np.ndarray) - force.
+            t_eval (np.ndarray) - times.
         """
 
         assert time.size > 1, "you must enter more than one point in time"
