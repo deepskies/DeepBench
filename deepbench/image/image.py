@@ -37,7 +37,6 @@ class Image(ABC):
     def generate_noise(self, seed=42):
         """
         Add noise to an image
-        Updates SkyImage.image
 
         """
         noise_map = {
@@ -56,10 +55,10 @@ class Image(ABC):
         Save the generated image into the specified directory.
         Will create directory if it does not already exist.
 
-        :param save_dir: Directory to save
-        :param image_name: base name of the saved image
-        :param image_format: file format. Recommended jpg
-        :return: None
+        Args:
+            save_dir (str): Directory to save
+            param image_name (str): base name of the saved image
+            param image_format (str): file format. Recommended jpg
         """
 
         assert self.image is not None, "Image not instantiated"

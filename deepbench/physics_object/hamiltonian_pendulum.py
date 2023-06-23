@@ -7,6 +7,34 @@ from typing import Union, Optional
 
 
 class HamiltonianPendulum(Pendulum):
+    """
+    The Hamiltonian Pendulum class.
+
+    Args:
+        pendulum_arm_length (float): The length of the pendulum arm
+        starting_angle_radians (float): The starting angle of the pendulum
+            (angle from the 'ceiling')
+        noise_std_percent (dict): A dictionary of the Gaussian noise
+            level to be applied to each parameter. The default is no
+            noise. Each number is the standard deviation when
+            multiplied by the parameter. See create_noise().
+        acceleration_due_to_gravity (float): little g, local gravity
+            coefficient
+        mass_pendulum_bob (float): Mass of the pendulum bob,
+            this is optional if calculation_type is position only.
+
+    Examples:
+
+        >>> pendulum_obj = HamiltonianPendulum(pendulum_arm_length=10.,
+                                    starting_angle_radians=np.pi/4,
+                                    acceleration_due_to_gravity=9.8,
+                                    noise_std_percent=
+                                    {'pendulum_arm_length': 0.1,
+                                     'starting_angle_radians': 0.1,
+                                     'acceleration_due_to_gravity': 0.1}
+                                    )
+    """
+
     def __init__(
         self,
         pendulum_arm_length: float,
@@ -20,33 +48,7 @@ class HamiltonianPendulum(Pendulum):
             "acceleration_due_to_gravity": None,
         },
     ):
-        """
-        The initialization function for the Hamiltonian Pendulum class.
 
-        Args:
-            pendulum_arm_length (float): The length of the pendulum arm
-            starting_angle_radians (float): The starting angle of the pendulum
-                (angle from the 'ceiling')
-            noise_std_percent (dict): A dictionary of the Gaussian noise
-                level to be applied to each parameter. The default is no
-                noise. Each number is the standard deviation when
-                multiplied by the parameter. See create_noise().
-            acceleration_due_to_gravity (float): little g, local gravity
-                coefficient
-            mass_pendulum_bob (float): Mass of the pendulum bob,
-                this is optional if calculation_type is position only.
-
-        Examples:
-
-            >>> pendulum_obj = HamiltonianPendulum(pendulum_arm_length=10.,
-                                        starting_angle_radians=np.pi/4,
-                                        acceleration_due_to_gravity=9.8,
-                                        noise_std_percent=
-                                        {'pendulum_arm_length': 0.1,
-                                         'starting_angle_radians': 0.1,
-                                         'acceleration_due_to_gravity': 0.1}
-                                        )
-        """
         super().__init__(
             pendulum_arm_length=pendulum_arm_length,
             starting_angle_radians=starting_angle_radians,
@@ -55,43 +57,79 @@ class HamiltonianPendulum(Pendulum):
             mass_pendulum_bob=mass_pendulum_bob,
         )
 
-    def hamiltonian_fn(self, coords, m, L, g):
+    def _hamiltonian_fn(self, coords, m, L, g):
+
         q, p = np.split(coords, 2)
-        # m = self.mass_pendulum_bob
-        # L = self.pendulum_arm_length
-        # g = self.acceleration_due_to_gravity
-        # kinetic_term = ((self.pendulum_arm_length**2) * (p**2)) / (
-        #     2 * self.mass_pendulum_bob
-        # )
-        # potential_term = (
-        #     self.mass_pendulum_bob
-        #     * self.acceleration_due_to_gravity
-        #     * self.pendulum_arm_length
-        # ) * (1 - np.cos(q))
-        # H = kinetic_term + potential_term
+
         H = (m * g * L) * (1 - np.cos(q)) + ((L**2) * (p**2)) / (2 * m)
         return H
 
     def dynamics_fn(self, t, coords):
-        # derives the gradient of the hamiltonian function
-        # print(f'mass: {self.mass_pendulum_bob} length: {self.pendulum_arm_length} g: {self.acceleration_due_to_gravity}')
-        dcoords = autograd.grad(self.hamiltonian_fn)(
+        """
+        derives the gradient of the hamiltonian function
+
+        Args:
+            coords (np.ndarray): coordinates of the pendulum
+
+        Returns:
+            np.ndarray:time derivates of p and q.
+        """
+        #
+        dcoords = autograd.grad(self._hamiltonian_fn)(
             coords,
             self.mass_pendulum_bob,
             self.pendulum_arm_length,
             self.acceleration_due_to_gravity,
         )
 
-        # dcoords = autograd.grad(self.hamiltonian_fn)(coords, 2, 10, 9.8)
         dqdt, dpdt = np.split(dcoords, 2)
         S = np.concatenate([dpdt, -dqdt], axis=-1)
         return S
 
-    def create_object(self, time, noiseless=True):
-        assert noiseless
-        return super().create_object(time, noiseless)
+    def create_object(
+        self, time: Union[float, np.array], noiseless: bool = True, seed: int = 42
+    ):
+        """
+        Given a single or array of times, simulates the pendulum position at
+        each of these times and optionally adds Gaussian noise to each
+        parameter.
+
+        Args:
+            time (Union[float, np.array]): A single moment in time, or
+                an array of times (s)
+            noiseless (bool): Add noise to the pendulum parameters
+            seed (int): Random seed for parameters
+
+        Returns:
+            tuple
+            q (np.ndarray): position.
+            p (np.ndarray): momentum.
+            dqdt (np.ndarray): velocity.
+            dpdt (np.ndarray) - force.
+            t_eval (np.ndarray) - times.
+        """
+
+        if not noiseless:
+            raise NotImplementedError
+
+        return super().create_object(time, noiseless, seed=seed)
 
     def simulate_pendulum_dynamics(self, time, **kwargs):
+        """
+        Evaulate the hamilitonian at times `time` and return the position, momentum and time derviates
+
+        Args:
+            time (np.ndarray): Times to simulate
+
+        Returns:
+            tuple
+            q (np.ndarray): position.
+            p (np.ndarray): momentum.
+            dqdt (np.ndarray): velocity.
+            dpdt (np.ndarray) - force.
+            t_eval (np.ndarray) - times.
+        """
+
         assert time.size > 1, "you must enter more than one point in time"
 
         t_eval = np.array(time)
@@ -129,7 +167,7 @@ class HamiltonianPendulum(Pendulum):
         )  # creates a random array of size p.shape and is scaled with noise_std then adds to p for noise
         return q, p, dqdt, dpdt, t_eval
 
-    def get_field(self, xmin=-1.2, xmax=1.2, ymin=-1.2, ymax=1.2, gridsize=20):
+    def _get_field(self, xmin=-1.2, xmax=1.2, ymin=-1.2, ymax=1.2, gridsize=20):
         """get_field() is used to visualize the the gradiant vector field."""
         field = {"meta": locals()}
 

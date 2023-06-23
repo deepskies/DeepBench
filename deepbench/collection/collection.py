@@ -17,9 +17,18 @@ class Collection:
 
     Holds onto all the parameters used to make these files, including the default parameters, for replication.
 
+    Args:
+        object_config (dict): dictionary containing the parameters for the simulation output. Required fields:
+            - object_type: [sky, shape, physics, astro] : overall type of image
+            - object_name: Name of the class used in the image generation (e.g. - Pendulum, Star)
+            - total_runs: Number of times the simulation will be executed
+            - image_parameters: parameters for the image itself. In single object images, this is the parameters for the parent class.
+            - object parameters: list of objects that will be included in each image and their parameters
+
     """
 
     def __init__(self, object_config: dict):
+
         self.object_type = object_config["object_type"]
         self.object_name = object_config["object_name"]
 
@@ -54,11 +63,12 @@ class Collection:
             self.parameter_noise = object_config["parameter_noise"]
 
     def add_parameter_noise(self, seed, params):
-        """_summary_
+        """
+        Add noise to the image wide parameters
 
         Args:
             seed (int): integer stored by the program to denote the noise seed added to the object
-            params (dict): parameters for to add noise to
+            params (dict): parameters that have added noise.
 
         Returns:
             dict: parameters with added uniform noise
@@ -81,7 +91,7 @@ class Collection:
         Locate the default parameters for any simulation being called, via the `inspect.signature` method
 
         Returns:
-            dictionary: all the parameters either default to the called object or modified by the program
+            dict: all the parameters either default to the called object or modified by the program
         """
         init_signature = inspect.signature(
             self.object_engine_classes[self.object_name].__init__
