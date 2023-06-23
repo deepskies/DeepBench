@@ -5,6 +5,25 @@ from numpy import tan
 
 
 class SpiralGalaxyObject(GalaxyObject):
+    """
+    Create a spiral galaxy object
+
+    Args:
+        image_dimensions (Union[int, float, List[int], List[float]]): The dimension(s) of the object to be produced.
+        amplitude (Union[int, float]): The amplitude of the object to be produced, surface brightness at the sersic radius.
+        noise_level (Union[float, list[float]]): The Poisson noise level to be applied to the object.
+        radius (int, optional): Effective half-light radius of the galaxy. Defaults to 25.
+        n (float, optional): Sersic Index. Defaults to 1.0.
+        ellipse (float, optional): Galaxy Ellipticity. Defaults to random.uniform(0.1, 0.9).
+        theta (float, optional): The rotation of the galaxy in radians. Defaults to random.uniform(-1.5, 1.5).
+        winding_number (int, optional): number of arms. Defaults to 2.
+        spiral_pitch (float, optional): Severity of the spiral, the pitch angle. Defaults to 0.2.
+    Examples:
+
+        >>> example_galaxy = SpiralGalaxyObject(image_dimensions=28, winding_number=4)
+
+    """
+
     def __init__(
         self,
         image_dimensions,
@@ -17,7 +36,6 @@ class SpiralGalaxyObject(GalaxyObject):
         winding_number: int = 2,
         spiral_pitch: float = 0.2,
     ):
-
         self.winding_number = winding_number
         self.spiral_pitch = spiral_pitch
 
@@ -31,21 +49,48 @@ class SpiralGalaxyObject(GalaxyObject):
             noise_level=noise_level,
         )
 
-    def create_sprial_profile(self, center_x, center_y):
-        "ref paper: https://doi.org/10.1111/j.1365-2966.2009.14950.x"
+    def create_spiral_profile(self, center_x, center_y):
+        """
+        
+        ref paper: https://doi.org/10.1111/j.1365-2966.2009.14950.x
+        Impliment a spiral galaxy profile
+
+        Args:
+            center_x (float): x position of the center of the galaxy
+            center_y (float): y position of the center of the galaxy
+
+
+        Returns:
+            spiral profile (numpy array): Profile representing the spiral galaxy
+        """
 
         spiral = self._amplitude / log2(
             self.spiral_pitch * tan(self._theta / (2 * self.winding_number))
         )
-        # TO BE IMPLEMENTED.
-        # WHERE IS THE CODE FOR THIS????????
-        return random.default_rng().uniform(size=self._image.shape) * spiral
+        sersic = self.create_Sersic_profile(center_x, center_y)
+
+        return sersic * spiral
 
     def create_object(self, center_x, center_y):
+        """
+        Create the galaxy object from a Sersic distribution and Poisson and PSF noise.
+
+        Args:
+            center_x (float): The x-axis placement of the galaxy object.
+            center_y (float): The y-axis placement of the galaxy object.
+
+        Returns:
+            ndarray: Two dimensional Spiral object, composed of Spiral Distribution and noise appendings.
+
+        Examples:
+
+            >>> example_prof = example_spiral.create_object(center_x = 1.0, center_y = 0.0)
+
+        """
         image_shape = self._image.copy()
 
         # Add the spiral to the image
-        spiral = self.create_sprial_profile(center_x, center_y)
+        spiral = self.create_spiral_profile(center_x, center_y)
         image_shape += spiral
 
         # Create the Poisson noise profile.
@@ -58,4 +103,11 @@ class SpiralGalaxyObject(GalaxyObject):
         return image_shape
 
     def displayObject(self):
-        print("Code Container")
+        """
+        Display the object created in a 2d plot
+
+        Raises:
+            NotImplementedError: Raised if not implimented in the child class
+        """
+
+        raise NotImplementedError()

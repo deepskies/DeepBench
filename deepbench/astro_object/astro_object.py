@@ -7,7 +7,16 @@ import numpy as np
 
 class AstroObject(ABC):
     """
-    Description container.
+    Args:
+        image_dimensions (Union[int, float, List[int], List[float]]): The dimension(s) of the object to be produced.
+        radius (Union[int, float]): The radius of the object to be produced.
+        amplitude (Union[int, float]): The amplitude (brightness) of the object to be produced.
+        noise_level (Union[float, list[float]]): The Poisson noise level (lambda, the  expected seperation) to be applied to the object.
+
+    Examples:
+
+        >>> example_obj = AstroObject(image_dimensions=28, radius=5, amplitude=3, noise_level=0.7)
+
     """
 
     def __init__(
@@ -17,22 +26,6 @@ class AstroObject(ABC):
         amplitude: Union[int, float],
         noise_level: Union[float, List[float]],
     ) -> None:
-        """
-        The initialization function for the Abstract AstroObject class.
-
-        Args:
-            image_dimensions (Union[int, float, List[int], List[float]]): The dimension(s) of the object to be produced.
-            radius (Union[int, float]): The radius of the object to be produced.
-            amplitude (Union[int, float]): The amplitude of the object to be produced.
-            noise_level (Union[float, list[float]]): The Poisson noise level to be applied to the object.
-
-        Examples:
-
-            >>> example_obj = AstroObject(image_dimensions=28, radius=5, amplitude=3, noise_level=0.7)
-        """
-
-        #   TODO:
-        #   - May need a position param: position=(0,0)
 
         self._image = np.zeros((image_dimensions, image_dimensions))
         self._radius = radius
@@ -73,6 +66,7 @@ class AstroObject(ABC):
 
         Args:
             seed (int): The random initialization seed used for reproducibility.
+            galaxy (bool): Scale the weight to keep with the intensity scale of a galaxy
 
         Returns:
             ndarray: A random sample drawn from a Poisson distribution.
@@ -107,8 +101,10 @@ class AstroObject(ABC):
 
     @abstractmethod
     def displayObject(self):
+        """
+        Display the object created in a 2d plot
 
-        # Yet to implement. Will essentially just display a matplotlib image of the Object.
-
-        print("Code Container.")
+        Raises:
+            NotImplementedError: Raised if not implimented in the child class
+        """
         raise NotImplementedError()

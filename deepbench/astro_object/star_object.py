@@ -8,30 +8,28 @@ import numpy as np
 
 class StarObject(AstroObject):
     """
-    Description Container.
+    Create Stars
+
+    Args:
+ image_dimensions (Union[int, float, List[int], List[float]]): The dimension(s) of the object to be produced.
+        radius (Union[int, float]): The radius of the object to be produced.
+        amplitude (Union[int, float]): The amplitude (brightness) of the object to be produced.
+        noise_level (Union[float, list[float]]): The Poisson noise level (lambda, the  expected seperation) to be applied to the object.
+
+    Examples:
+
+        >>> example_star = StarObject(image_dimensions=28, noise=5.0, center=3, radius=0.7, amplitude=1.2)
+        >>> example_star = StarObject(image_dimensions=(28,28), noise=5.0)
     """
 
     def __init__(
         self,
         image_dimensions: Union[int, float, List[int], List[float]],
-        noise: Union[float, List[float]],
+        noise: Union[float, List[float]]=0.0,
         radius: Union[int, float] = 1.0,
         amplitude: Union[int, float] = 1.0,
     ) -> None:
-        """
-        The initialization function for the StarObject.
 
-        Args:
-            image_dimensions (Union[int, float, List[int], List[float]]): The dimension(s) of the Star to be produced.
-            noise_level (Union[float, list[float]]): The Poisson noise level to be applied to the object.
-            radius (Union[int, float]): The radius of the object to be produced.
-            amplitude (Union[int, float]): The amplitude of the object to be produced.
-
-        Examples:
-
-            >>> example_star = StarObject(image_dimensions=28, noise=5.0, center=3, radius=0.7, amplitude=1.2)
-            >>> example_star = StarObject(image_dimensions=(28,28), noise=5.0)
-        """
         super().__init__(
             image_dimensions=image_dimensions,
             radius=radius,

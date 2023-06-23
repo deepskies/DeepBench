@@ -7,7 +7,26 @@ from numpy import random
 
 class GalaxyObject(AstroObject):
 
-    # BOUNDS: ellipse -> (0,1), n -> (0.5, 1.0)
+    """
+
+    Produce a 2D galaxy using a Sersic2D distribution.
+    View https://docs.astropy.org/en/stable/api/astropy.modeling.functional_models.Sersic2D.html
+    for implimentation details.
+
+    Args:
+        image_dimensions (Union[int, float, List[int], List[float]]): The dimension(s) of the object to be produced.
+        amplitude (Union[int, float]): The amplitude of the object to be produced, surface brightness at radius.
+        noise_level (Union[float, list[float]]): The Poisson noise level (lambda, the  expected seperation) to be applied to the object.
+        radius (int, optional): Effective half-light radius of the galaxy. Defaults to 25.
+        n (float, optional): Sersic Index. Defaults to 1.0.
+        ellipse (float, optional): Galaxy Ellipticity. Defaults to random.uniform(0.1, 0.9).
+        theta (float, optional): The rotation of the galaxy in radians. Defaults to random.uniform(-1.5, 1.5).
+    Examples:
+
+        >>> example_galaxy = GalaxyObject(image_dimensions=28)
+
+    """
+
     def __init__(
         self,
         image_dimensions,
@@ -18,20 +37,6 @@ class GalaxyObject(AstroObject):
         ellipse=random.uniform(0.1, 0.9),
         theta=random.uniform(-1.5, 1.5),
     ):
-        """_summary_
-
-        Args:
-            image_dimensions (Union[int, float, List[int], List[float]]): The dimension(s) of the object to be produced.
-            radius (Union[int, float]): The radius of the object to be produced.
-            amplitude (Union[int, float]): The amplitude of the object to be produced.
-            noise_level (Union[float, list[float]]): The Poisson noise level to be applied to the object.
-
-            radius (int, optional): _description_. Defaults to 25.
-            n (float, optional): _description_. Defaults to 1.0.
-            ellipse (_type_, optional): _description_. Defaults to random.uniform(0.1, 0.9).
-            theta (_type_, optional): _description_. Defaults to random.uniform(-1.5, 1.5).
-        """
-
         super().__init__(
             image_dimensions=image_dimensions,
             radius=radius,
@@ -44,6 +49,16 @@ class GalaxyObject(AstroObject):
         self._theta = theta
 
     def create_Sersic_profile(self, center_x, center_y):
+        """
+        Wrapper for https://docs.astropy.org/en/stable/api/astropy.modeling.functional_models.Sersic2D.html
+
+        Args:
+            center_x (float): x position of the center of the galaxy
+            center_y (float): y position of the center of the galaxy
+
+        Returns:
+            galaxy (numpy.array): created galaxy profile
+        """
 
         x, y = self.create_meshgrid()
         profile = Sersic2D(
@@ -60,7 +75,7 @@ class GalaxyObject(AstroObject):
 
     def create_object(self, center_x=5.0, center_y=5.0) -> np.ndarray:
         """
-        Create the star object from a Moffat distribution and Poisson and PSF noise.
+        Create the galaxy object from a Sersic distribution and Poisson or PSF noise.
 
         Args:
             center_x (float): The x-axis placement of the galaxy object.
@@ -88,7 +103,11 @@ class GalaxyObject(AstroObject):
         return image_shape
 
     def displayObject(self):
+        """
+        Display the object created in a 2d plot
 
-        # To be implemented. Check parent for details.
+        Raises:
+            NotImplementedError: Raised if not implimented in the child class
+        """
 
-        print("Code Container.")
+        raise NotImplementedError()

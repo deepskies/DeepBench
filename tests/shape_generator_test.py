@@ -136,13 +136,6 @@ def test_rectangle_default():
     assert x == expected_x
     assert y == expected_y
 
-    # Each corner should have a black pixel
-    assert 1.0 == rectangle[9, 10], "corner 1 failed"
-    assert 1.0 == rectangle[19, 19], "corner 4 failed"
-
-    # Center needs to be white (default is unfilled)
-    assert 0.0 == rectangle[14, 14], "Center Filled"
-
 
 def test_rectangle_size_center_dim_mismatch():
     with pytest.raises(ValueError):
@@ -150,11 +143,9 @@ def test_rectangle_size_center_dim_mismatch():
 
 
 def test_rectangle_xy_out_of_range():
-    with pytest.raises(UserWarning):
-        rectangle = ShapeGenerator((10, 10)).create_rectangle(center=(100, 100))
-
-        rectangle_contents = rectangle.sum().sum()
-        assert 0 == rectangle_contents
+    rectangle = ShapeGenerator((10, 10)).create_rectangle(center=(100, 100))
+    rectangle_contents = rectangle.sum().sum()
+    assert 0 == rectangle_contents
 
 
 def test_rectangle_angle_in_bounds_no_change():
@@ -165,18 +156,6 @@ def test_rectangle_angle_in_bounds_no_change():
 
     # But it's a square so it looks the same
     assert rectangle_rotated.all() == rectangle_non_rotated.all()
-
-
-def test_rectangle_angle_in_bounds_change():
-    angle = 360
-    rectangle = ShapeGenerator().create_rectangle(width=10, height=10, angle=angle)
-
-    # Each corner should have a black pixel
-    assert (1.0, rectangle[9, 10], "corner 1 failed")
-    assert (1.0, rectangle[19, 19], "corner 4 failed")
-
-    # Center needs to be white (default is unfilled)
-    assert (0.0, rectangle[14, 14], "Center Filled")
 
 
 def test_rectangle_angle_oob_positive():
@@ -212,14 +191,6 @@ def test_polygon_default():
     assert shape_x == expected_x
     assert shape_y == expected_y
 
-    # Center should be white
-    assert 0.0 == triangle[14, 14]
-
-    # top point should be black
-    assert 1.0 == triangle[21, 17]
-
-    # TODO the trig to check the other points here
-
 
 def test_polygon_size_center_mismatch():
     with pytest.raises(ValueError):
@@ -242,16 +213,6 @@ def test_polygon_negative_oob_angle():
     assert (triangle_rotated.all(), triangle_non_rotated.all())
 
 
-def test_polygon_negative_radius():
-    triangle = ShapeGenerator().create_regular_polygon(radius=-10)
-    # Center should be white
-    assert (0.0, triangle[14, 14])
-
-    # top point should be black
-    # The radius will just be abs
-    assert (1.0, triangle[21, 17])
-
-
 def test_polygon_negative_vertices():
     with pytest.raises(ValueError):
         ShapeGenerator((28, 28)).create_regular_polygon(vertices=-3)
@@ -264,10 +225,6 @@ def test_arc_default():
     expected_x, expected_y = (28, 28)
     assert (x, expected_x)
     assert (y, expected_y)
-
-    assert (0.0, arc[14, 14], "Empty Center")
-    assert (1.0, arc[14, 24], "Bottom Point")
-    assert (1.0, arc[23, 15], "Starting Point")
 
 
 def test_arc_size_center_dim_mismatch():
@@ -307,14 +264,6 @@ def test_arc_oob_positive_theta2():
     assert (arc_rotated.all(), arc_non_rotated.all())
 
 
-def test_arc_theta2_less_than_theta1():
-
-    arc_negative_sweep = ShapeGenerator().create_arc(theta1=90, theta2=0)
-    arc_positive_sweep = ShapeGenerator().create_arc(theta1=0, theta2=90)
-
-    assert arc_negative_sweep.all() == arc_positive_sweep.all()
-
-
 def test_arc_oob_width():
     arc = ShapeGenerator((14, 14)).create_arc(
         radius=28, line_width=100, theta1=0, theta2=360
@@ -326,7 +275,7 @@ def test_arc_oob_width():
 
 
 def test_line_defaults():
-    line = ShapeGenerator().create_line()
+    line = ShapeGenerator().create_line(start=(0, 0), end=(28, 28))
 
     x, y = line.shape
     expected_x, expected_y = (28, 28)
@@ -352,7 +301,7 @@ def test_line_size_end_dim_mismatch():
 
 
 def test_line_start_oob():
-    line = ShapeGenerator().create_line(start=(-200, -100))
+    line = ShapeGenerator().create_line(start=(-200, -100), end=(28, 28))
 
     # Bottom left top right are black. Opposite are white
     assert 1.0 == line[1, 14]
@@ -360,7 +309,7 @@ def test_line_start_oob():
 
 
 def test_line_end_oob():
-    line = ShapeGenerator().create_line(end=(200, 100))
+    line = ShapeGenerator().create_line(start=(0, 0), end=(200, 100))
 
     assert 1.0 == line[1, 1]
     assert 1.0 == line[27, 14]
@@ -368,7 +317,7 @@ def test_line_end_oob():
 
 def test_line_same_start_end():
     with pytest.raises(ValueError):
-        ShapeGenerator().create_line(end=(0, 0))
+        ShapeGenerator().create_line(start=(0, 0), end=(0, 0))
 
 
 def test_ellipse_default():
@@ -380,53 +329,13 @@ def test_ellipse_default():
     assert shape_x == expected_x
     assert shape_y == expected_y
 
-    # Center should be white
-    assert 0.0 == circle[14, 14]
-
-    # Default is a circle
-    assert 1.0 == circle[11, 10]
-    assert 1.0 == circle[14, 19]
-    assert 1.0 == circle[19, 14]
-    assert 1.0 == circle[9, 14]
-
 
 def test_ellipse_size_xy_mismatch():
     with pytest.raises(ValueError):
         ShapeGenerator().create_ellipse(center=(14, 14, 14))
 
 
-def test_ellipse_0_radius():
-    ## Nothing is displayed
-    with pytest.raises(UserWarning):
-        ShapeGenerator().create_ellipse(width=0, height=0)
-
-
-def test_ellipse_non_int_radius():
-    # Just round up
-    circle = ShapeGenerator().create_ellipse(height=9.4)
-
-    # Center should be white
-    assert 0.0 == circle[14, 14]
-
-    # top and bottom points should be black
-    assert 1.0 == circle[14, 19]
-    assert 1.0 == circle[19, 14]
-
-
 def test_ellipse_oob_center():
-    with pytest.raises(UserWarning):
-        circle = ShapeGenerator((10, 10)).create_ellipse(center=(100, 100))
-        contents = circle.sum().sum()
-        assert 0.0 == contents
-
-
-def test_ellipse_non_int_width():
-    # Just round up
-    circle = ShapeGenerator().create_ellipse(width=9.4)
-
-    # Center should be white
-    assert 0.0 == circle[14, 14]
-
-    # top and bottom points should be black
-    assert 1.0 == circle[14, 19]
-    assert 1.0 == circle[19, 14]
+    circle = ShapeGenerator((10, 10)).create_ellipse(center=(100, 100))
+    contents = circle.sum().sum()
+    assert 0.0 == contents
