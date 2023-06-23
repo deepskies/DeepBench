@@ -77,10 +77,10 @@ class ShapeImage(Image):
 
         if type(object_params) == dict:
             object_params = [object_params]
-
+            
         for shape, params in zip(objects, object_params):
             image += self._create_object(shape, params)
-            
+     
         noise = self.generate_noise(seed)
         image += noise
         return image
