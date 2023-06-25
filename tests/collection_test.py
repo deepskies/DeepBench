@@ -60,6 +60,21 @@ def test_default_init(default_physics, default_shape, default_sky):
 
     assert isinstance(physics.object_engine, SkyImage)
 
+def test_load_from_config(): 
+    config_path = f"{os.path.dirname(__file__)}/../deepbench/settings/default_physics_object.yaml"
+    physics = Collection()
+    physics.from_config(config_path)
+    
+    physics.add_object()
+
+    assert len(physics.objects) == len(physics.object_params) == 1
+    assert physics.n_objects == 1
+
+def test_run_without_config(): 
+    physics = Collection()
+    with pytest.raises(AssertionError): 
+        physics.add_object()
+
 
 def test_add_single_item_phy(default_physics):
     physics = Collection(default_physics)
@@ -199,3 +214,24 @@ def test_no_added_noise(default_physics):
         ).flatten()
     )
     assert len(arm_lengths) == len(default_physics["object_parameters"]["time"])
+
+
+def test_save_results_no_path(default_physics): 
+    collection = Collection(default_physics)
+    collection.add_object()
+    with pytest.raises(AssertionError): 
+        collection.save()
+
+def test_save_supplied_path(default_physics): 
+    collection = Collection(default_physics)
+    collection.add_object()
+    collection.save("./custom_path/")
+
+    assert os.path.exists("./custom_path/dataset.h5")
+    assert os.path.exists("./custom_path/dataset_parameters.yaml")
+
+def test_save_results_yes_path(default_physics): 
+    default_physics['name'] = "./from_config_dataset/"
+    collection = Collection(default_physics)
+    collection.add_object()
+    collection.save()
