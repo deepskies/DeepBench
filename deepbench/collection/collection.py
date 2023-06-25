@@ -2,9 +2,11 @@ import inspect
 import deepbench.image as image
 import deepbench.astro_object as astro
 import deepbench.physics_object as physics
+from deepbench.collection import Save
 
 import numpy as np
-
+import yaml
+import os 
 
 class Collection:
     """
@@ -18,16 +20,50 @@ class Collection:
     Holds onto all the parameters used to make these files, including the default parameters, for replication.
 
     Args:
-        object_config (dict): dictionary containing the parameters for the simulation output. Required fields:
-            - object_type: [sky, shape, physics, astro] : overall type of image
-            - object_name: Name of the class used in the image generation (e.g. - Pendulum, Star)
-            - total_runs: Number of times the simulation will be executed
-            - image_parameters: parameters for the image itself. In single object images, this is the parameters for the parent class.
-            - object parameters: list of objects that will be included in each image and their parameters
+        object_config (dict, optional): dictionary containing the parameters for the simulation output. Required fields:
+            * object_type: [sky, shape, physics, astro] : overall type of image
+            * object_name: Name of the class used in the image generation (e.g. - Pendulum, Star)
+            * total_runs: Number of times the simulation will be executed
+            * image_parameters: parameters for the image itself. In single object images, this is the parameters for the parent class.
+            * object parameters: list of objects that will be included in each image and their parameters
+        Defaults to None.
 
     """
 
-    def __init__(self, object_config: dict):
+    def __init__(self, object_config: dict=None):
+
+        self.object_type = None
+        self.object_name = None
+
+        self.total_objects = None
+        self.included_params = None
+        self.object_rules = None
+
+
+        self.object_engine_classes = None 
+        self.object_engine = None 
+
+        self.n_objects = 0
+        self.objects = {}
+        self.object_params = {}
+
+        if object_config is not None: 
+            self._set_parameters(object_config)
+
+
+    def from_config(self, config_path:str):
+        """
+        Read an external configuration file and initalize the dataset. Must be run if a configuration is not supplied at initalization. 
+
+        Args:
+            config_path (str): Path to yaml file containing an object dictionary. Object dictionary must have the parameters: "object_type","object_name",total_runs",image_parameters","object_parameters"
+        """
+        config = yaml.safe_load(open(config_path))
+        
+        self._set_parameters(config)
+
+
+    def _set_parameters(self, object_config): 
 
         self.object_type = object_config["object_type"]
         self.object_name = object_config["object_name"]
@@ -61,6 +97,12 @@ class Collection:
 
         if "parameter_noise" in object_config:
             self.parameter_noise = object_config["parameter_noise"]
+        
+        if "name" in object_config: 
+            self.save_path = object_config["name"]
+            if not os.path.exists: 
+                os.makedirs(self.save_path)
+
 
     def add_parameter_noise(self, seed, params):
         """
@@ -123,6 +165,8 @@ class Collection:
         If the specified object is a composite image, it will only find the default values for the compositor method, not the indivual simulations
 
         """
+        assert self.object_type is not None, "Collection parameters not initialized, please run collection.from_config(your_configuration_path)"
+
         random_seed = (
             np.random.default_rng().integers(1, 10**6, size=1)[0]
             if not hasattr(self, "seed")
@@ -180,3 +224,29 @@ class Collection:
         """
         for _ in range(self.total_objects):
             self.add_object()
+        
+        if hasattr(self, "save_path"): 
+            self.save()
+
+
+    def save(self, save_path:str=None, format:str='h5'): 
+        """
+        Save generated dataset to path of your choosing. 
+        If the path is not specified, the program will look for a save path to be specified by the configation_file 
+
+        Args:
+            save_path (str, optional): directory, location to save a file. Will be created if does not already exist. Defaults to None.
+            format (str, optional): Format to save the file in. Defaults to h5.
+        """
+
+        if save_path is None: 
+            assert hasattr(self, "save_path"), "Could not parse save path from config, please supply it manually"
+            save_path = self.save_path
+        
+        if not os.path.exists(save_path):
+            os.makedirs(save_path)
+        
+        Save(self, save_path)(format=format)
+
+        
+        
