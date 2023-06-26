@@ -1,7 +1,5 @@
 from deepbench.astro_object.galaxy_object import GalaxyObject
-
-from numpy import log2, random
-from numpy import tan
+import numpy as np
 
 
 class SpiralGalaxyObject(GalaxyObject):
@@ -31,13 +29,13 @@ class SpiralGalaxyObject(GalaxyObject):
         radius=25,
         n=1.0,
         noise_level=0.2,
-        ellipse=random.uniform(0.1, 0.9),
-        theta=random.uniform(-1.5, 1.5),
+        ellipse=np.random.uniform(0.1, 0.9),
+        theta=np.random.uniform(-1.5, 1.5),
         winding_number: int = 2,
         spiral_pitch: float = 0.2,
     ):
+        self.pitch_angle = spiral_pitch
         self.winding_number = winding_number
-        self.spiral_pitch = spiral_pitch
 
         super().__init__(
             image_dimensions=image_dimensions,
@@ -51,7 +49,7 @@ class SpiralGalaxyObject(GalaxyObject):
 
     def create_spiral_profile(self, center_x, center_y):
         """
-        
+
         ref paper: https://doi.org/10.1111/j.1365-2966.2009.14950.x
         Impliment a spiral galaxy profile
 
@@ -64,37 +62,60 @@ class SpiralGalaxyObject(GalaxyObject):
             spiral profile (numpy array): Profile representing the spiral galaxy
         """
 
-        spiral = self._amplitude / log2(
-            self.spiral_pitch * tan(self._theta / (2 * self.winding_number))
-        )
-        sersic = self.create_Sersic_profile(center_x, center_y)
+        pitch_angle = np.deg2rad(self.pitch_angle)
 
-        return sersic * spiral
+        # Define the grid
+        x, y = self.create_meshgrid()
 
-    def create_object(self, center_x, center_y):
+        # Calculate the distance from the center
+        R = np.sqrt(center_x**2 + center_y**2)
+
+        # Calculate the angle from the x-axis
+        theta = np.arctan2(y, x) + np.pi
+
+        # Create the spiral pattern
+        spiral = np.zeros_like(self._image)
+
+        for arm in range(self.winding_number):
+            arm_angle = 2 * np.pi * arm / self.winding_number
+            # Calculate logarithmic spiral
+            r_spiral = ((self._radius * 2) / (2 * np.pi)) * np.exp(
+                (theta - arm_angle) / np.tan(pitch_angle)
+            )
+
+            # Calculate distance from each point to the spiral arm
+            distance = np.abs(R - r_spiral)
+
+            # Add arm intensity to the spiral pattern
+            spiral += self._amplitude * np.exp(
+                -(distance**2) / (2 * self._radius**2)
+            )
+
+        # Add Poisson noise
+        profile = np.random.poisson(spiral * self._noise_level)
+
+        return profile
+
+    def create_object(self, center_x, center_y) -> np.ndarray:
         """
-        Create the galaxy object from a Sersic distribution and Poisson and PSF noise.
+
+        ref paper: https://doi.org/10.1111/j.1365-2966.2009.14950.x
+        Create a spiral galaxy image
 
         Args:
-            center_x (float): The x-axis placement of the galaxy object.
-            center_y (float): The y-axis placement of the galaxy object.
+            center_x (float): x position of the center of the galaxy
+            center_y (float): y position of the center of the galaxy
+
 
         Returns:
-            ndarray: Two dimensional Spiral object, composed of Spiral Distribution and noise appendings.
-
-        Examples:
-
-            >>> example_prof = example_spiral.create_object(center_x = 1.0, center_y = 0.0)
-
+            spiral profile (numpy array): Profile representing the spiral galaxy
         """
-        image_shape = self._image.copy()
 
-        # Add the spiral to the image
-        spiral = self.create_spiral_profile(center_x, center_y)
-        image_shape += spiral
-
-        # Create the Poisson noise profile.
+        # Create the Poisson noise profile specific to Galaxy objects.
         noise_profile = self.create_noise(galaxy=True)
+
+        # Create the spiral galaxy profile
+        image_shape = self.create_spiral_profile(center_x, center_y)
 
         # Append the noise profiles to the object.
         image_shape += noise_profile
