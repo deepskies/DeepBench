@@ -1,5 +1,5 @@
 from abc import ABC, abstractclassmethod, abstractmethod
-from typing import Union, List
+from typing import Union, List, Tuple
 from scipy import ndimage
 import numpy.random as rand
 import numpy as np
@@ -8,7 +8,7 @@ import numpy as np
 class AstroObject(ABC):
     """
     Args:
-        image_dimensions (Union[int, float, List[int], List[float]]): The dimension(s) of the object to be produced.
+        image_dimensions (Union[tuple(int,int), tuple(float,float)]): The dimension(s) of the object to be produced.
         radius (Union[int, float]): The radius of the object to be produced.
         amplitude (Union[int, float]): The amplitude (brightness) of the object to be produced.
         noise_level (Union[float, list[float]]): The Poisson noise level (lambda, the  expected seperation) to be applied to the object.
@@ -21,13 +21,13 @@ class AstroObject(ABC):
 
     def __init__(
         self,
-        image_dimensions: Union[int, float, List[int], List[float]],
+        image_dimensions: Union[Tuple[int, int], Tuple[float, float]],
         radius: Union[int, float],
         amplitude: Union[int, float],
         noise_level: Union[float, List[float]],
     ) -> None:
 
-        self._image = np.zeros((image_dimensions, image_dimensions))
+        self._image = np.zeros(image_dimensions)
         self._radius = radius
         self._amplitude = amplitude
         self._noise_level = noise_level

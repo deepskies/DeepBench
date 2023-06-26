@@ -90,7 +90,7 @@ class SkyImage(Image):
         ):
             import matplotlib.pyplot as plt
 
-            sky_params["image_dimensions"] = self.image_shape[0]
+            sky_params["image_dimensions"] = self.image_shape
             if "noise_level" not in sky_params:
                 sky_params["noise_level"] = 0
 
