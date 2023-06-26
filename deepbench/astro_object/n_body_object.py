@@ -1,10 +1,11 @@
+from typing import Union, Tuple
 from deepbench.astro_object.astro_object import AstroObject
 
 
 class NBodyObject(AstroObject):
     def __init__(
         self,
-        image_dimensions,
+        image_dimensions: Union[Tuple[int, int], Tuple[float, float]],
         t_duration: float = 2.0,
         dt: float = 0.2,
         dampening: float = 0,

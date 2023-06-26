@@ -1,3 +1,4 @@
+from typing import Union, Tuple
 from deepbench.astro_object.astro_object import AstroObject
 from astropy.modeling.models import Sersic2D
 
@@ -14,7 +15,7 @@ class GalaxyObject(AstroObject):
     for implimentation details.
 
     Args:
-        image_dimensions (Union[int, float, List[int], List[float]]): The dimension(s) of the object to be produced.
+        image_dimensions (Union[tuple(int,int), tuple(float,float)]): The dimension(s) of the object to be produced.
         amplitude (Union[int, float]): The amplitude of the object to be produced, surface brightness at radius.
         noise_level (Union[float, list[float]]): The Poisson noise level (lambda, the  expected seperation) to be applied to the object.
         radius (int, optional): Effective half-light radius of the galaxy. Defaults to 25.
@@ -29,7 +30,7 @@ class GalaxyObject(AstroObject):
 
     def __init__(
         self,
-        image_dimensions,
+        image_dimensions: Union[Tuple[int, int], Tuple[float, float]],
         amplitude=1,
         radius=25,
         n=1.0,

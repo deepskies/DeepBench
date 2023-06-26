@@ -1,3 +1,4 @@
+from typing import Tuple, Union
 from deepbench.astro_object.galaxy_object import GalaxyObject
 import numpy as np
 
@@ -7,7 +8,7 @@ class SpiralGalaxyObject(GalaxyObject):
     Create a spiral galaxy object
 
     Args:
-        image_dimensions (Union[int, float, List[int], List[float]]): The dimension(s) of the object to be produced.
+        image_dimensions (Union[Tuple(int,int), tuple(float,float)]): The dimension(s) of the object to be produced.
         amplitude (Union[int, float]): The amplitude of the object to be produced, surface brightness at the sersic radius.
         noise_level (Union[float, list[float]]): The Poisson noise level to be applied to the object.
         radius (int, optional): Effective half-light radius of the galaxy. Defaults to 25.
@@ -18,13 +19,13 @@ class SpiralGalaxyObject(GalaxyObject):
         spiral_pitch (float, optional): Severity of the spiral, the pitch angle. Defaults to 0.2.
     Examples:
 
-        >>> example_galaxy = SpiralGalaxyObject(image_dimensions=28, winding_number=4)
+        >>> example_galaxy = SpiralGalaxyObject(image_dimensions=(28,28), winding_number=4)
 
     """
 
     def __init__(
         self,
-        image_dimensions,
+        image_dimensions: Union[Tuple[int, int], Tuple[float, float]],
         amplitude=1,
         radius=25,
         n=1.0,
