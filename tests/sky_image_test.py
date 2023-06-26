@@ -7,7 +7,7 @@ def star():
     return {
         "objects": "star",
         "object_params": {"center_x": 14, "center_y": 14, "alpha": 1.0},
-        "instance_params": {"noise": 0, "radius": 1.0, "amplitude": 1.0},
+        "instance_params": {"noise_level": 0, "radius": 1.0, "amplitude": 1.0},
     }
 
 
@@ -119,7 +119,7 @@ def test_not_an_astro_object(star):
 
 def test_make_all_astro_objects():
     sky_objects = ["star", "galaxy", "spiral_galaxy"]
-    sky_params = [{"noise": 0, "radius": 1.0, "amplitude": 1.0}, {}, {}]
+    sky_params = [{"noise_level": 0, "radius": 1.0, "amplitude": 1.0}, {}, {}]
     object_params = [
         {"center_x": 14, "center_y": 14},
         {"center_x": 14, "center_y": 14},
@@ -129,3 +129,36 @@ def test_make_all_astro_objects():
     image_shape = (14, 14)
     one_image_sky = SkyImage(image_shape)
     one_image_sky.combine_objects(sky_objects, sky_params, object_params)
+
+
+def test_make_different_images():
+
+    sky_params = {"noise_level": 0, "radius": 1.0, "amplitude": 1.0}
+    object_params = {"center_x": 14, "center_y": 14}
+
+    image_shape = (14, 14)
+    one_image_sky = SkyImage(image_shape, scale=False)
+    star_image = one_image_sky.combine_objects(["star"], sky_params, object_params)
+    galaxy_image = one_image_sky.combine_objects(["galaxy"], sky_params, object_params)
+
+    assert (star_image != galaxy_image).all()
+
+
+def test_make_the_same_things():
+
+    sky_params = {"noise_level": 0, "radius": 1.0, "amplitude": 1.0}
+    object_params = {"center_x": 14, "center_y": 14}
+
+    image_shape = (14, 14)
+    one_image_sky = SkyImage(image_shape, scale=True)
+    star_image = one_image_sky.combine_objects(["star"], sky_params, object_params)
+    galaxy_image = one_image_sky.combine_objects(["galaxy"], sky_params, object_params)
+
+    combined_image = star_image + galaxy_image
+    generated_combined_image = one_image_sky.combine_objects(
+        ["star", "galaxy"],
+        instance_params=[sky_params, sky_params],
+        object_params=[object_params, object_params],
+    )
+
+    assert (combined_image == generated_combined_image).all()

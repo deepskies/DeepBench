@@ -16,7 +16,7 @@ object_parameters: {
         alpha: 1.0
     },
       instance: {
-        noise: 0,
+        noise_level: 0,
         radius: 1.0,
         amplitude: 1.0
       }
