@@ -8,24 +8,24 @@ import numpy as np
 
 class StarObject(AstroObject):
     """
-    Create Stars
+       Create Stars
 
-    Args:
- image_dimensions (Union[int, float, List[int], List[float]]): The dimension(s) of the object to be produced.
-        radius (Union[int, float]): The radius of the object to be produced.
-        amplitude (Union[int, float]): The amplitude (brightness) of the object to be produced.
-        noise_level (Union[float, list[float]]): The Poisson noise level (lambda, the  expected seperation) to be applied to the object.
+       Args:
+    image_dimensions (Union[int, float, List[int], List[float]]): The dimension(s) of the object to be produced.
+           radius (Union[int, float]): The radius of the object to be produced.
+           amplitude (Union[int, float]): The amplitude (brightness) of the object to be produced.
+           noise_level (Union[float, list[float]]): The Poisson noise level (lambda, the  expected seperation) to be applied to the object.
 
-    Examples:
+       Examples:
 
-        >>> example_star = StarObject(image_dimensions=28, noise=5.0, center=3, radius=0.7, amplitude=1.2)
-        >>> example_star = StarObject(image_dimensions=(28,28), noise=5.0)
+           >>> example_star = StarObject(image_dimensions=28, noise=5.0, center=3, radius=0.7, amplitude=1.2)
+           >>> example_star = StarObject(image_dimensions=(28,28), noise=5.0)
     """
 
     def __init__(
         self,
         image_dimensions: Union[int, float, List[int], List[float]],
-        noise: Union[float, List[float]]=0.0,
+        noise_level: Union[float, List[float]] = 0.0,
         radius: Union[int, float] = 1.0,
         amplitude: Union[int, float] = 1.0,
     ) -> None:
@@ -34,7 +34,7 @@ class StarObject(AstroObject):
             image_dimensions=image_dimensions,
             radius=radius,
             amplitude=amplitude,
-            noise_level=noise,
+            noise_level=noise_level,
         )
 
     def create_Moffat_profile(

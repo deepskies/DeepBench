@@ -30,5 +30,24 @@ def test_spiral_galaxy_init():
 
 
 def test_star_init():
-    StarObject(image_dimensions=1, noise=1)
+    StarObject(image_dimensions=1, noise_level=1)
     assert issubclass(StarObject, AstroObject)
+
+
+def test_object_contains():
+
+    radius = 5
+    centerx = centery = 14
+    star = StarObject(image_dimensions=28, noise_level=0, radius=radius).create_object(
+        centerx, centery
+    )
+    galaxy = GalaxyObject(image_dimensions=28, noise_level=0).create_object(
+        centerx, centery
+    )
+    spiral = SpiralGalaxyObject(
+        image_dimensions=28, noise_level=0, radius=radius
+    ).create_object(centerx, centery)
+
+    assert (star != galaxy).all()
+    assert (star != spiral).all()
+    assert (galaxy != spiral).all()

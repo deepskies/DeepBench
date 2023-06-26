@@ -1,10 +1,17 @@
 from typing import Union
 from deepbench.image.image import Image
 from deepbench import astro_object
+import numpy as np
 
 
 class SkyImage(Image):
-    def __init__(self, image_shape, object_noise_level=0, object_noise_type="gaussian"):
+    def __init__(
+        self,
+        image_shape,
+        object_noise_level=0,
+        object_noise_type="gaussian",
+        scale=True,
+    ):
         """
         Create an image that is a composition of multiple astronomy objects
 
@@ -12,8 +19,10 @@ class SkyImage(Image):
             image_shape (tuple(int, int)): Shape of the output image
             object_noise_level (int, optional): Level of noise added to the full image. Defaults to 0.
             object_noise_type (str, optional): Type of noise added. Defaults to "gaussian".
+            scale (bool, optional): Scale objects between 0 and 1 before adding to the composition
 
         """
+        self.scale = scale
         assert len(image_shape) >= 2, "Image must be 2D or higher."
         super().__init__(image_shape, object_noise_type, object_noise_level)
 
@@ -23,7 +32,6 @@ class SkyImage(Image):
             "star": astro_object.star_object.StarObject,
             "galaxy": astro_object.galaxy_object.GalaxyObject,
             "spiral_galaxy": astro_object.spiral_galaxy.SpiralGalaxyObject,
-            "n_body": astro_object.n_body_object.NBodyObject,
         }
 
         if object_type not in astro_object_map.keys():
@@ -33,6 +41,11 @@ class SkyImage(Image):
             )
 
         return astro_object_map[object_type](**object_parameters)
+
+    def _scale(self, input_image):
+        image = input_image.copy()
+        image = (image - input_image.min()) / (input_image.max() - input_image.min())
+        return image
 
     def combine_objects(
         self,
@@ -63,7 +76,8 @@ class SkyImage(Image):
             ndarray : image with objects and noise
 
         """
-        image = self.create_empty_shape()
+        object_images = []
+
         if type(objects) == str:
             objects = [objects]
         if type(instance_params) == dict:
@@ -71,13 +85,25 @@ class SkyImage(Image):
         if type(object_params) == dict:
             object_params = [object_params]
 
-        for sky_object, sky_params in zip(objects, instance_params):
+        for sky_object, sky_params, object in zip(
+            objects, instance_params, object_params
+        ):
+            import matplotlib.pyplot as plt
+
             sky_params["image_dimensions"] = self.image_shape[0]
+            if "noise_level" not in sky_params:
+                sky_params["noise_level"] = 0
+
             additional_sky_object = self._generate_astro_object(sky_object, sky_params)
-            for object in object_params:
-                object_image = additional_sky_object.create_object(**object)
-                image += object_image
+
+            object_image = additional_sky_object.create_object(**object)
+            if self.scale:
+                object_image = self._scale(object_image)
+
+            object_images.append(object_image)
 
         noise = self.generate_noise(seed)
-        image += noise
+        object_images.append(noise)
+        image = np.sum(object_images, axis=0)
+
         return image
