@@ -29,6 +29,20 @@ def test_spiral_galaxy_init():
     assert issubclass(SpiralGalaxyObject, GalaxyObject)
 
 
+def test_spiral_galaxy_contents():
+    spiral = SpiralGalaxyObject(
+        image_dimensions=(100, 100),
+        radius=30,
+        winding_number=4,
+        spiral_pitch=0.8,
+        arm_thickness=5,
+        noise_level=0,
+    )
+    spiral = spiral.create_object(center_x=25, center_y=50)
+
+    assert spiral.sum(axis=-1).sum(axis=0) != 0.0
+
+
 def test_star_init():
     StarObject(image_dimensions=(1, 1), noise_level=1)
     assert issubclass(StarObject, AstroObject)
