@@ -1,10 +1,10 @@
 [tool.poetry]
 name = "DeepBench"
-version = "0.1.1"
+version = "0.2.0"
 description = "Physics Benchmark Dataset Generator"
 license = "Apache 2.0"
 authors = ["M. Voetberg <maggiev@fnal.gov>", "Ashia Livaudais", "Becky Nevin", "Omari Paul", "Brian Nord"]
-maintainers = ["Maggie Voetberg <maggiev@fnal.gov>"]
+maintainers = ["M. Voetberg <maggiev@fnal.gov>"]
 readme = "README.md"
 homepage = "https://github.com/deepskies/DeepBenchmark"
 repository = "https://github.com/deepskies/DeepBenchmark"
