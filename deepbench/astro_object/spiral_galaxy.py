@@ -12,9 +12,7 @@ class SpiralGalaxyObject(GalaxyObject):
         amplitude (Union[int, float]): The amplitude of the object to be produced, surface brightness at the sersic radius.
         noise_level (Union[float, list[float]]): The Poisson noise level to be applied to the object.
         radius (int, optional): Effective half-light radius of the galaxy. Defaults to 25.
-        n (float, optional): Sersic Index. Defaults to 1.0.
-        ellipse (float, optional): Galaxy Ellipticity. Defaults to random.uniform(0.1, 0.9).
-        theta (float, optional): The rotation of the galaxy in radians. Defaults to random.uniform(-1.5, 1.5).
+        arm_thickness (float, optional): Width of each arm of the spiral. Defaults to 1.0.
         winding_number (int, optional): number of arms. Defaults to 2.
         spiral_pitch (float, optional): Severity of the spiral, the pitch angle. Defaults to 0.2.
     Examples:
@@ -28,12 +26,11 @@ class SpiralGalaxyObject(GalaxyObject):
         image_dimensions: Union[Tuple[int, int], Tuple[float, float]],
         amplitude=1,
         radius=25,
-        n=1.0,
+        arm_thickness=1.0,
         noise_level=0.2,
-        ellipse=np.random.uniform(0.1, 0.9),
-        theta=np.random.uniform(-1.5, 1.5),
         winding_number: int = 2,
         spiral_pitch: float = 0.2,
+        **kwargs
     ):
         self.pitch_angle = spiral_pitch
         self.winding_number = winding_number
@@ -42,9 +39,9 @@ class SpiralGalaxyObject(GalaxyObject):
             image_dimensions=image_dimensions,
             amplitude=amplitude,
             radius=radius,
-            n=n,
-            ellipse=ellipse,
-            theta=theta,
+            n=arm_thickness,
+            ellipse=0.1,
+            theta=0.1,
             noise_level=noise_level,
         )
 
@@ -63,39 +60,34 @@ class SpiralGalaxyObject(GalaxyObject):
             spiral profile (numpy array): Profile representing the spiral galaxy
         """
 
-        pitch_angle = np.deg2rad(self.pitch_angle)
-
         # Define the grid
-        x, y = self.create_meshgrid()
+        side_length = self._image.shape
+        x = np.linspace(-side_length[0] / 2, side_length[0] / 2, side_length[0])
+        y = np.linspace(-side_length[1] / 2, side_length[1] / 2, side_length[1])
+        X, Y = np.meshgrid(x, y)
 
         # Calculate the distance from the center
-        R = np.sqrt(center_x**2 + center_y**2)
+        R = np.sqrt(X**2 + Y**2)  # + np.sqrt(center_x**2 + center_y**2)
 
         # Calculate the angle from the x-axis
-        theta = np.arctan2(y, x) + np.pi
+        theta = np.arctan2(Y, X) + np.pi
 
         # Create the spiral pattern
-        spiral = np.zeros_like(self._image)
-
+        spiral = np.zeros_like(R)
         for arm in range(self.winding_number):
             arm_angle = 2 * np.pi * arm / self.winding_number
             # Calculate logarithmic spiral
             r_spiral = ((self._radius * 2) / (2 * np.pi)) * np.exp(
-                (theta - arm_angle) / np.tan(pitch_angle)
+                (theta - arm_angle) / np.tan(self.pitch_angle)
             )
 
             # Calculate distance from each point to the spiral arm
             distance = np.abs(R - r_spiral)
 
             # Add arm intensity to the spiral pattern
-            spiral += self._amplitude * np.exp(
-                -(distance**2) / (2 * self._radius**2)
-            )
+            spiral += self._amplitude * np.exp(-(distance**2) / (2 * self._n**2))
 
-        # Add Poisson noise
-        profile = np.random.poisson(spiral * self._noise_level)
-
-        return profile
+        return spiral
 
     def create_object(self, center_x, center_y) -> np.ndarray:
         """
