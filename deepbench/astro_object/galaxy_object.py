@@ -22,6 +22,8 @@ class GalaxyObject(AstroObject):
         n (float, optional): Sersic Index. Defaults to 1.0.
         ellipse (float, optional): Galaxy Ellipticity. Defaults to random.uniform(0.1, 0.9).
         theta (float, optional): The rotation of the galaxy in radians. Defaults to random.uniform(-1.5, 1.5).
+                seed (Union[float, list[float]], optional): Seed to set the random state for noise in the object. Initialized at the init of the class. Default None.
+
     Examples:
 
         >>> example_galaxy = GalaxyObject(image_dimensions=28)
@@ -37,12 +39,14 @@ class GalaxyObject(AstroObject):
         noise_level=0.2,
         ellipse=random.uniform(0.1, 0.9),
         theta=random.uniform(-1.5, 1.5),
+        seed: Union[int, None] = None,
     ):
         super().__init__(
             image_dimensions=image_dimensions,
             radius=radius,
             amplitude=amplitude,
             noise_level=noise_level,
+            seed=seed,
         )
 
         self._n = n

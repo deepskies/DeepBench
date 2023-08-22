@@ -1,7 +1,6 @@
 from abc import ABC, abstractclassmethod, abstractmethod
 from typing import Union, List, Tuple
 from scipy import ndimage
-import numpy.random as rand
 import numpy as np
 
 
@@ -12,6 +11,7 @@ class AstroObject(ABC):
         radius (Union[int, float]): The radius of the object to be produced.
         amplitude (Union[int, float]): The amplitude (brightness) of the object to be produced.
         noise_level (Union[float, list[float]]): The Poisson noise level (lambda, the  expected seperation) to be applied to the object.
+        seed (Union[float, list[float]], optional): Seed to set the random state for noise in the object. Initialized at the init of the class. Default None.
 
     Examples:
 
@@ -25,12 +25,15 @@ class AstroObject(ABC):
         radius: Union[int, float],
         amplitude: Union[int, float],
         noise_level: Union[float, List[float]],
+        seed: Union[int, None] = None,
     ) -> None:
 
         self._image = np.zeros(image_dimensions)
         self._radius = radius
         self._amplitude = amplitude
         self._noise_level = noise_level
+
+        self.random_state = np.random.default_rng(seed=seed)
 
     @abstractmethod
     def create_object(self):
@@ -60,7 +63,7 @@ class AstroObject(ABC):
 
     # UPDATE THIS METHODS DOCSTRINGS.
 
-    def create_noise(self, seed=42, galaxy=False) -> np.ndarray:
+    def create_noise(self, galaxy=False) -> np.ndarray:
         """
         Creates the Poisson noise added to the object.
 
@@ -76,11 +79,11 @@ class AstroObject(ABC):
             >>> example_obj.create_noise(seed=5)
         """
         if galaxy:
-            rs = rand.RandomState(seed)
-            return rs.poisson(self._noise_level * 10.0, size=self._image.shape)
+            return self.random_state.poisson(
+                self._noise_level * 10.0, size=self._image.shape
+            )
         else:
-            rs = rand.RandomState(seed)
-            return rs.poisson(self._noise_level, size=self._image.shape)
+            return self.random_state.poisson(self._noise_level, size=self._image.shape)
 
     def create_meshgrid(self) -> np.ndarray:
         """
