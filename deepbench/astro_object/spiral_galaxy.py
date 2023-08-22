@@ -15,6 +15,8 @@ class SpiralGalaxyObject(GalaxyObject):
         arm_thickness (float, optional): Width of each arm of the spiral. Defaults to 1.0.
         winding_number (int, optional): number of arms. Defaults to 2.
         spiral_pitch (float, optional): Severity of the spiral, the pitch angle. Defaults to 0.2.
+                seed (Union[float, list[float]], optional): Seed to set the random state for noise in the object. Initialized at the init of the class. Default None.
+
     Examples:
 
         >>> example_galaxy = SpiralGalaxyObject(image_dimensions=(28,28), winding_number=4)
@@ -30,6 +32,7 @@ class SpiralGalaxyObject(GalaxyObject):
         noise_level=0.2,
         winding_number: int = 2,
         spiral_pitch: float = 0.2,
+        seed: Union[int, None] = None,
         **kwargs
     ):
         self.pitch_angle = spiral_pitch
@@ -43,6 +46,7 @@ class SpiralGalaxyObject(GalaxyObject):
             ellipse=0.1,
             theta=0.1,
             noise_level=noise_level,
+            seed=seed,
         )
 
     def create_spiral_profile(self, center_x, center_y):

@@ -15,6 +15,7 @@ class StarObject(AstroObject):
            radius (Union[int, float]): The radius of the object to be produced.
            amplitude (Union[int, float]): The amplitude (brightness) of the object to be produced.
            noise_level (Union[float, list[float]]): The Poisson noise level (lambda, the  expected seperation) to be applied to the object.
+        seed (Union[float, list[float]], optional): Seed to set the random state for noise in the object. Initialized at the init of the class. Default None.
 
        Examples:
 
@@ -28,6 +29,7 @@ class StarObject(AstroObject):
         noise_level: Union[float, List[float]] = 0.0,
         radius: Union[int, float] = 1.0,
         amplitude: Union[int, float] = 1.0,
+        seed: Union[int, None] = None,
     ) -> None:
 
         super().__init__(
@@ -35,6 +37,7 @@ class StarObject(AstroObject):
             radius=radius,
             amplitude=amplitude,
             noise_level=noise_level,
+            seed=seed,
         )
 
     def create_Moffat_profile(
