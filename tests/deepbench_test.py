@@ -2,7 +2,7 @@ from deepbench import __version__
 
 
 def test_version():
-    assert __version__ == "0.0.1"
+    assert __version__ == "0.2.01"
 
 
 def test_astroobj_module_import():
