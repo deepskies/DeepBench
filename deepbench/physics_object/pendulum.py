@@ -299,11 +299,11 @@ class Pendulum(PhysicsObject):
             pendulum_arm_length_values.any() > 0
         ), "f{pendulum_arm_length_values} not greater than zero"
         theta_time = starting_angle_values * np.cos(
-            np.sqrt(acceleration_values / pendulum_arm_length_values)
+            np.sqrt(acceleration_values / pendulum_arm_length_values) * time
         )
 
         # Calculate x using the modified parameters and time
-        return pendulum_arm_length_values * np.sin(theta_time * time)
+        return pendulum_arm_length_values * np.sin(theta_time)
 
     def displayObject(self, time: Union[float, np.array]):
         """
