@@ -173,12 +173,10 @@ class Pendulum(PhysicsObject):
             if verbose:
                 print("key", key, "attribute", attribute, "noise level", noise_level)
             if noise_level is not None:
-                print("attribute before", attribute)
                 attribute = rs.normal(
                     loc=attribute, scale=attribute * noise_level, size=n_steps
                 )
                 setattr(self, key, attribute)
-                print("resetting attribute", attribute)
         # Now, if this is the hierarchical case, we can redefine
         # the acceleration_due_to_gravity term
         if self._noise_level["acceleration_due_to_gravity"] is None:
