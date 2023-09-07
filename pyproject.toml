@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "DeepBench"
-version = "0.2.0"
+version = "0.2.1"
 description = "Physics Benchmark Dataset Generator"
 license = "Apache 2.0"
 authors = ["M. Voetberg <maggiev@fnal.gov>", "Ashia Livaudais", "Becky Nevin", "Omari Paul", "Brian Nord"]
