@@ -37,7 +37,7 @@ affiliations:
  - name: Laboratory for Nuclear Science, MIT, Cambridge MA, 02139-4307
    index: 4
 date: 23 June 2023
-bibliography: paper.bib
+bibliography: paper/paper.bib
 
 ---
 
