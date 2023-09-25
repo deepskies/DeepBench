@@ -16,6 +16,18 @@ Simulation library for very simple simulations to *benchmark* machine learning a
 2. A very simple data set will have objects, patterns, and signals that are intuitively quanitifiable and will be fast to generate.
 3. A very simple data set will be a great testing ground for new networks and for newcomers to practice with the technology.
 
+## Documentation
+
+#### Readthedocs link coming soon!!
+
+#### To build
+```
+pip install sphinx
+cd docs
+make html
+```
+
+The folder `docs/_build/html` will be populated with the documentation. Navigate to `file:///<Path To DeepBench>/docs/_build/html/index.html` in any web browser to view.
 
 ## Requirements
 * python = ">=3.8,<3.11,"

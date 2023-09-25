@@ -4,6 +4,9 @@
    contain the root `toctree` directive.
 
 Welcome to DeepBench's documentation!
+
+.. image:: repository_support/DeepSkies_Logos_DeepBench.png
+   :width: 800
 =====================================
 
 .. toctree::
@@ -16,6 +19,9 @@ Welcome to DeepBench's documentation!
    physics_object
    shapes
    example
+
+.. image:: repository_support/DeepBench.png
+   :width: 800
 
 Indices and tables
 ==================
