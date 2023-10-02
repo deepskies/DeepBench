@@ -1,0 +1,29 @@
+﻿deepbench.collection.collection
+===============================
+
+.. automodule:: deepbench.collection.collection
+
+
+
+
+
+
+
+
+
+
+
+   .. rubric:: Classes
+
+   .. autosummary::
+
+      Collection
+
+
+
+
+
+
+
+
+
