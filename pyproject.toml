@@ -4,11 +4,11 @@ version = "0.2.2"
 description = "Physics Benchmark Dataset Generator"
 license = "Apache 2.0"
 authors = ["M. Voetberg <maggiev@fnal.gov>", "Ashia Livaudais", "Becky Nevin", "Omari Paul", "Brian Nord"]
-maintainers = ["M. Voetberg <maggiev@fnal.gov>"]
+maintainers = ["M. Voetberg <maggiev@fnal.gov>", "Brian Nord <bnord@fnal.gov"]
 readme = "README.md"
-homepage = "https://github.com/deepskies/DeepBenchmark"
-repository = "https://github.com/deepskies/DeepBenchmark"
-documentation = "https://github.com/deepskies/DeepBenchmark/tree/main/docs"
+homepage = "https://github.com/deepskies/DeepBench"
+repository = "https://github.com/deepskies/DeepBench"
+documentation = "https://deepbench.readthedocs.io/en/latest/"
 
 [tool.poetry.dependencies]
 python = ">=3.8,<4.0,"
