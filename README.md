@@ -3,9 +3,6 @@
  [![PyPI version](https://badge.fury.io/py/deepbench.svg)](https://badge.fury.io/py/deepbench)
 
 
-
-![DeepBench Logo](docs/repository_support/DeepSkies_Logos_DeepBench.png)
-
 ### What is it?
 Simulation library for very simple simulations to *benchmark* machine learning algorithms.
 
