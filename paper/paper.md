@@ -86,7 +86,7 @@ The **DeepBench** software simulates data for analysis tasks that require precis
 
 # Primary Modules
 
-* Geometry objects: two-dimensional images generated with matplotlib `[@hunterMatplotlib2DGraphics2007b]`. The shapes include $_N_$-sided polygons, arcs, straight lines, and ellipses. They are solid, filled or unfilled two-dimensional shapes with edges of variable thickness.
+* Geometry objects: two-dimensional images generated with matplotlib `[@hunterMatplotlib2DGraphics2007b]`. The shapes include \_N\_-sided polygons, arcs, straight lines, and ellipses. They are solid, filled or unfilled two-dimensional shapes with edges of variable thickness.
 * Physics objects: one-dimensional profiles for two types of implementations of pendulums dynamics: one using Newtonian physics, the other using Hamiltonian.
 * Astronomy objects: two-dimensional images generated based on radial profiles of typical astronomical objects. The star object is created using the Moffat distribution provided by the AstroPy `[@theastropycollaborationAstropyCommunityPython2013a]` library. The spiral galaxy object is created with the function used to produce a logarithmic spiral `[@ringermacherNewFormulaDescribing2009a]`. The elliptical Galaxy object is created using the Sérsic profile provided by the AstroPy library. Two-dimensional models are representations of astronomical objects commonly found in data sets used for galaxy morphology classification.
 * Image: two-dimensional images  that are combinations and/or concatenations of Geometry or Astronomy objects. The combined images are within `matplotlib` meshgrid objects. Sky images are composed of any combination of Astronomy objects, while geometric images comprise individual geometric shape objects.
@@ -95,7 +95,7 @@ The **DeepBench** software simulates data for analysis tasks that require precis
 
 All objects also come with the option to add noise to each object.
 For Physics objects -- i.e., the pendulum -- the user may add Gaussian noise to parameters: initial angle $theta_0$, the pendulum length $L$, the gravitational acceleration $g$, the planet properties $\Phi = (M/r^2)$, and Newton's gravity constant $G$.
-Note that $ g = G * \Phi = G * M/r^2$: all parameters in that relationship can receive noise.
+Note that $g = G * \Phi = G * M/r^2$: all parameters in that relationship can receive noise.
 For Astronomy and Geometry Objects, which are images, the user can add Poisson or Gaussian noise to the output images.
 Finally, the user can regenerate the same noise using the saved random seed.
 
