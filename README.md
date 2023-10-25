@@ -15,7 +15,7 @@ Simulation library for very simple simulations to *benchmark* machine learning a
 
 #### [ReadTheDocs](https://deepbench.readthedocs.io/en/latest/)
 
-#### To build fron source
+#### To build from source
 ```
 pip install sphinx
 cd docs
