@@ -86,7 +86,7 @@ The **DeepBench** software simulates data for analysis tasks that require precis
 
 # Primary Modules 
 
-* Geometry objects: two-dimensional images generated with matplotlib `[@hunterMatplotlib2DGraphics2007b]`. The shapes include $_N_$-sided polygons, arcs, straight lines, and ellipses. They are solid, filled or unfilled two-dimensional shapes with edges of variable thickness.  
+* Geometry objects: two-dimensional images generated with matplotlib `[@hunterMatplotlib2DGraphics2007b]`. The shapes include $N$-sided polygons, arcs, straight lines, and ellipses. They are solid, filled or unfilled two-dimensional shapes with edges of variable thickness.  
 * Physics objects: one-dimensional profiles for two types of implementations of pendulums dynamics: one using Newtonian physics, the other using Hamiltonian. 
 * Astronomy objects: two-dimensional images generated based on radial profiles of typical astronomical objects. The star object is created using the Moffat distribution provided by the AstroPy `[@theastropycollaborationAstropyCommunityPython2013a]` library. The spiral galaxy object is created with the function used to produce a logarithmic spiral `[@ringermacherNewFormulaDescribing2009a]`. The elliptical Galaxy object is created using the Sérsic profile provided by the AstroPy library. Two-dimensional models are representations of astronomical objects commonly found in data sets used for galaxy morphology classification. 
 * Image: two-dimensional images  that are combinations and/or concatenations of Geometry or Astronomy objects. The combined images are within `matplotlib` meshgrid objects. Sky images are composed of any combination of Astronomy objects, while geometric images comprise individual geometric shape objects. 
