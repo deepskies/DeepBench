@@ -104,6 +104,7 @@ Finally, the user can regenerate the same noise using the saved random seed.
 
 ![Example outputs of **DeepBench**, containing shapes, astronomy objects, and the two pendulum implementations. Variants include a single object, a noisy single object, two objects, and two noisy objects. Pendulums show noisy and non-noisy variants of the Newtonian (left) and Hamiltonian (right) mathematical simulations.](figures/example_objects.png)
 
+![Example physics simulations from **DeepBench**. Pendulums show noisy and non-noisy variants of the Newtonian (left) and Hamiltonian (right) mathematical simulations.](figures/pendulums.png)
 
 # Acknowledgements
 
@@ -117,5 +118,4 @@ We acknowledge the Deep Skies Lab as a community of multi-domain experts and col
 
 
 # References
-% current bib file: Proj-DeepBench.bib
 
