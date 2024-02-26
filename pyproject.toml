@@ -4,11 +4,11 @@ version = "0.2.2"
 description = "Physics Benchmark Dataset Generator"
 license = "Apache 2.0"
 authors = ["M. Voetberg <maggiev@fnal.gov>", "Ashia Livaudais", "Becky Nevin", "Omari Paul", "Brian Nord"]
-maintainers = ["M. Voetberg <maggiev@fnal.gov>"]
+maintainers = ["M. Voetberg <maggiev@fnal.gov>", "Brian Nord <bnord@fnal.gov"]
 readme = "README.md"
-homepage = "https://github.com/deepskies/DeepBenchmark"
-repository = "https://github.com/deepskies/DeepBenchmark"
-documentation = "https://github.com/deepskies/DeepBenchmark/tree/main/docs"
+homepage = "https://github.com/deepskies/DeepBench"
+repository = "https://github.com/deepskies/DeepBench"
+documentation = "https://deepbench.readthedocs.io/en/latest/"
 
 [tool.poetry.dependencies]
 python = ">=3.8,<4.0,"
@@ -20,16 +20,12 @@ autograd = "^1.5"
 pyyaml = "^6.0"
 h5py = ">=3.9.0"
 
-
-[tool.poetry.dev-dependencies]
-pytest-cov = "^4.0.0"
-pytest = "^7.3.1"
-pre-commit = "^3.2.2"
-
-
 [tool.poetry.group.dev.dependencies]
 sphinx = "^7.0.1"
 sphinx-autodoc-typehints = "^1.23.2"
+pytest-cov = "^4.0.0"
+pytest = "^7.3.1"
+pre-commit = "^3.2.2"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

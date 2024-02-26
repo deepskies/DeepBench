@@ -1,12 +1,10 @@
 ![GitHub Workflow Status](https://github.com/deepskies/DeepBench/actions/workflows/test-bench.yml/badge.svg?label=test)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
  [![PyPI version](https://badge.fury.io/py/deepbench.svg)](https://badge.fury.io/py/deepbench)
-
+[![Documentation Status](https://readthedocs.org/projects/deepbench/badge/?version=latest)](https://deepbench.readthedocs.io/en/latest/?badge=latest)
 
 ### What is it?
 Simulation library for very simple simulations to *benchmark* machine learning algorithms.
-
-
 
 ### Why do we need it? Why is it useful?
 1. There are very universally recognized scientifically meaningful benchmark data sets, or methods with which to generate them.
@@ -15,9 +13,9 @@ Simulation library for very simple simulations to *benchmark* machine learning a
 
 ## Documentation
 
-#### Readthedocs link coming soon!!
+#### [ReadTheDocs](https://deepbench.readthedocs.io/en/latest/)
 
-#### To build
+#### To build from source
 ```
 pip install sphinx
 cd docs
