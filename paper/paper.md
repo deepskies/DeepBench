@@ -97,7 +97,7 @@ All objects also come with the option to add noise to each object. For Physics o
 
 # Example Outputs 
 
-![Example outputs of **DeepBench**, containing shapes, astronomy objects, and the two pendulum implementations. Variants include a single object, a noisy single object, two objects, and two noisy objects. Pendulums show noisy and non-noisy variants of the Newtonian (left) and Hamiltonian (right) mathematical simulations.](figures/example_objects.png)
+![Example outputs of **DeepBench**, containing shapes, and astronomy objects. Variants include a single object, a noisy single object, two objects, and two noisy objects.](figures/example_objects.png)
 
 ![Example physics simulations from **DeepBench**. Pendulums show noisy and non-noisy variants of the Newtonian (left) and Hamiltonian (right) mathematical simulations.](figures/pendulums.png)
 
