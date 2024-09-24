@@ -8,7 +8,7 @@ Simulation library for very simple simulations to *benchmark* machine learning a
 
 ### Why do we need it? Why is it useful?
 1. There are very universally recognized scientifically meaningful benchmark data sets, or methods with which to generate them.
-2. A very simple data set will have objects, patterns, and signals that are intuitively quanitifiable and will be fast to generate.
+2. A very simple data set will have objects, patterns, and signals that are intuitively quantifiable and will be fast to generate.
 3. A very simple data set will be a great testing ground for new networks and for newcomers to practice with the technology.
 
 ## Documentation
@@ -68,7 +68,7 @@ poetry run pytest --cov
 - Rectangle, Regular Polygon, Arc, Line, Ellipse
 
 3. Physics Objects - simple physics simulations
-- Neutonian Pendulum, Hamiltonian Pendulum
+- Newtonian Pendulum, Hamiltonian Pendulum
 
 ## Example
 
@@ -89,16 +89,19 @@ configuration = {
 		"acceleration_due_to_gravity": 9.8,
 		"noise_std_percent":{
 			"acceleration_due_to_gravity": 0
-	},
-	"object_parameters":{
-		"time": np.linspace(0, 1, 10)
-	}
+        }
+    },
+    "object_parameters":{
+        "time": np.linspace(0, 1, 10)
+    }
 }
 
-phy_objects = Collection(configuration)()
+phy_objects = Collection(configuration)
+
+phy_objects()
 
 objects = phy_objects.objects
-parameters = phy_objects.object_parameters
+parameters = phy_objects.object_params
 ```
 
 * Produce a noisy shape image with a rectangle and an arc
@@ -110,40 +113,37 @@ from deepbench.collection import Collection
 configuration = {
 	"object_type": "shape",
 	"object_name": "ShapeImage",
-
 	"total_runs": 1,
 	"image_parameters": {
 		"image_shape": (28, 28),
 		"object_noise_level": 0.6
 	},
-
 	"object_parameters": {
-		[
-		"rectangle": {
-			"object": {
-				"width": np.random.default_rng().integers(2, 28),
-				"height": np.random.default_rng().integers(2, 28),
-				"fill": True
-			},
-			"instance": {}
-		},
-		"arc":{
-			"object": {
-				"radius": np.random.default_rng().integers(2, 28),
-				"theta1":np.random.default_rng().integers(0, 20),
-				"theta2":np.random.default_rng().integers(21, 180)
-			},
-			"instance":{}
-		}
 
-		]
-	}
+        "rectangle":{
+            "object": {
+                "width": np.random.default_rng().integers(2, 28),
+                "height": np.random.default_rng().integers(2, 28),
+                "fill": True
+            },
+            "instance": {}
+        },
+        "arc":{
+            "object": {
+                "radius": np.random.default_rng().integers(2, 28),
+                "theta1":np.random.default_rng().integers(0, 20),
+                "theta2":np.random.default_rng().integers(21, 180)
+            },
+            "instance":{}
+        }
+    }
 }
 
-shape_image = Collection(configuration)()
+shape_image = Collection(configuration)
+shape_image()
 
 objects = shape_image.objects
-parameters = shape_image.object_parameters
+parameters = shape_image.object_params
 ```
 
 
@@ -155,7 +155,7 @@ import numpy as np
 
 star = StarObject(
         image_dimensions = (28,28),
-        noise = 0.3,
+        noise_level = 0.3,
         radius= 0.8,
         amplitude = 1.0
     )
@@ -163,7 +163,8 @@ star = StarObject(
 generated_stars = []
 x_position, y_position = np.random.default_rng().uniform(low=1, high=27, size=(2, 50))
 for x_pos, y_pos in zip(x_position, y_position):
-	generated-stars.append(star.create_object(x_pos, y_pos))
+	star_object = star.create_object(x_pos, y_pos)
+	generated_stars.append(star_object)
 ```
 
 
