@@ -12,7 +12,7 @@ def test_patch_conversion_defaults():
         image=simple_patch
     )
     expected_obj_type = np.array([0, 0])
-    assert type(converted_object) == type(expected_obj_type)
+    assert isinstance(converted_object, type(expected_obj_type))
 
 
 def test_patch_conversion_default_dimensions():
@@ -202,7 +202,7 @@ def test_polygon_positive_oob_angle():
     triangle_rotated = ShapeGenerator().create_regular_polygon(angle=angle + 360)
     triangle_non_rotated = ShapeGenerator().create_regular_polygon(angle=angle)
 
-    assert (triangle_rotated.all(), triangle_non_rotated.all())
+    assert triangle_rotated.all() == triangle_non_rotated.all()
 
 
 def test_polygon_negative_oob_angle():
@@ -210,7 +210,7 @@ def test_polygon_negative_oob_angle():
     triangle_rotated = ShapeGenerator().create_regular_polygon(angle=angle - 360)
     triangle_non_rotated = ShapeGenerator().create_regular_polygon(angle=angle)
 
-    assert (triangle_rotated.all(), triangle_non_rotated.all())
+    assert triangle_rotated.all() == triangle_non_rotated.all()
 
 
 def test_polygon_negative_vertices():
@@ -223,8 +223,8 @@ def test_arc_default():
 
     x, y = arc.shape
     expected_x, expected_y = (28, 28)
-    assert (x, expected_x)
-    assert (y, expected_y)
+    assert x == expected_x
+    assert y == expected_y
 
 
 def test_arc_size_center_dim_mismatch():
@@ -253,7 +253,7 @@ def test_arc_oob_negative_theta2():
     arc_rotated = ShapeGenerator().create_arc(theta2=angle - 360)
     arc_non_rotated = ShapeGenerator().create_arc(theta2=angle)
 
-    assert (arc_rotated.all(), arc_non_rotated.all())
+    assert arc_rotated.all() == arc_non_rotated.all()
 
 
 def test_arc_oob_positive_theta2():
@@ -261,7 +261,7 @@ def test_arc_oob_positive_theta2():
     arc_rotated = ShapeGenerator().create_arc(theta2=angle + 360)
     arc_non_rotated = ShapeGenerator().create_arc(theta2=angle)
 
-    assert (arc_rotated.all(), arc_non_rotated.all())
+    assert arc_rotated.all() == arc_non_rotated.all()
 
 
 def test_arc_oob_width():
@@ -283,11 +283,11 @@ def test_line_defaults():
     assert y == expected_y
 
     # Bottom left top right are black. Opposite are white
-    assert (1.0 == line[1, 2], "line start incorrect")
-    assert (1.0 == line[26, 27], "line end incorrect")
+    assert 1.0 == line[1, 2], "line start incorrect"
+    assert 1.0 == line[26, 27], "line end incorrect"
 
-    assert (0.0 == line[1, 27], "line corner incorrect")
-    assert (0.0 == line[27, 1], "line corner incorrect")
+    assert 0.0 == line[1, 27], "line corner incorrect"
+    assert 0.0 == line[27, 1], "line corner incorrect"
 
 
 def test_line_size_start_dim_mismatch():
