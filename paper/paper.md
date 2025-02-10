@@ -10,11 +10,11 @@ authors:
   - name: M. Voetberg
     orcid: 0009-0005-2715-4709
     equal-contrib: true
-    affiliation: "1" 
-  - name: Ashia Livaudais 
+    affiliation: "1"
+  - name: Ashia Livaudais
     orcid: 0000-0003-3734-335X
     equal-contrib: true
-    affiliation: "1" 
+    affiliation: "1"
   - name: Becky Nevin
     orcid: 0000-0003-1056-8401
     equal-contrib: false
@@ -53,7 +53,7 @@ On the other hand, complex physics simulations (e.g., cosmological _N_-body simu
 
 The physical sciences community lacks sufficient datasets and software packages as benchmarks for the development of statistical and machine learning models.  In particular, there currently does not exist simulation software packages that generates data underpinned by physical principles and that satisfies the following criteria:
 
-* multi-domain 
+* multi-domain
 * multi-purpose
 * fast
 * reproducible
@@ -70,7 +70,7 @@ First, benchmark datasets of natural images include MNIST [@dengMnistDatabaseHan
 
 
 
-# DeepBench
+# DeepBench Software
 
 The **DeepBench** software package simulates data for analysis tasks that require precise numerical calculations. First, the simulation models are fundamentally mechanistic: they are based on relatively simple analytic mathematical expressions, which are physically meaningful. This means that for each model, the number of input parameters that determine a simulation output is small (<10 for most models). These elements make the software package fast and the outputs interpretable: they are conceptually and mathematically relatable to the inputs. Second, **DeepBench** also includes methods to precisely prescribe noise for inputs, which are propagated to outputs. This permits studies and the development of statistical inference models that require uncertainty quantification, which is a significant challenge in modern machine learning research. Third, the software framework includes features that permit a high degree of reproducibility: e.g., random seeds at every key stage of input, a unique identification tag for each simulation run, and the tracking and storage of metadata (including input parameters) and the related outputs. Fourth, the primary user interface is a YAML configuration file, which allows the user to specify every aspect of the simulation: e.g., types of objects, numbers of objects, noise type, and number of classes. This feature---which is especially useful when building and studying complex models like deep learning neural networks---permits the user to incrementally decrease or increase the complexity of the simulation with a high level of granularity.
 
@@ -87,23 +87,22 @@ The **DeepBench** software package simulates data for analysis tasks that requir
 * Readily extensible to new physics and outputs
 
 
-# Primary Modules 
+# Primary Modules
 
-* Geometry objects: two-dimensional images generated with `matplotlib` [@hunterMatplotlib2DGraphics2007b]. The shapes include _n_-sided polygons, arcs, straight lines, and ellipses. They are solid, filled, or unfilled two-dimensional shapes with edges of variable thickness.  
-* Physics objects: one-dimensional profiles for two types of implementations of pendulum dynamics: one using Newtonian physics, the other using Hamiltonian physics.
-* Astronomy objects: two-dimensional images generated based on radial profiles of typical astronomical objects. The star object is created using the Moffat distribution provided by the Astropy [@theastropycollaborationAstropyCommunityPython2013a] library. The spiral galaxy object is created with the function used to produce a logarithmic spiral [@ringermacherNewFormulaDescribing2009a]. The elliptical galaxy object is created using the Sérsic profile provided by the Astropy library. Two-dimensional models are representations of astronomical objects commonly found in datasets used for galaxy morphology classification. 
-* Image: two-dimensional images  that are combinations and/or concatenations of geometry or astronomy objects. The combined images are stored within `matplotlib` meshgrid objects. Sky images are composed of any combination of astronomy objects, while geometric images comprise individual geometric shape objects. 
-* Collection: provides a framework for producing module images or objects at once and storing all parameters that were included in their generation, including exact noise levels, object hyper-parameters, and non-specified defaults. 
-
+* Geometry objects: two-dimensional images generated with `matplotlib` [@hunterMatplotlib2DGraphics2007b]. The shapes include $N$-sided polygons, arcs, straight lines, and ellipses. They are solid, filled or unfilled two-dimensional shapes with edges of variable thickness.
+* Physics objects: one-dimensional profiles for two types of implementations of pendulum dynamics: one using Newtonian physics, the other using Hamiltonian.
+* Astronomy objects: two-dimensional images generated based on radial profiles of typical astronomical objects. The star object is created using the Moffat distribution provided by the AstroPy [@theastropycollaborationAstropyCommunityPython2013a] library. The spiral galaxy object is created with the function used to produce a logarithmic spiral [@ringermacherNewFormulaDescribing2009a]. The elliptical Galaxy object is created using the Sérsic profile provided by the AstroPy library. Two-dimensional models are representations of astronomical objects commonly found in data sets used for galaxy morphology classification.
+* Image: two-dimensional images  that are combinations and/or concatenations of Geometry or Astronomy objects. The combined images are within `matplotlib` meshgrid objects. Sky images are composed of any combination of Astronomy objects, while geometric images comprise individual geometric shape objects.
+* Collection: Provides a framework for producing module images or objects at once and storing all parameters that were included in their generation, including exact noise levels, object hyper-parameters, and non-specified defaults.
 
 All objects also come with the option to add noise to each object. For physics objects---i.e., the pendulum---the user may add Gaussian noise to parameters: initial angle $\theta_0$, the pendulum length $L$, the gravitational acceleration $g$, the planet properties $\Phi = (M/r^2)$, and Newton's gravity constant $G$. Note that $g = G * \Phi = G * M/r^2$: all parameters in this relationship can receive noise. For astronomy and geometry Objects, which are images, the user can add Poisson or Gaussian noise to the output images. Finally, the user can regenerate the same noise using the saved random seed.
 
 
-# Example Outputs 
+# Example Outputs
 
-![Example outputs of **DeepBench**, containing shapes, and astronomy objects. Variants include a single object, a noisy single object, two objects, and two noisy objects.](figures/example_objects.png)
+![Example outputs of **DeepBench**, containing geometric and astronomy objects. Variants include a single object, a noisy single object, two objects, and two noisy objects. The geometric outputs are produced with filled ellipses and outlined rectangles, with a gaussian noise overlay for the noisy variants. The astronomy outputs feature a star and an elliptical galaxy profile with similarly applied noise.](figures/example_objects.png)
 
-![Example physics simulations from **DeepBench**. Pendulums show noisy and non-noisy variants of the Newtonian (left) and Hamiltonian (right) mathematical simulations.](figures/pendulums.png)
+![Example physics simulations from **DeepBench**. Pendulums show noisy and noiseless variants of the Newtonian (left) and Hamiltonian (right) mathematical simulations. Both use initial conditions of an arm length of 10 meters and a starting angle of $\pi/4$. The noisy variants introduce uncertainty to these input parameters, along with the measurement of acceleration due to gravity.](figures/pendulums.png)
 
 
 # Acknowledgments

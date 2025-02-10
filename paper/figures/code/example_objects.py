@@ -1,5 +1,4 @@
 from deepbench.image import SkyImage, ShapeImage
-from deepbench.physics_object import HamiltonianPendulum, Pendulum
 import matplotlib.pyplot as plt
 import numpy as np
 
