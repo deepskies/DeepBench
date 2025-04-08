@@ -11,13 +11,13 @@ repository = "https://github.com/deepskies/DeepBench"
 documentation = "https://deepbench.readthedocs.io/en/latest/"
 
 [tool.poetry.dependencies]
-python = ">=3.10,<4.0,"
-numpy = "^1.25.0"
-matplotlib = "^3.7.1"
+python = ">=3.12,<4.0,"
+numpy = ">=1.25.0"
+matplotlib = ">=3.7.1"
 scikit-image = "^0.23.0"
-astropy = "^5.2.2"
-autograd = "^1.5"
-pyyaml = "^6.0"
+astropy = ">=7.0.0"
+autograd = ">=1.5"
+pyyaml = ">=6.0"
 h5py = ">=3.9.0"
 
 [tool.poetry.group.dev.dependencies]

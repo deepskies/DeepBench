@@ -1,7 +1,7 @@
 ![GitHub Workflow Status](https://github.com/deepskies/DeepBench/actions/workflows/test-bench.yml/badge.svg?label=test)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![PyPI version](https://badge.fury.io/py/deepbench.svg)](https://badge.fury.io/py/deepbench)
-[![Documentation Status](https://readthedocs.org/projects/deepbench/badge/?version=latest)](https://deepbench.readthedocs.io/en/latest/?badge=latest)
+[![documentation](https://github.com/deepskies/DeepBench/actions/workflows/build-docs.yml/badge.svg)](https://github.com/deepskies/DeepBench/actions/workflows/build-docs.yml)
 [![status](https://joss.theoj.org/papers/300762982613649881f8b6a08dabd33e/status.svg)](https://joss.theoj.org/papers/300762982613649881f8b6a08dabd33e)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.14845251.svg)](https://doi.org/10.5281/zenodo.14845251)
 
@@ -16,7 +16,7 @@ Simulation library for very simple simulations to *benchmark* machine learning a
 
 ## Documentation
 
-#### [ReadTheDocs](https://deepbench.readthedocs.io/en/latest/)
+#### [Docs Page](https://deepskies.github.io/DeepBench/)
 
 #### To build from source
 ```
@@ -28,14 +28,14 @@ make html
 The folder `docs/_build/html` will be populated with the documentation. Navigate to `file:///<Path To DeepBench>/docs/_build/html/index.html` in any web browser to view.
 
 ## Requirements
-* python = ">=3.8,<3.11,"
-* numpy = "^1.24.3"
-* matplotlib = "^3.7.1"
-* scikit-image = "^0.20.0"
-* astropy = "^5.2.2"
-* autograd = "^1.5"
-* pyyaml = "^6.0"
-
+python = ">=3.12,<4.0,"
+numpy = ">=1.25.0"
+matplotlib = ">=3.7.1"
+scikit-image = "^0.23.0"
+astropy = ">=7.0.0"
+autograd = ">=1.5"
+pyyaml = ">=6.0"
+h5py = ">=3.9.0"
 
 
 ## Install
@@ -50,7 +50,6 @@ pip install deepbench
 ```
 git clone https://github.com/deepskies/DeepBench.git
 pip install poetry
-poetry shell
 poetry install
 poetry run pytest --cov
 ```
